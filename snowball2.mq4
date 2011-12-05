@@ -45,7 +45,7 @@ extern string sound_grid_step = "";
 extern string sound_order_triggered = "";
 extern string sound_stop_all = "";
 
-string name = "snow2_";
+string name = "sno2_";
 
 double pip;
 double points_per_pip;
