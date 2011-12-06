@@ -1,5 +1,5 @@
 //+----------------------------------------------------------------------------------+
-//|                                   Copyright © 2010, Bernd Kreuss, Andrea Maldini |
+//|                        Copyright © 2010, Bernd Kreuss, Andrea Maldini            |
 //|                        PayPal donations go here -> 7bit@arcor.de                 |
 //+----------------------------------------------------------------------------------+
 #property copyright "© Bernd Kreuss, Version 2010.6.11.1 - Andrea Maldini November 2011"
