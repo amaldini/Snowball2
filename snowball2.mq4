@@ -511,28 +511,35 @@ void resume(){
 
 void checkLines(){
    if (crossedLine("stop")){
+      maldaLog("Crossed line 'stop'");
       stop();
    }
    if (crossedLine("pause")){
+      maldaLog("Crossed line 'pause'");
       pause();
    }
    if (crossedLine("start long")){
+      maldaLog("Crossed line 'start long'");
       go(LONG);
    }
    if (crossedLine("start short")){
+      maldaLog("Crossed line 'start short'");
       go(SHORT);
    }
    if (crossedLine("start bidir")){
+      maldaLog("Crossed line 'start bidir'");
       go(BIDIR);
    }   
    
    if (crossedLine("long")) {
+      maldaLog("Crossed line 'long'");
       if (running) stop();
       start_immediately = true;
       go(LONG);
    }
    
    if (crossedLine("short")) {
+      maldaLog("Crossed line 'short'");
       if (running) stop();
       start_immediately = true;
       go(SHORT);
