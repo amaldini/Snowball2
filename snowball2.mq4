@@ -14,23 +14,31 @@ extern double lots = 0.01; // lots to use per trade
 extern int stop_distance = 20;
 extern int min_stop_distance = 10;
 extern bool dynamicStopDistance = false;
+////////////////////////////////////////
 extern double profit_target = 0;
 extern int auto_tp = 2; // auto-takeprofit this many levels (roughly) above the BE point
 extern bool stopWhenAutoTP=true;
+////////////////////////////////////////
 extern bool useBreakEven=true;
 extern double breakEvenOffset=2;
+////////////////////////////////////////
 extern bool breakoutMode=false;
 extern int breakoutBars=25;
 extern bool breakoutBiDir=true;
+////////////////////////////////////////
 extern bool useMA=false;
 extern bool useMAEntry=false;
-
+////////////////////////////////////////
 extern int exitBars=3;
 extern int exitBarsLevel=2;
 extern bool exitBarsHeikenAshi=true;
-
+////////////////////////////////////////
 extern bool useDailyCycle=false;
-
+////////////////////////////////////////
+extern bool    BREAKEVEN=true;
+extern double  BREAKEVEN_ARM_PIPS=5;
+extern double  BREAKEVEN_EXECUTE_PIPS=2;
+////////////////////////////////////////
 extern bool is_ecn_broker = false; // different market order procedure when resuming after pause
 
 
@@ -230,6 +238,7 @@ void onTick(){
    info(); // calcola lastFloating
    checkAutoTP();
    checkStopToBreakEven();
+   checkBreakEven2();
    checkProfitTarget(); // usa lastFloating
    checkExitBars();
    checkMA();
@@ -239,6 +248,75 @@ void onTick(){
       plotNewClosedTrades(magic);
    }
    checkForStopReduction();
+}
+
+void checkBreakEven2() {
+   static double maxPrice = 0;
+   static bool armed = false;
+   if (!BREAKEVEN) return;
+   if (level>0) {
+      if (Bid>maxPrice) maxPrice = Bid;
+   } else if (level<0) {
+      if (Ask<maxPrice) maxPrice = Ask;   
+   } else {
+      return;
+   }  
+   
+   int total = OrdersTotal();
+   
+   bool doCycle = true;
+   while (doCycle) {
+      doCycle = false;
+      for (int cnt = 0; cnt < total; cnt++) {      
+         OrderSelect(cnt, SELECT_BY_POS, MODE_TRADES);
+         if (isMyOrder(magic)) {
+               int type = OrderType();
+   
+               double orderPrice; // lo calcolo in base allo stoploss perché dopo un resume 
+                                  // i prezzi sono tutti uguali mentre gli stop loss sono diversi  
+        
+               bool isToClose = false;
+               int clr;
+               if (armed) {     
+                  if (type == OP_BUY){
+                     orderPrice = OrderStopLoss()+ pip * (stop_distance+BREAKEVEN_EXECUTE_PIPS);
+                     clr = CLR_SELL_ARROW;
+                     if (orderPrice>=Bid) isToClose = true;
+                  }
+        
+                  if (type == OP_SELL){
+                     orderPrice = OrderStopLoss()- pip * (stop_distance+BREAKEVEN_EXECUTE_PIPS);
+                     clr = CLR_BUY_ARROW;
+                     if (orderPrice<=Ask) isToClose = true;
+                  }
+               } else {
+                  if (type == OP_BUY){
+                     orderPrice = OrderStopLoss()+ pip * (stop_distance+BREAKEVEN_ARM_PIPS);
+                     clr = CLR_SELL_ARROW;
+                     if (orderPrice>=Bid) armed = true;
+                  }
+        
+                  if (type == OP_SELL){
+                     orderPrice = OrderStopLoss()- pip * (stop_distance+BREAKEVEN_ARM_PIPS);
+                     clr = CLR_BUY_ARROW;
+                     if (orderPrice<=Ask) armed = true;
+                  }
+                  if (armed) maldaLog("BreakEven armed..."); 
+                  return;
+               }
+            
+               if (isToClose) {
+                  maldaLog("Close order "+OrderTicket()+" at BreakEven: "+orderPrice);
+                  orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, clr);
+                  maxPrice = 0; // <== verrà ricalcolato successivamente
+                  armed = 0;
+                  doCycle=true;
+                  break; // cycle again starting from 0 (HELLO FIFO!)
+               }
+            }
+         }
+   }
+
 }
 
 void onOpen(){
