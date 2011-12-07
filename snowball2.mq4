@@ -306,7 +306,7 @@ void checkBreakEven2() {
                }
             
                if (isToClose) {
-                  maldaLog("Close order "+OrderTicket()+" at BreakEven: "+orderPrice);
+                  maldaLog("BE2: Close order "+OrderTicket()+" at BreakEven: "+orderPrice);
                   orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, clr);
                   maxPrice = 0; // <== verrà ricalcolato successivamente
                   armed = 0;
