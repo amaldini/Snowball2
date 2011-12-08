@@ -251,14 +251,10 @@ void onTick(){
 }
 
 void checkBreakEven2() {
-   static double maxPrice = 0;
    static bool armed = false;
    if (!BREAKEVEN) return;
-   if (level>0) {
-      if (Bid>maxPrice) maxPrice = Bid;
-   } else if (level<0) {
-      if (Ask<maxPrice) maxPrice = Ask;   
-   } else {
+   if (level==0) {
+      armed=false;
       return;
    }  
    
@@ -309,8 +305,7 @@ void checkBreakEven2() {
                if (isToClose) {
                   maldaLog("BE2: Close order "+OrderTicket()+" at BreakEven: "+orderPrice);
                   orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, clr);
-                  maxPrice = 0; // <== verrà ricalcolato successivamente
-                  armed = 0;
+                  armed = false;
                   doCycle=true;
                   break; // cycle again starting from 0 (HELLO FIFO!)
                }
