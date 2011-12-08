@@ -37,7 +37,7 @@ extern bool useDailyCycle=false;
 ////////////////////////////////////////
 extern bool    BREAKEVEN=true;
 extern double  BREAKEVEN_ARM_PIPS=5;
-extern double  BREAKEVEN_EXECUTE_PIPS=2;
+extern double  BREAKEVEN_EXECUTE_PIPS=-5;
 ////////////////////////////////////////
 extern bool is_ecn_broker = false; // different market order procedure when resuming after pause
 
