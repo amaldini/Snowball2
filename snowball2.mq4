@@ -251,12 +251,25 @@ void onTick(){
 }
 
 void checkBreakEven2() {
-   static bool armed = false;
-   if (!BREAKEVEN) return;
+   
+   
+   // TODO: armed é da calcolare al volo per ogni trade (non mettere in variabile statica)
+   //       in base al massimo / minimo prezzo raggiunto.
+   //       
+   #define VERYBIG 10000000
+   static double maxPrice=0;
+   static double minPrice=VERYBIG;
+   
    if (level==0) {
-      armed=false;
+      maxPrice=0;
+      minPrice=VERYBIG;     
       return;
-   }  
+   } else {
+      if (Bid>maxPrice) maxPrice=Bid;
+      if (Ask<minPrice) minPrice=Ask;
+   }
+   
+   if (!BREAKEVEN) return;
    
    int total = OrdersTotal();
    
@@ -267,12 +280,29 @@ void checkBreakEven2() {
          OrderSelect(cnt, SELECT_BY_POS, MODE_TRADES);
          if (isMyOrder(magic)) {
                int type = OrderType();
+               int clr;
+               
+               bool armed = false;
+               double armPrice;
+               
+               if (type == OP_BUY){
+                  armPrice = OrderStopLoss()+ pip * (stop_distance+BREAKEVEN_ARM_PIPS);
+                  clr = CLR_SELL_ARROW;
+                  if (armPrice<=maxPrice) armed = true;
+               }
+        
+               if (type == OP_SELL){
+                  armPrice = OrderStopLoss()- pip * (stop_distance+BREAKEVEN_ARM_PIPS);
+                  clr = CLR_BUY_ARROW;
+                  if (armPrice>=minPrice) armed = true;
+               }
+               if (armed) maldaLog("BreakEven armed..."); 
    
                double orderPrice; // lo calcolo in base allo stoploss perché dopo un resume 
                                   // i prezzi sono tutti uguali mentre gli stop loss sono diversi  
         
                bool isToClose = false;
-               int clr;
+               
                if (armed) {     
                   if (type == OP_BUY){
                      orderPrice = OrderStopLoss()+ pip * (stop_distance+BREAKEVEN_EXECUTE_PIPS);
@@ -285,27 +315,17 @@ void checkBreakEven2() {
                      clr = CLR_BUY_ARROW;
                      if (orderPrice<=Ask) isToClose = true;
                   }
-               } else {
-                  double armPrice;
-                  if (type == OP_BUY){
-                     armPrice = OrderStopLoss()+ pip * (stop_distance+BREAKEVEN_ARM_PIPS);
-                     clr = CLR_SELL_ARROW;
-                     if (armPrice<=Bid) armed = true;
-                  }
-        
-                  if (type == OP_SELL){
-                     armPrice = OrderStopLoss()- pip * (stop_distance+BREAKEVEN_ARM_PIPS);
-                     clr = CLR_BUY_ARROW;
-                     if (armPrice>=Ask) armed = true;
-                  }
-                  if (armed) maldaLog("BreakEven armed..."); 
-                  return;
                }
             
                if (isToClose) {
                   maldaLog("BE2: Close order "+OrderTicket()+" at BreakEven: "+orderPrice);
                   orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, clr);
-                  armed = false;
+                  
+                  // quando si esegue una chiusura per breakeven,
+                  // il massimo/minimo prezzo raggiunto si imposta=al prezzo corrente
+                  maxPrice=Bid;
+                  minPrice=Ask;
+                  
                   doCycle=true;
                   break; // cycle again starting from 0 (HELLO FIFO!)
                }
