@@ -290,16 +290,17 @@ void checkBreakEven2() {
                      if (orderPrice<=Ask) isToClose = true;
                   }
                } else {
+                  double armPrice;
                   if (type == OP_BUY){
-                     orderPrice = OrderStopLoss()+ pip * (stop_distance+BREAKEVEN_ARM_PIPS);
+                     armPrice = OrderStopLoss()+ pip * (stop_distance+BREAKEVEN_ARM_PIPS);
                      clr = CLR_SELL_ARROW;
-                     if (orderPrice>=Bid) armed = true;
+                     if (armPrice<=Bid) armed = true;
                   }
         
                   if (type == OP_SELL){
-                     orderPrice = OrderStopLoss()- pip * (stop_distance+BREAKEVEN_ARM_PIPS);
+                     armPrice = OrderStopLoss()- pip * (stop_distance+BREAKEVEN_ARM_PIPS);
                      clr = CLR_BUY_ARROW;
-                     if (orderPrice<=Ask) armed = true;
+                     if (armPrice>=Ask) armed = true;
                   }
                   if (armed) maldaLog("BreakEven armed..."); 
                   return;
