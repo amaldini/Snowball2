@@ -296,7 +296,7 @@ void checkBreakEven2() {
                   clr = CLR_BUY_ARROW;
                   if (armPrice>=minPrice) armed = true;
                }
-               if (armed) maldaLog("BreakEven armed..."); 
+               // if (armed) maldaLog("BreakEven armed..."); 
    
                double orderPrice; // lo calcolo in base allo stoploss perché dopo un resume 
                                   // i prezzi sono tutti uguali mentre gli stop loss sono diversi  
