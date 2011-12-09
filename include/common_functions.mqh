@@ -1229,6 +1229,12 @@ bool labelButton(string name, int x, int y, int corner, string text, color clr =
          ObjectDelete(name);
          return(true);
       }
+      if (ObjectDescription(name)!=text) {
+         ObjectDelete(name);
+      }
+      if (ObjectGet(name, OBJPROP_COLOR)!=clr) {
+         ObjectDelete(name);
+      }
    }
    label(name, x, y, corner, "[" + text + "]", clr);
    return(false);

@@ -26,8 +26,9 @@ extern bool breakoutMode=false;
 extern int breakoutBars=25;
 extern bool breakoutBiDir=true;
 ////////////////////////////////////////
-extern bool useMA=false;
 extern bool useMAEntry=false;
+extern bool useMAExit=false;
+extern int useMA_Period=14;
 ////////////////////////////////////////
 extern int exitBars=3;
 extern int exitBarsLevel=2;
@@ -318,6 +319,8 @@ void checkBreakEven2() {
                }
             
                if (isToClose) {
+                  double SL = OrderStopLoss();
+               
                   maldaLog("BE2: Close order "+OrderTicket()+" at BreakEven: "+orderPrice);
                   orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, clr);
                   
@@ -328,6 +331,8 @@ void checkBreakEven2() {
                   // il massimo/minimo prezzo raggiunto si imposta=al prezzo corrente
                   maxPrice=Bid;
                   minPrice=Ask;
+                  
+                  placeLine(SL);
                   
                   doCycle=true;
                   break; // cycle again starting from 0 (HELLO FIFO!)
@@ -360,21 +365,21 @@ void checkDailyCycle() {
 }
 
 void checkMA() {
-   if (!useMA) return;
+   if (!(useMAEntry || useMAExit)) return;
    
    int Current = 0; // 0 per ogni tick, 1 per penultima bar
    double close = iClose(NULL, 0, Current+0);
    
-   double maValue = iMA(NULL,0,5,3,MODE_LWMA,PRICE_TYPICAL,0);
+   double maValue = iMA(NULL,0,useMA_Period,3,MODE_LWMA,PRICE_TYPICAL,0);
    
-   if (level>0) {
+   if (level>0 && useMAExit) {
       if (close<maValue) {
-         maldaLog("MA STOP! (profit= "+lastFloating+")");
+         maldaLog("MA ("+useMA_Period+") STOP! (profit= "+lastFloating+")");
          stop();
       }
-   } else if (level<0) {
+   } else if (level<0 && useMAExit) {
       if (close>maValue) {
-         maldaLog("MA STOP! (profit= "+lastFloating+")");
+         maldaLog("MA ("+useMA_Period+") STOP! (profit= "+lastFloating+")");
          stop();
       }
    } else if (level==0 && useMAEntry) {
@@ -382,12 +387,12 @@ void checkMA() {
       if (close>maValue+pip*10) { // LONG 
          if (running) stop();
          start_immediately = true;
-         maldaLog("MA LONG entry!");
+         maldaLog("MA("+useMA_Period+") LONG entry!");
          go(LONG);      
       } else if (close<maValue-pip*10) { // SHORT 
          if (running) stop();
          start_immediately = true;
-         maldaLog("MA SHORT entry!");
+         maldaLog("MA ("+useMA_Period+")SHORT entry!");
          go(SHORT);   
       }
    }
@@ -491,8 +496,7 @@ void deleteStopButtons(){
 }
 
 void deleteMAButtons() {
-   ObjectDelete("toggle_MA1");
-   ObjectDelete("toggle_MA2");
+   ObjectDelete("toggle_MA");
 }
 
 /**
@@ -714,30 +718,48 @@ void checkButtons(){
       }
    }
    
-   if (!useMA) {
-      if (labelButton("toggle_MA1", 15, 16*8,1, getToggleMAButtonDescription(), getToggleMAButtonColor())) {
-         useMA = true;
+   bool reButton = true; bool needRedraw=false;
+   while (reButton) {
+      reButton = false;
+      if (labelButton("toggle_MA", 15, 16*8,1, getToggleMAButtonDescription(), getToggleMAButtonColor())) {
+         if (!useMAEntry && !useMAExit) { 
+            useMAEntry = true;
+            useMAExit = false; 
+         } else if (useMAEntry && !useMAExit) {
+            useMAEntry = true;
+            useMAExit = true;
+         } else if (useMAEntry && useMAExit) {
+            useMAEntry = false;
+            useMAExit = true;
+         } else {
+            useMAEntry = false;
+            useMAExit = false;
+         }
          deleteMAButtons();
-      }
-   } else {
-      if (labelButton("toggle_MA2", 15, 16*8,1, getToggleMAButtonDescription(), getToggleMAButtonColor())) {
-         useMA = false;
-         deleteMAButtons();   
+         reButton=true;
+         needRedraw=true;
       }
    }
+   if (needRedraw) WindowRedraw();
    
 }
 
 string getToggleMAButtonDescription() {
-   if (useMA) {
-      return ("Trade MA: ON");
-   } else {
-      return ("Trade MA: OFF");
+   string description = "Trade MA("+useMA_Period+"):";
+   string OFF = " OFF";
+   if (useMAEntry) {
+      description = description + "Entry ";
+      OFF = "";
    }
+   if (useMAExit) {
+      description = description + "Exit";
+      OFF = ""; 
+   }
+   return (description+OFF);
 } 
 
 color getToggleMAButtonColor() {
-   if (useMA) return (Green);
+   if (useMAEntry || useMAExit) return (Green);
    return (Red);
 }
 
