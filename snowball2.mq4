@@ -321,6 +321,9 @@ void checkBreakEven2() {
                   maldaLog("BE2: Close order "+OrderTicket()+" at BreakEven: "+orderPrice);
                   orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, clr);
                   
+                  closeOpenOrders(OP_SELLSTOP, magic);
+                  closeOpenOrders(OP_BUYSTOP, magic);
+                  
                   // quando si esegue una chiusura per breakeven,
                   // il massimo/minimo prezzo raggiunto si imposta=al prezzo corrente
                   maxPrice=Bid;
