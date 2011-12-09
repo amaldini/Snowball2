@@ -272,10 +272,9 @@ void checkBreakEven2() {
    
    if (!BREAKEVEN) return;
    
-   int total = OrdersTotal();
-   
    bool doCycle = true;
    while (doCycle) {
+      int total = OrdersTotal();
       doCycle = false;
       for (int cnt = 0; cnt < total; cnt++) {      
          OrderSelect(cnt, SELECT_BY_POS, MODE_TRADES);
@@ -339,6 +338,13 @@ void checkBreakEven2() {
                }
             }
          }
+   }
+   
+   // calculate global variable level here // FIXME: global variable side-effect hell.
+   int newLevel = getNumOpenOrders(OP_BUY, magic) - getNumOpenOrders(OP_SELL, magic);
+   if (newLevel == 0 && useMAEntry) {
+      useMAEntry = false;
+      maldaLog("Warning: checkBreakEven2 disabled MA Entry!");  
    }
 
 }
