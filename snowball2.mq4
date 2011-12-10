@@ -114,7 +114,7 @@ void checkBreakout() {
    
    if (running) {
       if (direction==dir) return;
-      stop();
+      stop("checkBreakOut");
    }  
    
    go(dir);
@@ -363,7 +363,7 @@ void checkDailyCycle() {
    
    if (Hour()==0) {
       if (!justRestarted) {
-         if (running) stop();
+         if (running) stop("checkDailyCycle");
          go(BIDIR);
          justRestarted = true;
       }         
@@ -385,22 +385,22 @@ void checkMA() {
    if (level>0 && useMAExit) {
       if (close<maValue) {
          maldaLog("MA ("+useMA_Period+") STOP! (profit= "+lastFloating+")");
-         stop();
+         stop("checkMA");
       }
    } else if (level<0 && useMAExit) {
       if (close>maValue) {
          maldaLog("MA ("+useMA_Period+") STOP! (profit= "+lastFloating+")");
-         stop();
+         stop("checkMA");
       }
    } else if (level==0 && useMAEntry) {
       // ENTRY ?
       if (close>maValue+pip*10) { // LONG 
-         if (running) stop();
+         if (running) stop("checkMA");
          start_immediately = true;
          maldaLog("MA("+useMA_Period+") LONG entry!");
          go(LONG);      
       } else if (close<maValue-pip*10) { // SHORT 
-         if (running) stop();
+         if (running) stop("checkMA");
          start_immediately = true;
          maldaLog("MA ("+useMA_Period+")SHORT entry!");
          go(SHORT);   
@@ -440,7 +440,7 @@ void checkExitBars() {
    
    if (shouldStop) {
       maldaLog("ExitBars STOP!");
-      stop();
+      stop("checkExitBars");
    }
 }
 
@@ -531,7 +531,7 @@ void endArrow(){
    ObjectSet(aname, OBJPROP_BACK, true);
 }
 
-void stop(){
+void stop(string who){
    endArrow();
    deleteStopButtons();
    closeOpenOrders(-1, magic);
@@ -542,11 +542,13 @@ void stop(){
    if (sound_stop_all != ""){
       PlaySound(sound_stop_all);
    }
+   ifLevel0_disableMAEntry(who+"->stop");
 }
 
-void closeTrades() {
+void closeTrades(string who) {
    closeOpenOrders(OP_BUY,-1);
    closeOpenOrders(OP_SELL,-1);
+   ifLevel0_disableMAEntry(who+"->closeTrades");
 }
 
 void go(int mode){
@@ -623,7 +625,7 @@ void resume(){
 void checkLines(){
    if (crossedLine("stop")){
       maldaLog("Crossed line 'stop'");
-      stop();
+      stop("checkLines");
    }
    if (crossedLine("pause")){
       maldaLog("Crossed line 'pause'");
@@ -644,14 +646,14 @@ void checkLines(){
    
    if (crossedLine("long")) {
       maldaLog("Crossed line 'long'");
-      if (running) stop();
+      if (running) stop("checkLines");
       start_immediately = true;
       go(LONG);
    }
    
    if (crossedLine("short")) {
       maldaLog("Crossed line 'short'");
-      if (running) stop();
+      if (running) stop("checkLines");
       start_immediately = true;
       go(SHORT);
    }
@@ -714,13 +716,13 @@ void checkButtons(){
    if (running){
       deleteStartButtons();
       if (labelButton("stop", 15, 15*1, 1, "stop", Red)){
-         stop();
+         stop("checkButtons");
       }
       if (labelButton("pause", 15, 15*2, 1, "pause", Yellow)){
          pause();
       }
       if (labelButton("close", 15, 15*3, 1, "close", White)) {
-         closeTrades();
+         closeTrades("checkButtons");
       }
       
       if (labelButton("toggle_breakout2", 15, 15*4, 1, getBreakOutButtonDescription(), getBreakOutButtonColor())) {
@@ -796,17 +798,17 @@ void checkAutoTP(){
    if (auto_tp > 0 && auto_tp_price > 0){
       if (level > 0 && Close[0] >= auto_tp_price){
          if (stopWhenAutoTP) {
-            stop();
+            stop("checkAutoTP");
          } else {
-            closeTrades();
+            closeTrades("checkAutoTP");
             auto_tp_price = 0;
          }
       }
       if (level < 0 && Close[0] <= auto_tp_price){
          if (stopWhenAutoTP) {
-            stop();
+            stop("checkAutoTP");
          } else {
-            closeTrades();
+            closeTrades("checkAutoTP");
             auto_tp_price = 0;
          }
       }
@@ -874,7 +876,7 @@ void checkStopToBreakEven() {
 
 void checkProfitTarget() {
    if (profit_target>0 && lastFloating>profit_target) {
-      closeTrades();
+      closeTrades("checkProfitTarget");
    }
 }
 
@@ -939,7 +941,7 @@ void trade(){
       
          if (breakoutMode && prevLevel!=0) { // se sono in breakoutMode e sono tornato a livello 0 da un livello!=0, 
                                              // allora stop() e attendo un nuovo breakOut.
-            stop();
+            stop("trade");
             return;
          }
       
