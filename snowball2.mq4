@@ -375,7 +375,10 @@ void checkDailyCycle() {
 }
 
 void checkMA() {
-   if (!(useMAEntry || useMAExit)) return;
+   if (!(useMAEntry || useMAExit)) {
+      ObjectDelete("exitMA");
+      return;
+   }
    
    int Current = 0; // 0 per ogni tick, 1 per penultima bar
    double close = iClose(NULL, 0, Current+0);
@@ -387,11 +390,13 @@ void checkMA() {
          maldaLog("MA ("+useMA_Period+") STOP! (profit= "+lastFloating+")");
          stop("checkMA");
       }
+      place_SL_Line(maValue,"exitMA","Exit MA");
    } else if (level<0 && useMAExit) {
       if (close>maValue) {
          maldaLog("MA ("+useMA_Period+") STOP! (profit= "+lastFloating+")");
          stop("checkMA");
       }
+      place_SL_Line(maValue,"exitMA","Exit MA");
    } else if (level==0 && useMAEntry) {
       // ENTRY ?
       if (close>maValue+pip*10) { // LONG 
@@ -406,6 +411,7 @@ void checkMA() {
          go(SHORT);   
       }
    }
+   if (level==0) ObjectDelete("exitMA");
    
 }
 
@@ -413,6 +419,7 @@ void checkExitBars() {
    static int maxAbsLevel=0;
 
    if (!running || level==0) {
+      ObjectDelete("exitBars");
       maxAbsLevel=0;
       return;
    }
@@ -429,9 +436,11 @@ void checkExitBars() {
          if (level>0) {
             double Range_low = Low[iLowest(NULL,0,MODE_LOW,exitBars,1)];
             if (close<Range_low) shouldStop=true;
+            place_SL_Line(Range_low,"exitBars","Exit Bars");
          } if (level<0) {
             double Range_high = High[iHighest(NULL,0,MODE_HIGH,exitBars,1)];
             if (close>Range_high) shouldStop=true; 
+            place_SL_Line(Range_high,"exitBars","Exit Bars");
          }
       } else { // HEIKENASHI
          shouldStop = checkExitBars_HeikenAshi(close);
@@ -467,6 +476,7 @@ bool checkExitBars_HeikenAshi(double close) {
          if (HALow < Range_low) Range_low = HALow;
       }
       if (close<Range_low) shouldStop=true;
+      place_SL_Line(Range_low,"exitBars","Exit Bars HA");
    } if (level<0) {
       double Range_high = 0;
       for (i=1;i<=exitBars;i++) {
@@ -474,6 +484,7 @@ bool checkExitBars_HeikenAshi(double close) {
          if (HAHigh > Range_high) Range_high = HAHigh;
       }
       if (close>Range_high) shouldStop=true; 
+      place_SL_Line(Range_high,"exitBars","Exit Bars HA");
    }
    
    return (shouldStop);
@@ -885,6 +896,10 @@ void placeLine(double price){
    last_line = price;
    WindowRedraw();
 }
+
+void place_SL_Line(double price,string name,string description) {
+   horizLine(name,price,LightSalmon,SP+description);
+} 
 
 double getLine(){
    return(ObjectGet("last_order", OBJPROP_PRICE1));
