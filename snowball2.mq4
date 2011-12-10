@@ -340,13 +340,17 @@ void checkBreakEven2() {
          }
    }
    
+   ifLevel0_disableMAEntry("checkBreakEven2");
+   
+}
+
+void ifLevel0_disableMAEntry(string who) {
    // calculate global variable level here // FIXME: global variable side-effect hell.
    int newLevel = getNumOpenOrders(OP_BUY, magic) - getNumOpenOrders(OP_SELL, magic);
    if (newLevel == 0 && useMAEntry) {
       useMAEntry = false;
-      maldaLog("Warning: checkBreakEven2 disabled MA Entry!");  
-   }
-
+      maldaLog("Warning: "+who+" disabled MA Entry!");  
+   }   
 }
 
 void onOpen(){
