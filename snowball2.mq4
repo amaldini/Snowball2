@@ -270,7 +270,12 @@ void checkBreakEven2() {
       if (Ask<minPrice) minPrice=Ask;
    }
    
-   if (!BREAKEVEN) return;
+   if (!BREAKEVEN) {
+      ObjectDelete("BE2");
+      return;
+   }
+   
+   double stopLine=-1;
    
    bool doCycle = true;
    while (doCycle) {
@@ -308,12 +313,14 @@ void checkBreakEven2() {
                      orderPrice = OrderStopLoss()+ pip * (stop_distance+BREAKEVEN_EXECUTE_PIPS);
                      clr = CLR_SELL_ARROW;
                      if (orderPrice>=Bid) isToClose = true;
+                     if (stopLine<0 || stopLine<orderPrice) stopLine = orderPrice;
                   }
         
                   if (type == OP_SELL){
                      orderPrice = OrderStopLoss()- pip * (stop_distance+BREAKEVEN_EXECUTE_PIPS);
                      clr = CLR_BUY_ARROW;
                      if (orderPrice<=Ask) isToClose = true;
+                     if (stopLine<0 || stopLine>orderPrice) stopLine = orderPrice;
                   }
                }
             
@@ -340,6 +347,11 @@ void checkBreakEven2() {
          }
    }
    
+   if (stopLine>0) {
+      place_SL_Line(stopLine,"BE2","BreakEven2");
+   } else {
+      ObjectDelete("BE2");
+   }
    ifLevel0_disableMAEntry("checkBreakEven2");
    
 }
