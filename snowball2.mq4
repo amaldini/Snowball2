@@ -29,6 +29,7 @@ extern bool breakoutBiDir=true;
 extern bool useMAEntry=false;
 extern bool useMAExit=false;
 extern int useMA_Period=14;
+extern int MA_NumBarsToReenableEntry=4;
 ////////////////////////////////////////
 extern int exitBars=3;
 extern int exitBarsLevel=2;
@@ -362,10 +363,18 @@ void ifLevel0_disableMAEntry(string who) {
    if (newLevel == 0 && useMAEntry) {
       useMAEntry = false;
       maldaLog("Warning: "+who+" disabled MA Entry!");  
+      setCountDownToReenableEntry(MA_NumBarsToReenableEntry);
    }   
 }
 
+int countDownToReenableMAEntry=0;
 void onOpen(){
+   if (countDownToReenableMAEntry>0) {
+      countDownToReenableMAEntry--;
+      if (countDownToReenableMAEntry==0) {
+         useMAEntry = true;
+      }
+   }
 }
 
 void checkDailyCycle() {
@@ -384,6 +393,11 @@ void checkDailyCycle() {
    }
    
    
+}
+
+void setCountDownToReenableEntry(int nBars) {
+   maldaLog("MA Entry will be enabled after "+nBars+" bars");
+   countDownToReenableMAEntry = nBars;       
 }
 
 void checkMA() {
@@ -784,6 +798,9 @@ string getToggleMAButtonDescription() {
    string OFF = " OFF";
    if (useMAEntry) {
       description = description + "Entry ";
+      OFF = "";
+   } else if (countDownToReenableMAEntry>0) {
+      description = description+ "Entry sleep for "+countDownToReenableMAEntry+" bars.";  
       OFF = "";
    }
    if (useMAExit) {
