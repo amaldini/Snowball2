@@ -945,7 +945,7 @@ void placeLine(double price){
 }
 
 void place_SL_Line(double price,string name,string description) {
-   horizLine(name,price,LightSalmon,SP+description);
+   horizLine(name,price,LightSalmon, description);
 } 
 
 double getLine(){
