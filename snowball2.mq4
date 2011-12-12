@@ -41,6 +41,11 @@ extern bool    BREAKEVEN=true;
 extern double  BREAKEVEN_ARM_PIPS=5;
 extern double  BREAKEVEN_EXECUTE_PIPS=-5;
 ////////////////////////////////////////
+extern int START_HOUR = 0;
+extern int START_MINUTES = 0;
+extern int END_HOUR = 24;
+extern int END_MINUTES = 0;
+////////////////////////////////////////
 extern bool is_ecn_broker = false; // different market order procedure when resuming after pause
 
 
@@ -220,13 +225,10 @@ int deinit(){
 }
 
 void onTick(){
-   /*
-   if (TimeHour(TimeLocal())>9 && TimeMinute(TimeLocal())>44) {
-      stopped=true;
-   } */
    
    if (stopped) {
-      Comment("STOPPED!!!");
+      checkButtons();
+      info();
       return(0);
    }
    
@@ -374,6 +376,22 @@ void onOpen(){
       if (countDownToReenableMAEntry==0) {
          useMAEntry = true;
       }
+   }
+   
+   calcStopped();
+   
+}
+
+void calcStopped() {
+   int minutesStart = START_HOUR * 60 + START_MINUTES;
+   int minutesEnd = END_HOUR * 60 + END_MINUTES;
+   
+   int currentMinute = TimeHour(TimeLocal()) * 60 + TimeMinute(TimeLocal());
+   
+   if (currentMinute >= minutesStart && currentMinute < minutesEnd) {
+      stopped = false;
+   } else {
+      stopped = true;
    }
 }
 
@@ -1234,6 +1252,9 @@ void info(){
    int level_abs = MathAbs(getNumOpenOrders(OP_BUY, magic) - getNumOpenOrders(OP_SELL, magic));
    stop_value = MarketInfo(Symbol(), MODE_TICKVALUE) * lots * stop_distance * points_per_pip;
    
+   string stoppedInfo ="";
+   if (stopped) stoppedInfo = " (STOPPED)";
+   
    Comment("\n" + SP + name + magic + ", " + dir +
            "\n" + SP + Symbol() + " IsTesting:" + IsTesting() + 
            "\n" + SP + "1 pip is " + DoubleToStr(pip, Digits) + " " + Symbol6() +
@@ -1243,6 +1264,7 @@ void info(){
            "\n" + SP + "profit: " + DoubleToStr(cycle_total_profit, 2) + " " + AccountCurrency() + "  current level: " + level_abs +
            "\n" + SP + "auto-tp: " + auto_tp + " levels (" + DoubleToStr(auto_tp_price, Digits) + ", " + DoubleToStr(auto_tp_profit, 2) + " " + AccountCurrency() + ")" +
            "\n" + SP + "profit target: "+ profit_target + 
+           "\n" + SP + "Trading enabled from " + START_HOUR + ":" + START_MINUTES + " to " + END_HOUR + ":" + END_MINUTES + " local time"+stoppedInfo+
            "\n" + stringToAppendToInfo);
 
    if (last_be_plot == 0 || TimeCurrent() - last_be_plot > 300){ // every 5 minutes
