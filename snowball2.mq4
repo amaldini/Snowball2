@@ -294,13 +294,13 @@ void checkBreakEven2() {
                double armPrice;
                
                if (type == OP_BUY){
-                  armPrice = OrderStopLoss()+ pip * (stop_distance+BREAKEVEN_ARM_PIPS);
+                  armPrice = OrderOpenPrice()+ pip * (BREAKEVEN_ARM_PIPS);
                   clr = CLR_SELL_ARROW;
                   if (armPrice<=maxPrice) armed = true;
                }
         
                if (type == OP_SELL){
-                  armPrice = OrderStopLoss()- pip * (stop_distance+BREAKEVEN_ARM_PIPS);
+                  armPrice = OrderOpenPrice()- pip * (BREAKEVEN_ARM_PIPS);
                   clr = CLR_BUY_ARROW;
                   if (armPrice>=minPrice) armed = true;
                }
@@ -313,14 +313,14 @@ void checkBreakEven2() {
                
                if (armed) {     
                   if (type == OP_BUY){
-                     orderPrice = OrderStopLoss()+ pip * (stop_distance+BREAKEVEN_EXECUTE_PIPS);
+                     orderPrice = OrderOpenPrice()+ pip * (BREAKEVEN_EXECUTE_PIPS);
                      clr = CLR_SELL_ARROW;
                      if (orderPrice>=Bid) isToClose = true;
                      if (stopLine<0 || stopLine<orderPrice) stopLine = orderPrice;
                   }
         
                   if (type == OP_SELL){
-                     orderPrice = OrderStopLoss()- pip * (stop_distance+BREAKEVEN_EXECUTE_PIPS);
+                     orderPrice = OrderOpenPrice()- pip * (BREAKEVEN_EXECUTE_PIPS);
                      clr = CLR_BUY_ARROW;
                      if (orderPrice<=Ask) isToClose = true;
                      if (stopLine<0 || stopLine>orderPrice) stopLine = orderPrice;
