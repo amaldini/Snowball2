@@ -616,6 +616,7 @@ void go(int mode){
    deleteStartButtons();
    running = true;
    direction = mode;
+   FOLLOW_PRICE_minutePriceMoved=-1;
    storeVariables();
    resume();
 }
@@ -1125,6 +1126,8 @@ void trade(){
          if (Bid  <= start - stop_distance*pip){
             jumpGrid(-1);
          }
+         
+         FOLLOW_PRICE_minutePriceMoved=-1;
       }
       
       // alert on level change (order triggered, not line moved)
