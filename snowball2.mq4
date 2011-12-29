@@ -46,6 +46,11 @@ extern int START_MINUTES = 0;
 extern int END_HOUR = 24;
 extern int END_MINUTES = 0;
 ////////////////////////////////////////
+extern double FOLLOW_PRICE_PIPS_X_MINUTE=2;
+int FOLLOW_PRICE_minutePriceMoved=-1;
+int FOLLOW_PRICE_secondsCenterMoved=-1;
+double FOLLOW_PRICE_minutePriceValue=0;
+///////////////////////////////////////
 extern bool is_ecn_broker = false; // different market order procedure when resuming after pause
 
 
@@ -1043,6 +1048,39 @@ void trade(){
          // make sure first short orders are in place
          if (direction == BIDIR || direction == SHORT){
             shortOrders(start);
+         }
+         
+         if (direction == BIDIR) {
+            if (FOLLOW_PRICE_PIPS_X_MINUTE>0) {
+               int minute = TimeMinute(TimeLocal());
+               int seconds = TimeSeconds(TimeLocal());
+               if (minute!=FOLLOW_PRICE_minutePriceMoved) {
+                  FOLLOW_PRICE_minutePriceValue=(Bid+Ask)/2;
+                  FOLLOW_PRICE_minutePriceMoved = minute;
+               }
+               
+               if (seconds!=FOLLOW_PRICE_secondsCenterMoved) {
+                  FOLLOW_PRICE_secondsCenterMoved=seconds;
+               
+                  double delta = (Bid+Ask)/2-FOLLOW_PRICE_minutePriceValue;
+                  if (MathAbs(delta)>0) {
+                     if (delta>FOLLOW_PRICE_PIPS_X_MINUTE) delta = FOLLOW_PRICE_PIPS_X_MINUTE;
+                     if (-delta>FOLLOW_PRICE_PIPS_X_MINUTE) delta = -FOLLOW_PRICE_PIPS_X_MINUTE;
+                  
+                     double desiredPrice = FOLLOW_PRICE_minutePriceValue+delta;
+                     double deltaFromStart = desiredPrice-start;
+                  
+                     moveOrders(deltaFromStart);
+                     start+=deltaFromStart;
+                     placeLine(start);
+                  }
+               }
+               
+               place_SL_Line(FOLLOW_PRICE_minutePriceValue+FOLLOW_PRICE_PIPS_X_MINUTE*pip,"followPriceLimitHigh","Follow price high limit");
+               place_SL_Line(FOLLOW_PRICE_minutePriceValue-FOLLOW_PRICE_PIPS_X_MINUTE*pip,"followPriceLimitLow","Follow price low limit");
+            }
+            // int FOLLOW_PRICE_minutePriceMoved=-1;
+            // double FOLLOW_PRICE_minutePriceValue=0;
          }
       }
    
