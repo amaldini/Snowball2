@@ -1057,6 +1057,7 @@ void trade(){
                if (minute!=FOLLOW_PRICE_minutePriceMoved) {
                   FOLLOW_PRICE_minutePriceValue=(Bid+Ask)/2;
                   FOLLOW_PRICE_minutePriceMoved = minute;
+                  FOLLOW_PRICE_secondsCenterMoved=-1;
                }
                
                if (seconds!=FOLLOW_PRICE_secondsCenterMoved) {
@@ -1135,6 +1136,7 @@ void trade(){
       }
       
    }else{ // not running
+      FOLLOW_PRICE_minutePriceMoved=-1;
       placeLine(Bid);
    }
 }
