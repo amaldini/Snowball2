@@ -1056,9 +1056,12 @@ void trade(){
                int minute = TimeMinute(TimeLocal());
                int seconds = TimeSeconds(TimeLocal());
                if (minute!=FOLLOW_PRICE_minutePriceMoved) {
+                  maldaLog("Changed FOLLOW_PRICE_minutePriceValue at minute:"+minute+"!="+FOLLOW_PRICE_minutePriceMoved);
                   FOLLOW_PRICE_minutePriceValue=(Bid+Ask)/2;
                   FOLLOW_PRICE_minutePriceMoved = minute;
                   FOLLOW_PRICE_secondsCenterMoved=-1;
+               } else {
+                  // maldaLog("FOLLOW_PRICE_minutePriceValue not changed."+minute);
                }
                
                if (seconds!=FOLLOW_PRICE_secondsCenterMoved) {
@@ -1116,6 +1119,8 @@ void trade(){
          if (Bid - (pip * stop_distance / 6) <= start - stop_distance*pip){
             jumpGrid(-1);
          }
+         
+         FOLLOW_PRICE_minutePriceMoved=-1;
       }else{   
          // grid reached exactly
          if (Ask  >= start + stop_distance*pip){
@@ -1127,7 +1132,7 @@ void trade(){
             jumpGrid(-1);
          }
          
-         FOLLOW_PRICE_minutePriceMoved=-1;
+         
       }
       
       // alert on level change (order triggered, not line moved)
