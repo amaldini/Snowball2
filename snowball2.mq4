@@ -11,7 +11,7 @@
 
 extern double lots = 0.01; // lots to use per trade
 //extern double oanda_factor = 25000;
-extern int stop_distance = 20;
+extern int stop_distance = 5;
 extern int min_stop_distance = 10;
 extern bool dynamicStopDistance = false;
 ////////////////////////////////////////
@@ -1064,15 +1064,20 @@ void trade(){
                   // maldaLog("FOLLOW_PRICE_minutePriceValue not changed."+minute);
                }
                
+               double highLimit = FOLLOW_PRICE_minutePriceValue+FOLLOW_PRICE_PIPS_X_MINUTE*pip;
+               double lowLimit = FOLLOW_PRICE_minutePriceValue-FOLLOW_PRICE_PIPS_X_MINUTE*pip;
+               
                if (seconds!=FOLLOW_PRICE_secondsCenterMoved) {
                   FOLLOW_PRICE_secondsCenterMoved=seconds;
                
                   double delta = (Bid+Ask)/2-FOLLOW_PRICE_minutePriceValue;
                   if (MathAbs(delta)>0) {
-                     if (delta>FOLLOW_PRICE_PIPS_X_MINUTE) delta = FOLLOW_PRICE_PIPS_X_MINUTE;
-                     if (-delta>FOLLOW_PRICE_PIPS_X_MINUTE) delta = -FOLLOW_PRICE_PIPS_X_MINUTE;
                   
                      double desiredPrice = FOLLOW_PRICE_minutePriceValue+delta;
+                     
+                     if (desiredPrice>highLimit) desiredPrice = highLimit;
+                     if (desiredPrice<lowLimit) desiredPrice = lowLimit;
+                     
                      double deltaFromStart = desiredPrice-start;
                   
                      moveOrders(deltaFromStart);
@@ -1081,8 +1086,8 @@ void trade(){
                   }
                }
                
-               place_SL_Line(FOLLOW_PRICE_minutePriceValue+FOLLOW_PRICE_PIPS_X_MINUTE*pip,"followPriceLimitHigh","Follow price high limit");
-               place_SL_Line(FOLLOW_PRICE_minutePriceValue-FOLLOW_PRICE_PIPS_X_MINUTE*pip,"followPriceLimitLow","Follow price low limit");
+               place_SL_Line(highLimit,"followPriceLimitHigh","Follow price high limit");
+               place_SL_Line(lowLimit,"followPriceLimitLow","Follow price low limit");
             }
             // int FOLLOW_PRICE_minutePriceMoved=-1;
             // double FOLLOW_PRICE_minutePriceValue=0;
