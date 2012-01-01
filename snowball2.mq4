@@ -985,6 +985,8 @@ bool lineMoved(){
    }
 }
 
+double highLimit,lowLimit;
+
 /**
 * manage all the entry order placement
 */
@@ -1053,24 +1055,31 @@ void trade(){
          
          if (direction == BIDIR) {
             if (FOLLOW_PRICE_PIPS_X_MINUTE>0) {
+            
                int minute = TimeMinute(TimeLocal());
                int seconds = TimeSeconds(TimeLocal());
                if (minute!=FOLLOW_PRICE_minutePriceMoved) {
                   maldaLog("Changed FOLLOW_PRICE_minutePriceValue at minute:"+minute+"!="+FOLLOW_PRICE_minutePriceMoved);
-                  FOLLOW_PRICE_minutePriceValue=(Bid+Ask)/2;
+                  
+                  FOLLOW_PRICE_minutePriceValue=NormalizeDouble((Bid+Ask)/2,Digits);
+                  if (FOLLOW_PRICE_minutePriceMoved!=-1) {
+                     if (FOLLOW_PRICE_minutePriceValue>highLimit) FOLLOW_PRICE_minutePriceValue = highLimit;
+                     if (FOLLOW_PRICE_minutePriceValue<lowLimit) FOLLOW_PRICE_minutePriceValue = lowLimit;
+                  }
                   FOLLOW_PRICE_minutePriceMoved = minute;
                   FOLLOW_PRICE_secondsCenterMoved=-1;
                } else {
                   // maldaLog("FOLLOW_PRICE_minutePriceValue not changed."+minute);
                }
                
-               double highLimit = FOLLOW_PRICE_minutePriceValue+FOLLOW_PRICE_PIPS_X_MINUTE*pip;
-               double lowLimit = FOLLOW_PRICE_minutePriceValue-FOLLOW_PRICE_PIPS_X_MINUTE*pip;
+               highLimit = NormalizeDouble(FOLLOW_PRICE_minutePriceValue+FOLLOW_PRICE_PIPS_X_MINUTE*pip,Digits);
+               lowLimit = NormalizeDouble(FOLLOW_PRICE_minutePriceValue-FOLLOW_PRICE_PIPS_X_MINUTE*pip,Digits);
                
                if (seconds!=FOLLOW_PRICE_secondsCenterMoved) {
                   FOLLOW_PRICE_secondsCenterMoved=seconds;
                
                   double delta = (Bid+Ask)/2-FOLLOW_PRICE_minutePriceValue;
+                  
                   if (MathAbs(delta)>0) {
                   
                      double desiredPrice = FOLLOW_PRICE_minutePriceValue+delta;
@@ -1078,11 +1087,15 @@ void trade(){
                      if (desiredPrice>highLimit) desiredPrice = highLimit;
                      if (desiredPrice<lowLimit) desiredPrice = lowLimit;
                      
-                     double deltaFromStart = desiredPrice-start;
+                     double deltaFromStart = NormalizeDouble(desiredPrice-start,Digits);
                   
-                     moveOrders(deltaFromStart);
-                     start+=deltaFromStart;
-                     placeLine(start);
+                     if (deltaFromStart!=0) {
+                        moveOrders(deltaFromStart);
+                        start+=deltaFromStart;
+                        placeLine(start);
+                        maldaLog("Moved orders, delta="+DoubleToStr(deltaFromStart,Digits)+" secs="+seconds);
+                     }
+                     
                   }
                }
                
