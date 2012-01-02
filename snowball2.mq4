@@ -1027,6 +1027,8 @@ void trade(){
             if (sound_grid_trail != ""){
                PlaySound(sound_grid_trail);
             }
+            
+            FOLLOW_PRICE_minutePriceMoved = -1;
          }
          
          if (direction == LONG && Bid < start){
@@ -1041,6 +1043,8 @@ void trade(){
             if (sound_grid_trail != ""){
                PlaySound(sound_grid_trail);
             }
+            
+            FOLLOW_PRICE_minutePriceMoved = -1;
          }
          
          // make sure first long orders are in place
@@ -1054,56 +1058,13 @@ void trade(){
          }
          
          if (direction == BIDIR) {
-            if (FOLLOW_PRICE_PIPS_X_MINUTE>0) {
-            
-               int minute = TimeMinute(TimeLocal());
-               int seconds = TimeSeconds(TimeLocal());
-               if (minute!=FOLLOW_PRICE_minutePriceMoved) {
-                  maldaLog("Changed FOLLOW_PRICE_minutePriceValue at minute:"+minute+"!="+FOLLOW_PRICE_minutePriceMoved);
-                  
-                  FOLLOW_PRICE_minutePriceValue=NormalizeDouble((Bid+Ask)/2,Digits);
-                  if (FOLLOW_PRICE_minutePriceMoved!=-1) {
-                     if (FOLLOW_PRICE_minutePriceValue>highLimit) FOLLOW_PRICE_minutePriceValue = highLimit;
-                     if (FOLLOW_PRICE_minutePriceValue<lowLimit) FOLLOW_PRICE_minutePriceValue = lowLimit;
-                  }
-                  FOLLOW_PRICE_minutePriceMoved = minute;
-                  FOLLOW_PRICE_secondsCenterMoved=-1;
-               } else {
-                  // maldaLog("FOLLOW_PRICE_minutePriceValue not changed."+minute);
-               }
-               
-               highLimit = NormalizeDouble(FOLLOW_PRICE_minutePriceValue+FOLLOW_PRICE_PIPS_X_MINUTE*pip,Digits);
-               lowLimit = NormalizeDouble(FOLLOW_PRICE_minutePriceValue-FOLLOW_PRICE_PIPS_X_MINUTE*pip,Digits);
-               
-               if (seconds!=FOLLOW_PRICE_secondsCenterMoved) {
-                  FOLLOW_PRICE_secondsCenterMoved=seconds;
-               
-                  double delta = (Bid+Ask)/2-FOLLOW_PRICE_minutePriceValue;
-                  
-                  if (MathAbs(delta)>0) {
-                  
-                     double desiredPrice = FOLLOW_PRICE_minutePriceValue+delta;
-                     
-                     if (desiredPrice>highLimit) desiredPrice = highLimit;
-                     if (desiredPrice<lowLimit) desiredPrice = lowLimit;
-                     
-                     double deltaFromStart = NormalizeDouble(desiredPrice-start,Digits);
-                  
-                     if (deltaFromStart!=0) {
-                        moveOrders(deltaFromStart);
-                        start+=deltaFromStart;
-                        placeLine(start);
-                        maldaLog("Moved orders, delta="+DoubleToStr(deltaFromStart,Digits)+" secs="+seconds);
-                     }
-                     
-                  }
-               }
-               
-               place_SL_Line(highLimit,"followPriceLimitHigh","Follow price high limit");
-               place_SL_Line(lowLimit,"followPriceLimitLow","Follow price low limit");
-            }
+            followPrice(start,NormalizeDouble((Bid+Ask)/2,Digits));
             // int FOLLOW_PRICE_minutePriceMoved=-1;
             // double FOLLOW_PRICE_minutePriceValue=0;
+         } else if (direction == SHORT) {
+            followPrice(start, Ask);
+         } else if (direction == LONG) {
+            followPrice(start, Bid);   
          }
       }
    
@@ -1165,6 +1126,57 @@ void trade(){
       FOLLOW_PRICE_minutePriceMoved=-1;
       placeLine(Bid);
    }
+}
+
+void followPrice(double start, double currentPrice) {
+   if (FOLLOW_PRICE_PIPS_X_MINUTE<=0) return;
+    
+   int minute = TimeMinute(TimeLocal());
+   int seconds = TimeSeconds(TimeLocal());
+   if (minute!=FOLLOW_PRICE_minutePriceMoved) {
+      maldaLog("Changed FOLLOW_PRICE_minutePriceValue at minute:"+minute+"!="+FOLLOW_PRICE_minutePriceMoved);
+      
+      FOLLOW_PRICE_minutePriceValue=currentPrice;
+      if (FOLLOW_PRICE_minutePriceMoved!=-1) {
+         if (FOLLOW_PRICE_minutePriceValue>highLimit) FOLLOW_PRICE_minutePriceValue = highLimit;
+         if (FOLLOW_PRICE_minutePriceValue<lowLimit) FOLLOW_PRICE_minutePriceValue = lowLimit;
+      }
+      FOLLOW_PRICE_minutePriceMoved = minute;
+      FOLLOW_PRICE_secondsCenterMoved=-1;
+   } else {
+      // maldaLog("FOLLOW_PRICE_minutePriceValue not changed."+minute);
+   }
+   
+   highLimit = NormalizeDouble(FOLLOW_PRICE_minutePriceValue+FOLLOW_PRICE_PIPS_X_MINUTE*pip,Digits);
+   lowLimit = NormalizeDouble(FOLLOW_PRICE_minutePriceValue-FOLLOW_PRICE_PIPS_X_MINUTE*pip,Digits);
+   
+   if (seconds!=FOLLOW_PRICE_secondsCenterMoved) {
+      FOLLOW_PRICE_secondsCenterMoved=seconds;
+   
+      double delta = currentPrice-FOLLOW_PRICE_minutePriceValue;
+      
+      if (MathAbs(delta)>0) {
+      
+         double desiredPrice = FOLLOW_PRICE_minutePriceValue+delta;
+         
+         if (desiredPrice>highLimit) desiredPrice = highLimit;
+         if (desiredPrice<lowLimit) desiredPrice = lowLimit;
+         
+         double deltaFromStart = NormalizeDouble(desiredPrice-start,Digits);
+      
+         if (deltaFromStart!=0) {
+            moveOrders(deltaFromStart);
+            start+=deltaFromStart;
+            placeLine(start);
+            maldaLog("Moved orders, delta="+DoubleToStr(deltaFromStart,Digits)+" secs="+seconds);
+         }
+         
+      }
+   }
+   
+   place_SL_Line(highLimit,"followPriceLimitHigh","Follow price high limit");
+   place_SL_Line(lowLimit,"followPriceLimitLow","Follow price low limit");
+   
 }
 
 /**
