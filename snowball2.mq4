@@ -51,6 +51,10 @@ int FOLLOW_PRICE_minutePriceMoved=-1;
 int FOLLOW_PRICE_secondsCenterMoved=-1;
 double FOLLOW_PRICE_minutePriceValue=0;
 ///////////////////////////////////////
+
+extern double ACCOUNT_EURO = 350;
+
+
 extern bool is_ecn_broker = false; // different market order procedure when resuming after pause
 
 
@@ -96,6 +100,25 @@ bool stopped=false;
 #define BIDIR 0
 #define LONG  1
 #define SHORT 2
+
+double STOP_FOR_1_PERCENT_RISK() {
+
+   double toDestCurrency;
+   if (StringSubstr(Symbol6(),0,3)=="EUR") { 
+      toDestCurrency = (Bid+Ask)/2;
+   } else { // RENDERE GENERICA CONVERSIONE
+      maldaLog("Warning: CANNOT CALCULATE 1 PERCENT RISK FOR THIS PAIR!");   
+   }
+
+   double MaximumCapital = ACCOUNT_EURO * toDestCurrency / 100; 
+   double PointValue = Point;
+   double TradeSize = getLotsOnTable(magic);
+   if (TradeSize==0) {
+      TradeSize = lots;
+   }  
+   double StopPoints = MaximumCapital / (TradeSize* 100000 * PointValue);
+   return (StopPoints / points_per_pip);
+}
 
 int getBreakOut() {
 
@@ -1343,6 +1366,7 @@ void info(){
            "\n" + SP + "auto-tp: " + auto_tp + " levels (" + DoubleToStr(auto_tp_price, Digits) + ", " + DoubleToStr(auto_tp_profit, 2) + " " + AccountCurrency() + ")" +
            "\n" + SP + "profit target: "+ profit_target + 
            "\n" + SP + "Trading enabled from " + START_HOUR + ":" + START_MINUTES + " to " + END_HOUR + ":" + END_MINUTES + " local time"+stoppedInfo+
+           "\n" + SP + "Stop for 1 percent risk: " + DoubleToStr(STOP_FOR_1_PERCENT_RISK(),3) + 
            "\n" + stringToAppendToInfo);
 
    if (last_be_plot == 0 || TimeCurrent() - last_be_plot > 300){ // every 5 minutes
