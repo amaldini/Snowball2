@@ -107,7 +107,13 @@ double STOP_FOR_1_PERCENT_RISK() {
    if (StringSubstr(Symbol6(),0,3)=="EUR") { 
       toDestCurrency = (Bid+Ask)/2;
    } else { // RENDERE GENERICA CONVERSIONE
-      maldaLog("Warning: CANNOT CALCULATE 1 PERCENT RISK FOR THIS PAIR!");   
+      double eu_ask = MarketInfo("EURUSD",MODE_ASK); 
+      double eu_bid = MarketInfo("EURUSD",MODE_BID);
+      if (StringSubstr(Symbol6(),3,3)=="USD") {
+         toDestCurrency = (eu_bid+eu_ask)/2;
+      } else {
+         maldaLog("Warning: CANNOT CALCULATE 1 PERCENT RISK FOR THIS PAIR!");  
+      }
    }
 
    double MaximumCapital = ACCOUNT_EURO * toDestCurrency / 100; 
