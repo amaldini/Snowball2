@@ -104,26 +104,46 @@ bool stopped=false;
 double STOP_FOR_1_PERCENT_RISK() {
 
    double toDestCurrency;
-   if (StringSubstr(Symbol6(),0,3)=="EUR") { 
-      toDestCurrency = (Bid+Ask)/2;
-   } else { // RENDERE GENERICA CONVERSIONE
-      double eu_ask = MarketInfo("EURUSD",MODE_ASK); 
-      double eu_bid = MarketInfo("EURUSD",MODE_BID);
-      if (StringSubstr(Symbol6(),3,3)=="USD") {
-         toDestCurrency = (eu_bid+eu_ask)/2;
-      } else {
-         maldaLog("Warning: CANNOT CALCULATE 1 PERCENT RISK FOR THIS PAIR!");  
-      }
-   }
+   double PointValue;
+   double pipValueInDollars;
 
-   double MaximumCapital = ACCOUNT_EURO * toDestCurrency / 100; 
-   double PointValue = Point;
+   double eu_ask = MarketInfo("EURUSD",MODE_ASK); 
+   double eu_bid = MarketInfo("EURUSD",MODE_BID);
+   double EURUSD = (eu_ask + eu_bid) / 2;
+
+   double lotSize = MarketInfo(Symbol6(),MODE_LOTSIZE);
    double TradeSize = getLotsOnTable(magic);
    if (TradeSize==0) {
       TradeSize = lots;
    }  
-   double StopPoints = MaximumCapital / (TradeSize* 100000 * PointValue);
-   return (StopPoints / points_per_pip);
+
+   /*
+   maldaLog("lotSize:"+lotSize);
+   maldaLog("pip:"+pip);
+   maldaLog("tradeSize(lots):"+TradeSize);
+   */
+
+   double currentQuote = ((Bid+Ask)/2);
+
+   // COPPIE xxxUSD
+   if (StringSubstr(Symbol6(),3,3)=="USD") {   
+      pipValueInDollars = lotSize * pip * TradeSize;            
+   // COPPIE USDxxx
+   } else if (StringSubstr(Symbol6(),0,3)=="USD") {
+      pipValueInDollars = lotSize * pip * TradeSize / currentQuote; 
+   } else { // COPPIE xxxyyy
+      string baseCurr = StringSubstr(Symbol6(),0,3)+"USD";
+      double baseQuote= (MarketInfo(baseCurr,MODE_ASK)+MarketInfo(baseCurr,MODE_BID))/2; 
+      // maldaLog("baseQuote:"+baseQuote);
+      pipValueInDollars = lotSize * pip * TradeSize * baseQuote / currentQuote;  
+   }
+
+   // maldaLog("pipValueInDollars:"+pipValueInDollars);
+
+   double MaximumCapitalInDollars = ACCOUNT_EURO * EURUSD / 100;   
+   
+   double StopPips = MaximumCapitalInDollars / pipValueInDollars;
+   return (StopPips);
 }
 
 int getBreakOut() {
