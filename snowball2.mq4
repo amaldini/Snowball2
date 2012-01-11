@@ -53,7 +53,7 @@ double FOLLOW_PRICE_minutePriceValue=0;
 ///////////////////////////////////////
 
 extern double ACCOUNT_EURO = 350;
-
+extern double RISK_STOPDISTANCE_DIVISOR = 4;
 
 extern bool is_ecn_broker = false; // different market order procedure when resuming after pause
 
@@ -185,6 +185,9 @@ void defaults(){
 
    IS_ECN_BROKER = true; // different market order procedure when resuming after pause
 
+   if (RISK_STOPDISTANCE_DIVISOR>0) {
+      stop_distance = STOP_FOR_1_PERCENT_RISK()/RISK_STOPDISTANCE_DIVISOR;
+   }
    /*
    
    //auto_tp = 2;
@@ -233,12 +236,12 @@ int init(){
    CLR_BUY_ARROW = clr_buy;
    CLR_SELL_ARROW = clr_sell;
    CLR_CROSSLINE_ACTIVE = clr_stopline_active;
-   CLR_CROSSLINE_TRIGGERED = clr_stopline_triggered;
-   
-   defaults();
+   CLR_CROSSLINE_TRIGGERED = clr_stopline_triggered;   
 
    points_per_pip = pointsPerPip();
    pip = Point * points_per_pip;
+
+   defaults();
    
    comment = name + "_" + Symbol6();
    magic = makeMagicNumber(name + "_" + Symbol());
@@ -1394,7 +1397,7 @@ void info(){
            "\n" + SP + "auto-tp: " + auto_tp + " levels (" + DoubleToStr(auto_tp_price, Digits) + ", " + DoubleToStr(auto_tp_profit, 2) + " " + AccountCurrency() + ")" +
            "\n" + SP + "profit target: "+ profit_target + 
            "\n" + SP + "Trading enabled from " + START_HOUR + ":" + START_MINUTES + " to " + END_HOUR + ":" + END_MINUTES + " local time"+stoppedInfo+
-           "\n" + SP + "Stop for 1 percent risk: " + DoubleToStr(STOP_FOR_1_PERCENT_RISK(),3) + 
+           "\n" + SP + "Stop for 1 percent risk: " + DoubleToStr(STOP_FOR_1_PERCENT_RISK(),3) + " / "+ DoubleToStr(RISK_STOPDISTANCE_DIVISOR,1) + 
            "\n" + stringToAppendToInfo);
 
    if (last_be_plot == 0 || TimeCurrent() - last_be_plot > 300){ // every 5 minutes
