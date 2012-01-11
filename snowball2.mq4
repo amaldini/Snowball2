@@ -665,6 +665,7 @@ void go(int mode){
    deleteStartButtons();
    running = true;
    direction = mode;
+   // maldaLog("go ==> FOLLOW_PRICE_minutePriceMoved=-1");
    FOLLOW_PRICE_minutePriceMoved=-1;
    storeVariables();
    resume();
@@ -1076,7 +1077,7 @@ void trade(){
             if (sound_grid_trail != ""){
                PlaySound(sound_grid_trail);
             }
-            
+            // maldaLog("SHORT and Ask>start ==> FOLLOW_PRICE_minutePriceMoved =-1");
             FOLLOW_PRICE_minutePriceMoved = -1;
          }
          
@@ -1092,7 +1093,7 @@ void trade(){
             if (sound_grid_trail != ""){
                PlaySound(sound_grid_trail);
             }
-            
+            // maldaLog("LONG and Bid<start ==> FOLLOW_PRICE_minutePriceMoved =-1");
             FOLLOW_PRICE_minutePriceMoved = -1;
          }
          
@@ -1147,7 +1148,7 @@ void trade(){
          if (Bid - (pip * stop_distance / 6) <= start - stop_distance*pip){
             jumpGrid(-1);
          }
-         
+         // maldaLog("level!=0 ==> FOLLOW_PRICE_minutePriceMoved =-1");
          FOLLOW_PRICE_minutePriceMoved=-1;
       }else{   
          // grid reached exactly
@@ -1172,6 +1173,7 @@ void trade(){
       }
       
    }else{ // not running
+      // maldaLog("Not running ===> minutePriceMoved=-1");
       FOLLOW_PRICE_minutePriceMoved=-1;
       placeLine(Bid);
    }
