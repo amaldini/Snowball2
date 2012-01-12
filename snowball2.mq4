@@ -1048,6 +1048,7 @@ void trade(){
    static int last_level;
    
    if (lineMoved()){
+      maldaLog("Closing open orders because line moved...");
       closeOpenOrders(OP_SELLSTOP, magic);
       closeOpenOrders(OP_BUYSTOP, magic);
    }
@@ -1180,6 +1181,59 @@ void trade(){
       FOLLOW_PRICE_minutePriceMoved=-1;
       placeLine(Bid);
    }
+   
+   deleteDuplicatedOrders(magic,start);
+}
+
+void deleteDuplicatedOrders(int magic,double start) {
+   
+   int numOpenOrders = getNumOpenOrders(-1,magic);
+   if (numOpenOrders<=0) return(0);
+     
+   int tickets[];
+   double prices[];
+   
+   ArrayResize(tickets, numOpenOrders);
+   ArrayResize(prices, numOpenOrders);
+   
+   int total = OrdersTotal();
+   
+   int idx=0;
+   for (int cnt = 0; cnt < total; cnt++) {
+      OrderSelect(cnt, SELECT_BY_POS, MODE_TRADES);
+      if (isMyOrder(magic)) {
+         int order_type = OrderType();
+         if (order_type == OP_BUYSTOP || order_type == OP_SELLSTOP || order_type == OP_BUYLIMIT || order_type == OP_SELLLIMIT) {
+            tickets[idx] = OrderTicket();
+            prices[idx] = OrderOpenPrice();
+            idx++;
+         }
+      }
+   }
+   
+   for (int i=0;i<idx;i++) {
+      bool deleted = false;
+      
+      double distanceFromExactGrid = MathMod(MathAbs(start-prices[i]),stop_distance * pip);
+      if (distanceFromExactGrid>pip && (stop_distance*pip-distanceFromExactGrid)>pip) {
+         maldaLog("Deleting out-of-grid order..."+distanceFromExactGrid);
+         orderDeleteReliable(tickets[i]);
+         deleted = true;
+      }
+      
+      for (int j=0;j<idx && !deleted;j++) {
+         if (i!=j) {
+            double delta = MathAbs(NormalizeDouble(prices[i],Digits)-NormalizeDouble(prices[j],Digits));
+            // maldaLog("Delta:"+delta+" pip:"+pip);
+            if (delta<=pip) {
+               orderDeleteReliable(tickets[i]);
+               deleted = true;
+               break;
+            }
+         }
+      }      
+   }
+
 }
 
 void followPrice(double start, double currentPrice) {
