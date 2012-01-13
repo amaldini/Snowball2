@@ -122,12 +122,20 @@ double calcStopLossByPrice(int op,double price) {
    }
 }
 
+double calcPriceByStopLoss(int op, double SL) {
+  if (op==OP_SELLSTOP || op==OP_SELLLIMIT || op==OP_SELL) { // stop above
+      return (SL-getStopDistance()*pip);
+   } else { // BUY (stop below) 
+      return (SL+getStopDistance()*pip);
+   } 
+}
+
 double getOrderStopLoss(int op,double SL) {
    if (!NO_STOPS) return (SL);
    if (op==OP_SELLSTOP || op==OP_SELLLIMIT || op==OP_SELL) {
-      return (SL+(FAKE_STOPLOSS_PIPS-stop_distance)*pip);
+      return (SL+(getStopDistance()-stop_distance)*pip);
    } else { // BUY 
-      return (SL-(FAKE_STOPLOSS_PIPS-stop_distance)*pip);   
+      return (SL-(getStopDistance()-stop_distance)*pip);   
    }
 }
 
@@ -1673,12 +1681,8 @@ double getPyramidBase(){
       }
    }
    
-   if (type == OP_BUY){
-      return(sl + pip * stop_distance);
-   }
-   
-   if (type == OP_SELL){
-      return(sl - pip * stop_distance);
+   if (type==OP_BUY || type==OP_SELL) {
+      return (calcPriceByStopLoss(type,sl));
    }
    
    return(0);
