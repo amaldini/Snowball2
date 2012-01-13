@@ -116,17 +116,9 @@ int getStopDistance() {
 
 double calcStopLossByPrice(int op,double price) {
    if (op==OP_SELLSTOP || op==OP_SELLLIMIT || op==OP_SELL) {
-      if (!NO_STOPS) {
-         return (price+stop_distance*pip);
-      } else {
-         return (price+FAKE_STOPLOSS_PIPS*pip);
-      }
+      return (price+getStopDistance()*pip);
    } else { // BUY 
-      if (!NO_STOPS) {
-         return (price-stop_distance*pip);
-      } else {
-         return (price-FAKE_STOPLOSS_PIPS*pip);
-      }  
+      return (price-getStopDistance()*pip);
    }
 }
 
