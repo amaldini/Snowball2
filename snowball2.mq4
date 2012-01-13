@@ -54,6 +54,7 @@ double FOLLOW_PRICE_minutePriceValue=0;
 
 extern double ACCOUNT_EURO = 350;
 extern double RISK_STOPDISTANCE_DIVISOR = 4;
+extern bool NO_STOPS = true;
 
 extern bool is_ecn_broker = false; // different market order procedure when resuming after pause
 
@@ -68,6 +69,8 @@ extern string sound_grid_trail = "";
 extern string sound_grid_step = "";
 extern string sound_order_triggered = "";
 extern string sound_stop_all = "";
+
+
 
 string name = "sno2_";
 
@@ -100,6 +103,41 @@ bool stopped=false;
 #define BIDIR 0
 #define LONG  1
 #define SHORT 2
+
+#define FAKE_STOPLOSS_PIPS 100
+
+int getStopDistance() {
+   if (NO_STOPS) {
+      return (FAKE_STOPLOSS_PIPS);
+   } else {
+      return (stop_distance);
+   }
+}
+
+double calcStopLossByPrice(int op,double price) {
+   if (op==OP_SELLSTOP || op==OP_SELLLIMIT || op==OP_SELL) {
+      if (!NO_STOPS) {
+         return (price+stop_distance*pip);
+      } else {
+         return (price+FAKE_STOPLOSS_PIPS*pip);
+      }
+   } else { // BUY 
+      if (!NO_STOPS) {
+         return (price-stop_distance*pip);
+      } else {
+         return (price-FAKE_STOPLOSS_PIPS*pip);
+      }  
+   }
+}
+
+double getOrderStopLoss(int op,double SL) {
+   if (!NO_STOPS) return (SL);
+   if (op==OP_SELLSTOP || op==OP_SELLLIMIT || op==OP_SELL) {
+      return (SL+(FAKE_STOPLOSS_PIPS-stop_distance)*pip);
+   } else { // BUY 
+      return (SL-(FAKE_STOPLOSS_PIPS-stop_distance)*pip);   
+   }
+}
 
 double STOP_FOR_1_PERCENT_RISK() {
 
@@ -1315,14 +1353,14 @@ bool needsOrder(double price, int where){
       type = OrderType();
       if (where < 0){ // look only for buy orders (stop below)
          if (isMyOrder(magic) && (type == OP_BUY || type == OP_BUYSTOP)){
-            if (isEqualPrice(OrderStopLoss(), price + where * pip * stop_distance)){
+            if (isEqualPrice(OrderStopLoss(), calcStopLossByPrice(type,price))){
                return(false);
             }
          }
       }
       if (where > 0){ // look only for sell orders (stop above)
          if (isMyOrder(magic) && (type == OP_SELL || type == OP_SELLSTOP)){
-            if (isEqualPrice(OrderStopLoss(), price + where * pip * stop_distance)){
+            if (isEqualPrice(OrderStopLoss(), calcStopLossByPrice(type,price))){
                return(false);
             }
          }
@@ -1338,11 +1376,12 @@ bool needsOrder(double price, int where){
 void longOrders(double start){
    double a = start + stop_distance * pip;
    double b = start + 2 * stop_distance * pip;
+   
    if (needsOrder(a, -1)){
-      buyStop(lots, a, start, 0, magic, comment);
+      buyStop(lots, a, calcStopLossByPrice(OP_BUY, a), 0, magic, comment);
    }
    if (needsOrder(b, -1)){
-      buyStop(lots, b, a, 0, magic, comment);
+      buyStop(lots, b, calcStopLossByPrice(OP_BUY, b), 0, magic, comment);
    }
 }
 
@@ -1353,11 +1392,12 @@ void longOrders(double start){
 void shortOrders(double start){
    double a = start - stop_distance * pip;
    double b = start - 2 * stop_distance * pip;
+   
    if (needsOrder(a, 1)){
-      sellStop(lots, a, start, 0, magic, comment);
+      sellStop(lots, a, calcStopLossByPrice(OP_SELL, a), 0, magic, comment);
    }
    if (needsOrder(b, 1)){
-      sellStop(lots, b, a, 0, magic, comment);
+      sellStop(lots, b, calcStopLossByPrice(OP_SELL, a), 0, magic, comment);
    }
 }
 
