@@ -423,7 +423,7 @@ void checkBreakEven2() {
                }
             
                if (isToClose) {
-                  double SL = OrderStopLoss();
+                  double SL = getOrderStopLoss(type,OrderStopLoss()); //OK
                
                   maldaLog("BE2: Close order "+OrderTicket()+" at BreakEven: "+orderPrice);
                   orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, clr);
@@ -1004,14 +1004,14 @@ void checkStopToBreakEven() {
                bool isToClose = false;
                int clr;     
                if (type == OP_BUY){
-                  orderPrice = OrderStopLoss()+ pip * (stop_distance+breakEvenOffset);
+                  orderPrice = getOrderStopLoss(type,OrderStopLoss())+ pip * (stop_distance+breakEvenOffset); //OK
                   clr = CLR_SELL_ARROW;
                   if (orderPrice>=Bid) isToClose = true;
                   // isToClose = true;
                }
         
                if (type == OP_SELL){
-                  orderPrice = OrderStopLoss()- pip * (stop_distance+breakEvenOffset);
+                  orderPrice = getOrderStopLoss(type,OrderStopLoss())- pip * (stop_distance+breakEvenOffset); //OK
                   clr = CLR_BUY_ARROW;
                   if (orderPrice<=Ask) isToClose = true;
                   // isToClose = true;
@@ -1353,14 +1353,14 @@ bool needsOrder(double price, int where){
       type = OrderType();
       if (where < 0){ // look only for buy orders (stop below)
          if (isMyOrder(magic) && (type == OP_BUY || type == OP_BUYSTOP)){
-            if (isEqualPrice(OrderStopLoss(), calcStopLossByPrice(type,price))){
+            if (isEqualPrice(OrderStopLoss(), calcStopLossByPrice(type,price))){ //OK
                return(false);
             }
          }
       }
       if (where > 0){ // look only for sell orders (stop above)
          if (isMyOrder(magic) && (type == OP_SELL || type == OP_SELLSTOP)){
-            if (isEqualPrice(OrderStopLoss(), calcStopLossByPrice(type,price))){
+            if (isEqualPrice(OrderStopLoss(), calcStopLossByPrice(type,price))){ //OK
                return(false);
             }
          }
@@ -1415,7 +1415,7 @@ void moveOrders(double d){
             orderModifyReliable(
                OrderTicket(),
                OrderOpenPrice() + d,
-               OrderStopLoss() + d,
+               OrderStopLoss() + d, //OK
                0,
                0,
                CLR_NONE
@@ -1672,10 +1672,10 @@ double getPyramidBase(){
    for (i=0; i<OrdersTotal(); i++){
       OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
       if (isMyOrder(magic) && OrderType() < 2){
-         d = MathAbs(Close[0] - OrderStopLoss());
+         d = MathAbs(Close[0] - OrderStopLoss()); //OK
          if (d > max_d){
             max_d = d;
-            sl = OrderStopLoss();
+            sl = OrderStopLoss(); //OK
             type = OrderType();
          }
       }
