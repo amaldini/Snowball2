@@ -1076,6 +1076,24 @@ bool lineMoved(){
    }
 }
 
+bool checkSpread() {
+   double spread = MarketInfo(Symbol6(),MODE_SPREAD)/points_per_pip;
+   
+   string text = "Spread: "+DoubleToStr(spread,1);
+   label("lblSpread", 50, 20, 2, text, Gray); 
+   ObjectSet("lblSpread", OBJPROP_FONTSIZE, 20);
+   bool spreadTooBig = false;
+   
+   if (spread>2.5) {
+      closeOpenOrders(OP_SELLSTOP,magic);
+      closeOpenOrders(OP_BUYSTOP,magic);
+      spreadTooBig = true;
+      ObjectSet("lblSpread",OBJPROP_COLOR,Red);
+   }
+   
+   return (spreadTooBig);
+}
+
 double highLimit,lowLimit;
 
 /**
@@ -1084,6 +1102,8 @@ double highLimit,lowLimit;
 void trade(){
    double start;
    static int last_level;
+   
+   bool spreadTooBig = checkSpread();
    
    if (lineMoved()){
       maldaLog("Closing open orders because line moved...");
@@ -1236,6 +1256,7 @@ void deleteDuplicatedOrders(int magic,double start) {
    
    int total = OrdersTotal();
    
+   // collect order tickets and prices
    int idx=0;
    for (int cnt = 0; cnt < total; cnt++) {
       OrderSelect(cnt, SELECT_BY_POS, MODE_TRADES);
@@ -1252,6 +1273,7 @@ void deleteDuplicatedOrders(int magic,double start) {
    for (int i=0;i<idx;i++) {
       bool deleted = false;
       
+      // delete out-of-grid orders 
       double distanceFromExactGrid = MathMod(MathAbs(start-prices[i])/pip,stop_distance);
       if (distanceFromExactGrid>1 && (stop_distance-distanceFromExactGrid)>1) {
          maldaLog("Deleting out-of-grid order..."+distanceFromExactGrid);
@@ -1259,6 +1281,7 @@ void deleteDuplicatedOrders(int magic,double start) {
          deleted = true;
       }
       
+      // delete duplicate orders
       for (int j=i+1;j<idx && !deleted;j++) {
          double delta = MathAbs(NormalizeDouble(prices[i],Digits)-NormalizeDouble(prices[j],Digits));
          // maldaLog("Delta:"+delta+" pip:"+pip);
