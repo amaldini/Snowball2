@@ -1259,17 +1259,13 @@ void deleteDuplicatedOrders(int magic,double start) {
          deleted = true;
       }
       
-      for (int j=0;j<idx && !deleted;j++) {
-         if (i!=j) {
-            double delta = MathAbs(NormalizeDouble(prices[i],Digits)-NormalizeDouble(prices[j],Digits));
-            // maldaLog("Delta:"+delta+" pip:"+pip);
-            if (delta<=pip) {
-               orderDeleteReliable(tickets[i]);
-               deleted = true;
-               break;
-            }
+      for (int j=i+1;j<idx && !deleted;j++) {
+         double delta = MathAbs(NormalizeDouble(prices[i],Digits)-NormalizeDouble(prices[j],Digits));
+         // maldaLog("Delta:"+delta+" pip:"+pip);
+         if (delta<=pip) {
+            orderDeleteReliable(tickets[ji]);
          }
-      }      
+      }   
    }
 
 }
