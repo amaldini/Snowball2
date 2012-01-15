@@ -1252,8 +1252,8 @@ void deleteDuplicatedOrders(int magic,double start) {
    for (int i=0;i<idx;i++) {
       bool deleted = false;
       
-      double distanceFromExactGrid = MathMod(MathAbs(start-prices[i]),stop_distance * pip);
-      if (distanceFromExactGrid>pip && (stop_distance*pip-distanceFromExactGrid)>pip) {
+      double distanceFromExactGrid = MathMod(MathAbs(start-prices[i])/pip,stop_distance);
+      if (distanceFromExactGrid>1 && (stop_distance-distanceFromExactGrid)>1) {
          maldaLog("Deleting out-of-grid order..."+distanceFromExactGrid);
          orderDeleteReliable(tickets[i]);
          deleted = true;
