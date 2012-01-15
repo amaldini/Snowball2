@@ -1263,7 +1263,7 @@ void deleteDuplicatedOrders(int magic,double start) {
          double delta = MathAbs(NormalizeDouble(prices[i],Digits)-NormalizeDouble(prices[j],Digits));
          // maldaLog("Delta:"+delta+" pip:"+pip);
          if (delta<=pip) {
-            orderDeleteReliable(tickets[ji]);
+            orderDeleteReliable(tickets[j]);
          }
       }   
    }
