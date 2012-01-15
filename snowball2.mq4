@@ -1103,7 +1103,7 @@ void trade(){
    double start;
    static int last_level;
    
-   bool spreadTooBig = checkSpread();
+   bool bigSpread = checkSpread();
    
    if (lineMoved()){
       maldaLog("Closing open orders because line moved...");
@@ -1159,14 +1159,16 @@ void trade(){
             FOLLOW_PRICE_minutePriceMoved = -1;
          }
          
-         // make sure first long orders are in place
-         if (direction == BIDIR || direction == LONG){
-            longOrders(start);
-         }
+         if (!bigSpread) {
+            // make sure first long orders are in place
+            if (direction == BIDIR || direction == LONG){
+               longOrders(start);
+            }
          
-         // make sure first short orders are in place
-         if (direction == BIDIR || direction == SHORT){
-            shortOrders(start);
+            // make sure first short orders are in place
+            if (direction == BIDIR || direction == SHORT){
+               shortOrders(start);
+            }
          }
          
          if (direction == BIDIR) {
@@ -1179,17 +1181,19 @@ void trade(){
             followPrice(start, Bid);   
          }
       }
-   
-      // are we already long?
-      if (level > 0){
-         // make sure the next long orders are in place
-         longOrders(start);
-      }
+      
+      if (!bigSpread) {
+         // are we already long?
+         if (level > 0){
+            // make sure the next long orders are in place
+            longOrders(start);
+         }
 
-      // are we short?
-      if (level < 0){
-         // make sure the next short orders are in place
-         shortOrders(start);
+         // are we short?
+         if (level < 0){
+            // make sure the next short orders are in place
+            shortOrders(start);
+         }
       }
       
       // we have two different models how to move the grid line.
