@@ -1278,11 +1278,23 @@ void deleteDuplicatedOrders(int magic,double start) {
       bool deleted = false;
       
       // delete out-of-grid orders 
-      double distanceFromExactGrid = MathMod(MathAbs(start-prices[i])/pip,stop_distance);
-      if (distanceFromExactGrid>1 && (stop_distance-distanceFromExactGrid)>1) {
-         maldaLog("Deleting out-of-grid order..."+distanceFromExactGrid);
-         orderDeleteReliable(tickets[i]);
-         deleted = true;
+      double distanceFromExactGrid = MathMod((prices[i]-start)/pip,stop_distance);
+      if (MathAbs(distanceFromExactGrid)>1 && (stop_distance-MathAbs(distanceFromExactGrid))>1) {
+         // maldaLog("Deleting out-of-grid order..."+distanceFromExactGrid);
+         double d = -distanceFromExactGrid;
+         maldaLog("Snap out-of-grid order to grid..."+tickets[i]+" d="+d);
+         // orderDeleteReliable(tickets[i]);
+         if (OrderSelect(tickets[i],SELECT_BY_TICKET,MODE_TRADES)) {
+            orderModifyReliable(
+                  OrderTicket(),
+                  OrderOpenPrice() + d,
+                  OrderStopLoss()  + d, //OK
+                  0,
+                  0,
+                  CLR_NONE
+               );
+            }
+         // deleted = true;
       }
       
       // delete duplicate orders
@@ -1290,6 +1302,7 @@ void deleteDuplicatedOrders(int magic,double start) {
          double delta = MathAbs(NormalizeDouble(prices[i],Digits)-NormalizeDouble(prices[j],Digits));
          // maldaLog("Delta:"+delta+" pip:"+pip);
          if (delta<=pip) {
+            maldaLog("Deleting duplicated order..."+tickets[j]);
             orderDeleteReliable(tickets[j]);
          }
       }   
