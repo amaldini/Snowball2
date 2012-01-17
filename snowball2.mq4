@@ -31,7 +31,7 @@ extern bool useMAExit=false;
 extern int useMA_Period=14;
 extern int MA_NumBarsToReenableEntry=4;
 ////////////////////////////////////////
-extern int exitBars=3;
+extern int exitBars=100;
 extern int exitBarsLevel=2;
 extern bool exitBarsHeikenAshi=true;
 ////////////////////////////////////////
@@ -46,15 +46,16 @@ extern int START_MINUTES = 0;
 extern int END_HOUR = 24;
 extern int END_MINUTES = 0;
 ////////////////////////////////////////
-extern double FOLLOW_PRICE_PIPS_X_MINUTE=2;
+extern double FOLLOW_PRICE_PIPS_X_MINUTE=0;
 int FOLLOW_PRICE_minutePriceMoved=-1;
 int FOLLOW_PRICE_secondsCenterMoved=-1;
 double FOLLOW_PRICE_minutePriceValue=0;
 ///////////////////////////////////////
 
 extern double ACCOUNT_EURO = 350;
-extern double RISK_STOPDISTANCE_DIVISOR = 4;
+extern double RISK_STOPDISTANCE_DIVISOR = 2;
 extern bool NO_STOPS = true;
+extern double MAX_SPREAD_PIPS = 2.5;
 
 extern bool is_ecn_broker = false; // different market order procedure when resuming after pause
 
@@ -1084,7 +1085,7 @@ bool checkSpread() {
    ObjectSet("lblSpread", OBJPROP_FONTSIZE, 20);
    bool spreadTooBig = false;
    
-   if (spread>2.5) {
+   if (spread>MAX_SPREAD_PIPS) {
       closeOpenOrders(OP_SELLSTOP,magic);
       closeOpenOrders(OP_BUYSTOP,magic);
       spreadTooBig = true;
@@ -1310,8 +1311,15 @@ void deleteDuplicatedOrders(int magic,double start) {
 
 }
 
+#define highLimitName "followPriceLimitHigh"
+#define lowLimitName "followPriceLimitLow"
+
 void followPrice(double start, double currentPrice) {
-   if (FOLLOW_PRICE_PIPS_X_MINUTE<=0) return;
+   if (FOLLOW_PRICE_PIPS_X_MINUTE<=0) {
+      ObjectDelete(highLimitName);
+      ObjectDelete(lowLimitName);
+      return;
+   }
     
    int minute = TimeMinute(TimeLocal());
    int seconds = TimeSeconds(TimeLocal());
@@ -1356,8 +1364,8 @@ void followPrice(double start, double currentPrice) {
       }
    }
    
-   place_SL_Line(highLimit,"followPriceLimitHigh","Follow price high limit");
-   place_SL_Line(lowLimit,"followPriceLimitLow","Follow price low limit");
+   place_SL_Line(highLimit,highLimitName,"Follow price high limit");
+   place_SL_Line(lowLimit, lowLimitName,"Follow price low limit");
    
 }
 
