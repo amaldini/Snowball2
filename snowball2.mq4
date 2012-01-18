@@ -37,7 +37,7 @@ extern bool exitBarsHeikenAshi=true;
 ////////////////////////////////////////
 extern bool useDailyCycle=false;
 ////////////////////////////////////////
-extern bool    BREAKEVEN=true;
+extern bool    BREAKEVEN=false;
 extern double  BREAKEVEN_ARM_PIPS=5;
 extern double  BREAKEVEN_EXECUTE_PIPS=-5;
 ////////////////////////////////////////
