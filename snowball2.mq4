@@ -31,7 +31,7 @@ extern bool useMAExit=false;
 extern int useMA_Period=14;
 extern int MA_NumBarsToReenableEntry=4;
 ////////////////////////////////////////
-extern int exitBars=100;
+extern int exitBars=0;
 extern int exitBarsLevel=2;
 extern bool exitBarsHeikenAshi=true;
 ////////////////////////////////////////
@@ -56,6 +56,8 @@ extern double ACCOUNT_EURO = 350;
 extern double RISK_STOPDISTANCE_DIVISOR = 2;
 extern bool NO_STOPS = true;
 extern double MAX_SPREAD_PIPS = 2.5;
+
+extern double ACCOUNT_PROFIT_TARGET = 5;
 
 extern bool is_ecn_broker = false; // different market order procedure when resuming after pause
 
@@ -558,7 +560,7 @@ void checkMA() {
 void checkExitBars() {
    static int maxAbsLevel=0;
 
-   if (!running || level==0) {
+   if (!running || level==0 || exitBars==0) {
       ObjectDelete("exitBars");
       maxAbsLevel=0;
       return;
@@ -1034,6 +1036,9 @@ void checkProfitTarget() {
    if (profit_target>0 && lastFloating>profit_target) {
       closeTrades("checkProfitTarget");
    }
+   if (ACCOUNT_PROFIT_TARGET>0.1 && AccountProfit()>ACCOUNT_PROFIT_TARGET) {
+      closeTrades("checkProfitTarget(AccountProfit)");
+   } 
 }
 
 void placeLine(double price){
@@ -1533,7 +1538,7 @@ void info(){
            "\n" + SP + "realized: " + DoubleToStr(realized - getGlobal("realized"), 2) + "  floating: " + DoubleToStr(floating, 2) +
            "\n" + SP + "profit: " + DoubleToStr(cycle_total_profit, 2) + " " + AccountCurrency() + "  current level: " + level_abs +
            "\n" + SP + "auto-tp: " + auto_tp + " levels (" + DoubleToStr(auto_tp_price, Digits) + ", " + DoubleToStr(auto_tp_profit, 2) + " " + AccountCurrency() + ")" +
-           "\n" + SP + "profit target: "+ profit_target + 
+           "\n" + SP + "profit target: "+ profit_target + " AccountProfit target: "+DoubleToStr(ACCOUNT_PROFIT_TARGET,Digits) +
            "\n" + SP + "Trading enabled from " + START_HOUR + ":" + START_MINUTES + " to " + END_HOUR + ":" + END_MINUTES + " local time"+stoppedInfo+
            "\n" + SP + "Stop for 1 percent risk: " + DoubleToStr(STOP_FOR_1_PERCENT_RISK(),3) + " / "+ DoubleToStr(RISK_STOPDISTANCE_DIVISOR,1) + 
            "\n" + stringToAppendToInfo);
