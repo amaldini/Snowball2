@@ -301,12 +301,12 @@ int bitRotate(int value, int count) {
 * place a market buy with stop loss, target, magic and Comment
 * keeps trying in an infinite loop until the position is open.
 */
-int buy(double lots, double sl, double tp, int magic = 42, string comment = "") {
+int buy(double lots, double sl, double tp, int magic = 42, string comment = "", string caller = "") {
    int ticket;
    if (!IS_ECN_BROKER) {
-      return(orderSendReliable(Symbol(), OP_BUY, lots, Ask, 100, sl, tp, comment, magic, 0, CLR_BUY_ARROW));
+      return(orderSendReliable(Symbol(), OP_BUY, lots, Ask, 100, sl, tp, comment, magic, 0, CLR_BUY_ARROW, caller));
    } else {
-      ticket = orderSendReliable(Symbol(), OP_BUY, lots, Ask, 100, 0, 0, comment, magic, 0, CLR_BUY_ARROW);
+      ticket = orderSendReliable(Symbol(), OP_BUY, lots, Ask, 100, 0, 0, comment, magic, 0, CLR_BUY_ARROW, caller);
       if (sl + tp > 0) {
          orderModifyReliable(ticket, 0, sl, tp, 0);
       }
@@ -318,12 +318,12 @@ int buy(double lots, double sl, double tp, int magic = 42, string comment = "") 
 * place a market sell with stop loss, target, magic and comment
 * keeps trying in an infinite loop until the position is open.
 */
-int sell(double lots, double sl, double tp, int magic = 42, string comment = "") {
+int sell(double lots, double sl, double tp, int magic = 42, string comment = "", string caller = "") {
    int ticket;
    if (!IS_ECN_BROKER) {
-      return(orderSendReliable(Symbol(), OP_SELL, lots, Bid, 100, sl, tp, comment, magic, 0, CLR_SELL_ARROW));
+      return(orderSendReliable(Symbol(), OP_SELL, lots, Bid, 100, sl, tp, comment, magic, 0, CLR_SELL_ARROW, caller));
    } else {
-      ticket = orderSendReliable(Symbol(), OP_SELL, lots, Bid, 100, 0, 0, comment, magic, 0, CLR_SELL_ARROW);
+      ticket = orderSendReliable(Symbol(), OP_SELL, lots, Bid, 100, 0, 0, comment, magic, 0, CLR_SELL_ARROW, caller);
       if (sl + tp > 0) {
          orderModifyReliable(ticket, 0, sl, tp, 0);
       }
@@ -334,29 +334,29 @@ int sell(double lots, double sl, double tp, int magic = 42, string comment = "")
 /**
 * place a buy limit order
 */
-int buyLimit(double lots, double price, double sl, double tp, int magic = 42, string comment = "") {
-   return(orderSendReliable(Symbol(), OP_BUYLIMIT, lots, price, 1, sl, tp, comment, magic, 0, CLR_NONE));
+int buyLimit(double lots, double price, double sl, double tp, int magic = 42, string comment = "", string caller = "") {
+   return(orderSendReliable(Symbol(), OP_BUYLIMIT, lots, price, 1, sl, tp, comment, magic, 0, CLR_NONE, caller));
 }
 
 /**
 * place a sell limit order
 */
-int sellLimit(double lots, double price, double sl, double tp, int magic = 42, string comment = "") {
-   return(orderSendReliable(Symbol(), OP_SELLLIMIT, lots, price, 1, sl, tp, comment, magic, 0, CLR_NONE));
+int sellLimit(double lots, double price, double sl, double tp, int magic = 42, string comment = "", string caller = "") {
+   return(orderSendReliable(Symbol(), OP_SELLLIMIT, lots, price, 1, sl, tp, comment, magic, 0, CLR_NONE, caller));
 }
 
 /**
 * place a buy stop order
 */
-int buyStop(double lots, double price, double sl, double tp, int magic = 42, string comment = "") {
-   return(orderSendReliable(Symbol(), OP_BUYSTOP, lots, price, 1, sl, tp, comment, magic, 0, CLR_NONE));
+int buyStop(double lots, double price, double sl, double tp, int magic = 42, string comment = "", string caller = "") {
+   return(orderSendReliable(Symbol(), OP_BUYSTOP, lots, price, 1, sl, tp, comment, magic, 0, CLR_NONE, caller));
 }
 
 /**
 * place a sell stop order
 */
-int sellStop(double lots, double price, double sl, double tp, int magic = 42, string comment = "") {
-   return(orderSendReliable(Symbol(), OP_SELLSTOP, lots, price, 1, sl, tp, comment, magic, 0, CLR_NONE));
+int sellStop(double lots, double price, double sl, double tp, int magic = 42, string comment = "", string caller = "") {
+   return(orderSendReliable(Symbol(), OP_SELLSTOP, lots, price, 1, sl, tp, comment, magic, 0, CLR_NONE, caller));
 }
 
 
@@ -1454,7 +1454,8 @@ int orderSendReliable(
    string comment = "",
    int magic = 0,
    datetime expiration = 0,
-   color arrow_color = CLR_NONE
+   color arrow_color = CLR_NONE, 
+   string caller = ""
 ) {
    int ticket;
    int err;
@@ -1469,7 +1470,8 @@ int orderSendReliable(
          + comment + ","
          + magic + ","
          + expiration + ","
-         + arrow_color + ")");
+         + arrow_color + "," 
+         + caller + ")");
 
    while (true) {
       if (IsStopped()) {

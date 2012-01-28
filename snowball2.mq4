@@ -57,7 +57,7 @@ extern double RISK_STOPDISTANCE_DIVISOR = 2;
 extern bool NO_STOPS = true;
 extern double MAX_SPREAD_PIPS = 2.5;
 
-extern double ACCOUNT_PROFIT_TARGET = 5;
+extern double ACCOUNT_PROFIT_TARGET = 30;
 
 extern bool is_ecn_broker = false; // different market order procedure when resuming after pause
 
@@ -324,12 +324,13 @@ int deinit(){
 
 void onTick(){
    
+   checkDailyCycle();
+   
    if (stopped) {
       checkButtons();
       info();
       return(0);
    }
-   
 
    recordEquity(name+Symbol6(), PERIOD_H1, magic);
    //checkOanda(magic, oanda_factor);
@@ -344,7 +345,7 @@ void onTick(){
    checkProfitTarget(); // usa lastFloating
    checkExitBars();
    checkMA();
-   checkDailyCycle();
+   
    if(!IsTesting()){
       plotNewOpenTrades(magic);
       plotNewClosedTrades(magic);
@@ -501,6 +502,7 @@ void checkDailyCycle() {
    if (Hour()==0) {
       if (!justRestarted) {
          if (running) stop("checkDailyCycle");
+         maldaLog("checkDailyCycle goes BIDIR");
          go(BIDIR);
          justRestarted = true;
       }         
@@ -761,7 +763,7 @@ void resume(){
       for (i=1; i<=level; i++){
          sl = line - pip * i * stop_distance;
          // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
-         buy(lots, sl, 0, magic, comment);
+         buy(lots, sl, 0, magic, comment, "resume");
       }
    }
    
@@ -770,7 +772,7 @@ void resume(){
       for (i=1; i<=-level; i++){
          sl = line + pip * i * stop_distance;
          // maldaLog(" selling at "+NormalizeDouble(Bid,5)+" with stop loss="+sl);
-         sell(lots, sl, 0, magic, comment);
+         sell(lots, sl, 0, magic, comment, "resume");
       }
    }
       
@@ -1168,12 +1170,12 @@ void trade(){
          if (!bigSpread) {
             // make sure first long orders are in place
             if (direction == BIDIR || direction == LONG){
-               longOrders(start);
+               longOrders(start,"trade.1");
             }
          
             // make sure first short orders are in place
             if (direction == BIDIR || direction == SHORT){
-               shortOrders(start);
+               shortOrders(start,"trade.1");
             }
          }
          
@@ -1192,13 +1194,13 @@ void trade(){
          // are we already long?
          if (level > 0){
             // make sure the next long orders are in place
-            longOrders(start);
+            longOrders(start,"trade.2");
          }
 
          // are we short?
          if (level < 0){
             // make sure the next short orders are in place
-            shortOrders(start);
+            shortOrders(start,"trade.2");
          }
       }
       
@@ -1396,41 +1398,59 @@ bool needsOrder(double price, int where){
    int i;
    int total = OrdersTotal();
    int type;
+   
+   double minDelta = 1000000;
+   double delta;
+   
+   string confrontati = "";
+   
    // search for a stoploss at exactly one grid distance away from price
    for (i=0; i<total; i++){
       OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
       type = OrderType();
       if (where < 0){ // look only for buy orders (stop below)
          if (isMyOrder(magic) && (type == OP_BUY || type == OP_BUYSTOP)){
+            delta = MathAbs(OrderStopLoss()- calcStopLossByPrice(type,price));         
+            if (delta<minDelta) minDelta = delta;
             if (isEqualPrice(OrderStopLoss(), calcStopLossByPrice(type,price))){ //OK
-               return(false);
+               // return(false);
             }
+            confrontati=confrontati+","+OrderTicket()+"(SL="+OrderStopLoss()+")";
          }
       }
       if (where > 0){ // look only for sell orders (stop above)
          if (isMyOrder(magic) && (type == OP_SELL || type == OP_SELLSTOP)){
+            delta = MathAbs(OrderStopLoss()- calcStopLossByPrice(type,price));
+            if (delta<minDelta) minDelta = delta;
             if (isEqualPrice(OrderStopLoss(), calcStopLossByPrice(type,price))){ //OK
-               return(false);
+              // return(false);
             }
+            confrontati=confrontati+","+OrderTicket()+"(SL="+OrderStopLoss()+")";
          }
       }
    }
-   return(true);
+   
+   if (minDelta<=(pip/3)) {
+      return(false);
+   } else {
+      Print("NeedsOrder: "+price+" minDelta="+minDelta+" Confrontati:"+confrontati);
+      return(true);
+   }
 }
 
 /**
 * Make sure there are the next two long orders above start in place.
 * If they are already there do nothing, else replace the missing ones.
 */
-void longOrders(double start){
+void longOrders(double start, string caller){
    double a = start + stop_distance * pip;
    double b = start + 2 * stop_distance * pip;
    
    if (needsOrder(a, -1)){
-      buyStop(lots, a, calcStopLossByPrice(OP_BUY, a), 0, magic, comment);
+      buyStop(lots, a, calcStopLossByPrice(OP_BUY, a), 0, magic, comment, caller+".longOrders.1");
    }
    if (needsOrder(b, -1)){
-      buyStop(lots, b, calcStopLossByPrice(OP_BUY, b), 0, magic, comment);
+      buyStop(lots, b, calcStopLossByPrice(OP_BUY, b), 0, magic, comment, caller+".longOrders.2");
    }
 }
 
@@ -1438,15 +1458,15 @@ void longOrders(double start){
 * Make sure there are the next two short orders below start in place.
 * If they are already there do nothing, else replace the missing ones.
 */
-void shortOrders(double start){
+void shortOrders(double start, string caller){
    double a = start - stop_distance * pip;
    double b = start - 2 * stop_distance * pip;
    
    if (needsOrder(a, 1)){
-      sellStop(lots, a, calcStopLossByPrice(OP_SELL, a), 0, magic, comment);
+      sellStop(lots, a, calcStopLossByPrice(OP_SELL, a), 0, magic, comment, caller+".shortOrders.1");
    }
    if (needsOrder(b, 1)){
-      sellStop(lots, b, calcStopLossByPrice(OP_SELL, a), 0, magic, comment);
+      sellStop(lots, b, calcStopLossByPrice(OP_SELL, b), 0, magic, comment, caller+".shortOrders.2");
    }
 }
 
