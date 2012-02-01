@@ -51,6 +51,7 @@ int FOLLOW_PRICE_minutePriceMoved=-1;
 int FOLLOW_PRICE_secondsCenterMoved=-1;
 double FOLLOW_PRICE_minutePriceValue=0;
 ///////////////////////////////////////
+extern bool IS_RENKO_CHART = true;
 
 extern double ACCOUNT_EURO = 350;
 extern double RISK_STOPDISTANCE_DIVISOR = 2;
@@ -108,6 +109,94 @@ bool stopped=false;
 #define SHORT 2
 
 #define FAKE_STOPLOSS_PIPS 100
+
+#define HALOW       1
+#define HAHIGH      0
+#define HAOPEN      2
+#define HACLOSE     3
+
+#define HAcolor1  Red
+#define HAcolor2  White
+#define HAcolor3  Red
+#define HAcolor4  White
+
+double HALow;
+double HAHigh;
+double HAClose;
+double HAOpen;
+
+void getHeikenAshiValues(int candleIndex) {
+   HALow = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HALOW, candleIndex);
+   HAHigh = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HAHIGH, candleIndex);
+   HAClose = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HACLOSE, candleIndex);
+   HAOpen = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HAOPEN, candleIndex);
+
+   if (HAClose>HAOpen) {
+      double help = HALow;
+      HALow = HAHigh;
+      HAHigh = help;
+   }   
+}
+
+void tradeRenko() {
+
+   if (!IS_RENKO_CHART) return;
+
+   // verifica se posso entrare
+   if (heikenAshiHasNearOpenWiggle(1)) {
+      maldaLog("heikenAshiHasNearOpenWiggle==true!");
+      return;
+   } 
+   
+   double HAOpen1 = HAOpen;
+   double HAClose1 = HAClose;
+   double HAHigh1 = HAHigh;
+   double HALow1 = HALow;
+   
+   getHeikenAshiValues(0);
+   double HAOpen0 = HAOpen;
+   double HAClose0 = HAClose;
+   double HAHigh0 = HAHigh;
+   double HALow0 = HALow;  
+   
+   bool HADirectionUP = (HAClose1>HAOpen1) && (HAClose0>HAOpen0);
+   bool HADirectionDown = (HAClose1<HAOpen1) && (HAClose0<HAOpen0);
+   
+   double RSI = RenkoRSI();
+   double MACDUp = MACD_Colored_v105(0,0);
+   double MACDDown = MACD_Colored_v105(1,0);
+   double MACDSignal = MACD_Colored_v105(2,0);
+   double MACDHistoGram = MACDUp+MACDDown;  
+   maldaLog("RSI="+RSI+" MACDSignal="+MACDSignal+" MACDUp="+MACDUp+" MACDDown="+MACDDown+ "MACDHistogram="+(MACDHistoGram));
+   if (RSI>55) {
+      if (HADirectionUP) { // blue candles
+         // check to  go long
+         //start_immediately = true;
+         //go(LONG);
+         if (MACDHistoGram>MACDSignal) {
+            maldaLog("RENKO GO LONG!!!");
+         }
+      } else {
+         maldaLog("HA direction NOT up!!!");
+      }
+   }
+   if (RSI<45) {  
+      if (HADirectionDown) { // black candles
+         // check to go short
+         // start_immediately = true;
+         // go(SHORT);
+         if (MACDHistoGram<MACDSignal) {
+            maldaLog("RENKO GO SHORT!!!");
+         } 
+      } else {
+         maldaLog("HA direction NOT down!!!");
+      }
+   }
+   
+   if (level==0) {
+      
+   }
+}
 
 int getStopDistance() {
    if (NO_STOPS) {
@@ -168,7 +257,8 @@ double STOP_FOR_1_PERCENT_RISK() {
 
    // COPPIE xxxUSD
    if (StringSubstr(Symbol6(),3,3)=="USD") {   
-      pipValueInDollars = lotSize * pip * TradeSize;            
+      pipValueInDollars = lotSize * pip * TradeSize;   
+      // maldaLog("lotSize*pip*TradeSize="+lotSize+"*"+pip+"*"+TradeSize);         
    // COPPIE USDxxx
    } else if (StringSubstr(Symbol6(),0,3)=="USD") {
       pipValueInDollars = lotSize * pip * TradeSize / currentQuote; 
@@ -338,6 +428,7 @@ void onTick(){
    checkButtons();
    checkBreakout();
    trade();
+   tradeRenko();
    info(); // calcola lastFloating
    checkAutoTP();
    checkStopToBreakEven();
@@ -597,27 +688,20 @@ void checkExitBars() {
    }
 }
 
-#define HAHIGH      0
-#define HALOW       1
-#define HAOPEN      2
-#define HACLOSE     3
 
-#define HAcolor1  Red
-#define HAcolor2  White
-#define HAcolor3  Red
-#define HAcolor4  White
 
 bool heikenAshiHasNearOpenWiggle(int candleIndex) {
-   double HALow = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HALOW, candleIndex);
-   double HAHigh = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HAHIGH, candleIndex);
-   double HAClose = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HACLOSE, candleIndex);
-   double HAOpen = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HAOPEN, candleIndex);
    
-   if (HAClose>HAOpen && HALow<HAOpen) {
+   getHeikenAshiValues(candleIndex);
+   
+   maldaLog("HAClose:"+HAClose+" HAOpen:"+HAOpen+" HALow:"+HALow+" HAHigh:"+HAHigh);
+   if ((HAClose>HAOpen) && (HALow<HAOpen)) {
       return (true);
    }
    
-   if (HAHigh>HAOpen) return(true);
+   if ((HAClose<HAOpen) && (HAHigh>HAOpen)) {
+      return(true);
+   }
    
    return (false);
 }
@@ -666,7 +750,7 @@ bool checkExitBars_HeikenAshi(double close) {
       // double Heiken_cl = iCustom(NULL,0,"Heiken Ashi",Red,White,Red,White,3,0);
       double Range_low = 10000000;
       for (i=1;i<=exitBars;i++) {
-         double HALow = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HALOW, i);
+         getHeikenAshiValues(i);
          if (HALow < Range_low) Range_low = HALow;
       }
       if (close<Range_low) shouldStop=true;
@@ -674,7 +758,7 @@ bool checkExitBars_HeikenAshi(double close) {
    } if (level<0) {
       double Range_high = 0;
       for (i=1;i<=exitBars;i++) {
-         double HAHigh = iCustom(NULL,0,"Heiken Ashi",HAcolor1,HAcolor2,HAcolor3,HAcolor4, HAHIGH, i);
+         getHeikenAshiValues(i);
          if (HAHigh > Range_high) Range_high = HAHigh;
       }
       if (close>Range_high) shouldStop=true; 
@@ -1611,6 +1695,7 @@ void info(){
            "\n" + SP + "profit target: "+ profit_target + " AccountProfit target: "+DoubleToStr(ACCOUNT_PROFIT_TARGET,Digits) +
            "\n" + SP + "Trading enabled from " + START_HOUR + ":" + START_MINUTES + " to " + END_HOUR + ":" + END_MINUTES + " local time"+stoppedInfo+
            "\n" + SP + "Stop for 1 percent risk: " + DoubleToStr(STOP_FOR_1_PERCENT_RISK(),3) + " / "+ DoubleToStr(RISK_STOPDISTANCE_DIVISOR,1) + 
+           "\n" + SP + "IS RENKO CHART: " + IS_RENKO_CHART +
            "\n" + stringToAppendToInfo);
 
    if (last_be_plot == 0 || TimeCurrent() - last_be_plot > 300){ // every 5 minutes
