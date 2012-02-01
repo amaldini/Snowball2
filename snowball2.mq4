@@ -597,15 +597,65 @@ void checkExitBars() {
    }
 }
 
+#define HAHIGH      0
+#define HALOW       1
+#define HAOPEN      2
+#define HACLOSE     3
+
+#define HAcolor1  Red
+#define HAcolor2  White
+#define HAcolor3  Red
+#define HAcolor4  White
+
+bool heikenAshiHasNearOpenWiggle(int candleIndex) {
+   double HALow = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HALOW, candleIndex);
+   double HAHigh = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HAHIGH, candleIndex);
+   double HAClose = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HACLOSE, candleIndex);
+   double HAOpen = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HAOPEN, candleIndex);
+   
+   if (HAClose>HAOpen && HALow<HAOpen) {
+      return (true);
+   }
+   
+   if (HAHigh>HAOpen) return(true);
+   
+   return (false);
+}
+
+double RenkoRSI() {
+   int shift = 0;
+   int period = 10;
+   double rsi = iRSI(NULL,0,period,PRICE_CLOSE,shift);
+   return (rsi);
+}
+
+double MACD_Colored_v105(int bufferIndex,int candleIndex) {
+
+   // questi devono corrispondere nell'ordine e tipo ai parametri dell'indicatore, e vanno passati alla funzione iCustom 
+   string Alert_On="";
+   bool EMail_Alert=false;
+   int Max_Alerts=1;
+   int Alert_Before_Minutes=15;
+   int Alert_Every_Minutes=5;
+   bool ShowSignal=false;
+   int FastEMA=12;
+   int SlowEMA=26;
+   int SignalSMA=9;
+   int FontSize=0;
+   color FontColor=Black;
+
+   // SetIndexBuffer(0,MacdBufferUp);
+   // SetIndexBuffer(1,MacdBufferDn);
+   // SetIndexBuffer(2,SignalBuffer);
+
+   double value = iCustom(NULL,0,"MACD_Colored_v105", Alert_On,EMail_Alert,Max_Alerts,
+                           Alert_Before_Minutes, Alert_Every_Minutes,ShowSignal,FastEMA,SlowEMA,SignalSMA,FontSize,FontColor,
+                           bufferIndex, candleIndex);
+                           
+   return (value);
+}
+
 bool checkExitBars_HeikenAshi(double close) {
-   color color1 = Red;
-   color color2 = White;
-   color color3 = Red;
-   color color4 = White;
-   #define HAHIGH      0
-   #define HALOW       1
-   #define HAOPEN      2
-   #define HACLOSE     3
 
    bool shouldStop = false;   
 
@@ -616,7 +666,7 @@ bool checkExitBars_HeikenAshi(double close) {
       // double Heiken_cl = iCustom(NULL,0,"Heiken Ashi",Red,White,Red,White,3,0);
       double Range_low = 10000000;
       for (i=1;i<=exitBars;i++) {
-         double HALow = iCustom(NULL,0,"Heiken Ashi", color1,color2,color3,color4, HALOW, i);
+         double HALow = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HALOW, i);
          if (HALow < Range_low) Range_low = HALow;
       }
       if (close<Range_low) shouldStop=true;
@@ -624,7 +674,7 @@ bool checkExitBars_HeikenAshi(double close) {
    } if (level<0) {
       double Range_high = 0;
       for (i=1;i<=exitBars;i++) {
-         double HAHigh = iCustom(NULL,0,"Heiken Ashi",color1,color2,color3,color4, HAHIGH, i);
+         double HAHigh = iCustom(NULL,0,"Heiken Ashi",HAcolor1,HAcolor2,HAcolor3,HAcolor4, HAHIGH, i);
          if (HAHigh > Range_high) Range_high = HAHigh;
       }
       if (close>Range_high) shouldStop=true; 
