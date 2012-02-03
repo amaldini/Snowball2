@@ -138,63 +138,266 @@ void getHeikenAshiValues(int candleIndex) {
    }   
 }
 
+#define NUMBARSFORTREND 8
+int getLastTrendIndex(int direction) {
+   int shiftStart = 0; int iCount = 0;
+   
+   // look back
+   for (int i = 1; i<Bars && iCount<NUMBARSFORTREND; i++) {
+      getHeikenAshiValues(i);
+      if (direction*HAClose>direction*HAOpen) {
+         if (shiftStart==0) {
+            shiftStart = i;
+         }
+         iCount++;
+      } else {
+         shiftStart=0;
+         iCount = 0;
+      }
+   }
+   
+   return (shiftStart);
+}
+
+int getShiftOfLastTrend(int direction,double &outValue) {
+  
+   int shiftStart = getLastTrendIndex(direction); // 1==UP -1==DOWN
+   
+   // maldaLog("ShiftStart="+shiftStart);
+   
+   if (direction>0) {
+      outValue = 0;
+   } else {
+      outValue = 100000;
+   }
+   int iRes = 0;
+   while (iRes!=shiftStart) {
+      iRes = shiftStart;
+      for (int i=-NUMBARSFORTREND;i<=NUMBARSFORTREND;i++) {
+         int checkIndex = i+iRes;
+         if (checkIndex<Bars && checkIndex>0) {
+            getHeikenAshiValues(checkIndex);
+            if (direction==1) { 
+               if (HAHigh>outValue) {
+                  outValue = HAHigh;
+                  shiftStart = checkIndex;
+               }
+            }
+            if (direction==-1) {
+               if (HALow<outValue) {
+                  outValue=HALow;
+                  shiftStart = checkIndex;
+               }
+            }
+         }  
+      }
+   }
+   
+   
+   return (iRes);
+}
+
+int findOtherSide(int direction, int shiftStart,double &outValue) {
+   
+   outValue = 0;
+   if (direction<0) outValue = 100000;
+   
+   bool candle1found = false;
+   int candle1shift = -1;
+   int i;
+   for (i=shiftStart-1;i>0;i--) {
+      getHeikenAshiValues(i);
+      if (direction*HAClose>direction*HAOpen) { // candela blu con direction==1, candela nera non direction==-1
+         candle1found = true;
+         if (direction==-1 && outValue>HALow) {
+            outValue = HALow;
+            candle1shift = i;
+         } else if (direction==1 && outValue<HAHigh) {
+            outValue = HAHigh;
+            candle1shift = i;
+         }
+      }
+   }
+   if (!candle1found) return (-1);
+   
+   // trova candela opposta con chiusura dentro alle minibollingher (medie mobili sel prezzo alto e basso
+   
+   double MA;
+   bool candle2found = false;
+   for (i=candle1shift-1;i>0;i--) {
+      getHeikenAshiValues(i);
+      if (direction==-1 && (HAClose>HAOpen)) {
+         MA = iMA(NULL,0,5,0,MODE_SMMA, PRICE_LOW, i);
+         if (HAClose>MA) {
+            candle2found = true;
+         }
+      } else if (direction==1 && (HAClose<HAOpen)) {
+         MA = iMA(NULL,0,5,0,MODE_SMMA, PRICE_HIGH, i);
+         if (HAClose<MA) {
+            candle2found = true;
+         }
+      }
+   }
+   
+   if (!candle2found) return (-1);   
+   
+   return (candle1shift);
+}
+
+#define NO_SUPPORT -1
+#define NO_RESISTANCE 1000000
+
+double support=NO_SUPPORT; int supportShift = 0;
+double resistance =NO_RESISTANCE; int resistanceShift = 0;
+
+void resetSupportAndResistance() {
+   support = NO_SUPPORT; // <== questi default fanno si che sia impossibile che il prezzo rompa il supporto/resistenza
+   resistance = NO_RESISTANCE;
+   supportShift=0;
+   resistanceShift=0;
+}
+
+void findSupportAndResistance(double &support,double &resistance) {
+   double high=0,low=0;
+   
+   int shiftUp;
+   int shiftDown;
+   
+   if (resistance!=NO_RESISTANCE && support!=NO_SUPPORT) return;
+   
+   if (resistance==NO_RESISTANCE && support==NO_SUPPORT) {
+      shiftUp = getShiftOfLastTrend(1,high);
+      shiftDown = getShiftOfLastTrend(-1,low); 
+   
+      if (shiftUp<shiftDown) {
+         // ultimo trend é stato UP
+         resistance = high; resistanceShift = shiftUp;
+      }
+      
+      if (shiftDown<shiftUp) {
+         // ultimo trend é stato DOWN
+         support = low; supportShift = shiftDown; 
+      }
+   } 
+   
+   if (resistance!=NO_RESISTANCE) {
+      // a partire da shiftUP, cerca il low (candela nera che sia seguita da candela blu con corpo dentro la media)
+      shiftDown = findOtherSide(-1,resistanceShift,low);
+      if (shiftDown>0) {
+         support = low;
+         supportShift = shiftDown;
+      }
+   }
+   
+   if (support!=NO_SUPPORT) {
+      shiftUp = findOtherSide(1, supportShift, high);
+      if (shiftUp>0) {
+         resistance = high;
+         resistanceShift = shiftUp; 
+      }
+   }
+   
+   if (resistance!=NO_RESISTANCE) { 
+      place_SL_Line(resistance,"highResistance","Resistance");
+   } else {
+      ObjectDelete("highResistance");
+   }
+   if (support!=NO_SUPPORT) {
+      place_SL_Line(support,"lowSupport","Support");
+   } else {
+      ObjectDelete("lowSupport");
+   }
+   
+}
+
 void tradeRenko() {
 
    if (!IS_RENKO_CHART) return;
 
-   // verifica se posso entrare
-   if (heikenAshiHasNearOpenWiggle(1)) {
-      maldaLog("heikenAshiHasNearOpenWiggle==true!");
-      return;
-   } 
-   
-   double HAOpen1 = HAOpen;
-   double HAClose1 = HAClose;
-   double HAHigh1 = HAHigh;
-   double HALow1 = HALow;
-   
-   getHeikenAshiValues(0);
-   double HAOpen0 = HAOpen;
-   double HAClose0 = HAClose;
-   double HAHigh0 = HAHigh;
-   double HALow0 = HALow;  
-   
-   bool HADirectionUP = (HAClose1>HAOpen1) && (HAClose0>HAOpen0);
-   bool HADirectionDown = (HAClose1<HAOpen1) && (HAClose0<HAOpen0);
-   
-   double RSI = RenkoRSI();
-   double MACDUp = MACD_Colored_v105(0,0);
-   double MACDDown = MACD_Colored_v105(1,0);
-   double MACDSignal = MACD_Colored_v105(2,0);
-   double MACDHistoGram = MACDUp+MACDDown;  
-   maldaLog("RSI="+RSI+" MACDSignal="+MACDSignal+" MACDUp="+MACDUp+" MACDDown="+MACDDown+ "MACDHistogram="+(MACDHistoGram));
-   if (RSI>55) {
-      if (HADirectionUP) { // blue candles
-         // check to  go long
-         //start_immediately = true;
-         //go(LONG);
-         if (MACDHistoGram>MACDSignal) {
-            maldaLog("RENKO GO LONG!!!");
-         }
-      } else {
-         maldaLog("HA direction NOT up!!!");
-      }
+   // return (0);
+
+   bool isLong=false;
+   bool isShort=false;
+   if (getNumOpenOrders(OP_BUY, magic)>0) {
+      isLong = true;
+   } else if (getNumOpenOrders(OP_SELL, magic)>0) {
+      isShort = true;
    }
-   if (RSI<45) {  
-      if (HADirectionDown) { // black candles
-         // check to go short
-         // start_immediately = true;
-         // go(SHORT);
-         if (MACDHistoGram<MACDSignal) {
-            maldaLog("RENKO GO SHORT!!!");
-         } 
-      } else {
-         maldaLog("HA direction NOT down!!!");
-      }
+
+   if (isLong||isShort) { 
+      resetSupportAndResistance();
    }
-   
-   if (level==0) {
+
+   if (!(isLong||isShort)) {
       
+      findSupportAndResistance(support,resistance);
+
+      // verifica se posso entrare
+      /*
+      if (heikenAshiHasNearOpenWiggle(1)) {
+         maldaLog("heikenAshiHasNearOpenWiggle==true!");
+         return;
+      } 
+      */
+  
+      getHeikenAshiValues(1);
+      double HAOpen1 = HAOpen;
+      double HAClose1 = HAClose;
+      double HAHigh1 = HAHigh;
+      double HALow1 = HALow;
+   
+      getHeikenAshiValues(0);
+      double HAOpen0 = HAOpen;
+      double HAClose0 = HAClose;
+      double HAHigh0 = HAHigh;
+      double HALow0 = HALow;  
+   
+      bool HADirectionUP = (HAClose1>HAOpen1) && (HAClose0>HAOpen0);
+      bool HADirectionDown = (HAClose1<HAOpen1) && (HAClose0<HAOpen0);
+   
+      double RSI = RenkoRSI();
+   
+      double MACDUp0 = MACD_Colored_v105(0,0);
+      double MACDDown0 = MACD_Colored_v105(1,0);
+      double MACDSignal0 = MACD_Colored_v105(2,0);
+      double MACDHistoGram0 = MACDUp0+MACDDown0; 
+   
+      double MACDUp1 = MACD_Colored_v105(0,1);
+      double MACDDown1 = MACD_Colored_v105(1,1);
+      double MACDSignal1 = MACD_Colored_v105(2,1);
+      double MACDHistoGram1 = MACDUp1+MACDDown1; 
+    
+      // maldaLog("RSI="+RSI+" MACDSignal="+MACDSignal0+" MACDUp="+MACDUp0+" MACDDown="+MACDDown0+ "MACDHistogram="+(MACDHistoGram0));
+      if (RSI>55) {
+         if (HAClose0>resistance && HAClose1>resistance) {  
+            if (HADirectionUP) { // blue candles
+               // check to  go long
+               //start_immediately = true;
+               //go(LONG);
+               if ((MACDHistoGram0>MACDHistoGram1) && (MACDHistoGram1>MACDSignal1)) {
+                  maldaLog("RENKO GO LONG!!!");
+                  Alert(Symbol6()+" RENKO GO LONG!!!");
+               }
+            } else {
+               maldaLog("HA direction NOT up!!!");
+            }
+         }
+      }
+      if (RSI<45) { 
+         if (HAClose0<support && HAClose1<support) { 
+            if (HADirectionDown) { // black candles
+               // check to go short
+               // start_immediately = true;
+               // go(SHORT);
+               if ((MACDHistoGram0<MACDHistoGram1) && (MACDHistoGram1<MACDSignal1)) {
+                  maldaLog("RENKO GO SHORT!!!");
+                  Alert(Symbol6()+" RENKO GO SHORT!!!");
+               } 
+            } else {
+               maldaLog("HA direction NOT down!!!");
+            }
+         }
+      }
    }
 }
 
@@ -694,7 +897,7 @@ bool heikenAshiHasNearOpenWiggle(int candleIndex) {
    
    getHeikenAshiValues(candleIndex);
    
-   maldaLog("HAClose:"+HAClose+" HAOpen:"+HAOpen+" HALow:"+HALow+" HAHigh:"+HAHigh);
+   // maldaLog("HAClose:"+HAClose+" HAOpen:"+HAOpen+" HALow:"+HALow+" HAHigh:"+HAHigh);
    if ((HAClose>HAOpen) && (HALow<HAOpen)) {
       return (true);
    }
