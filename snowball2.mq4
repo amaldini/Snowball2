@@ -52,9 +52,10 @@ int FOLLOW_PRICE_secondsCenterMoved=-1;
 double FOLLOW_PRICE_minutePriceValue=0;
 ///////////////////////////////////////
 extern bool IS_RENKO_CHART = true;
+extern bool RENKO_AUTO_TRADE = true;
 
-extern double ACCOUNT_EURO = 350;
-extern double RISK_STOPDISTANCE_DIVISOR = 2;
+extern double ACCOUNT_EURO = 250;
+extern double RISK_STOPDISTANCE_DIVISOR = 1;
 extern bool NO_STOPS = true;
 extern double MAX_SPREAD_PIPS = 2.5;
 
@@ -324,8 +325,44 @@ void tradeRenko() {
       isShort = true;
    }
 
+   double MACDUp0 = MACD_Colored_v105(0,0);
+   double MACDDown0 = MACD_Colored_v105(1,0);
+   double MACDSignal0 = MACD_Colored_v105(2,0);
+   double MACDHistoGram0 = MACDUp0+MACDDown0; 
+
+   double MACDUp1 = MACD_Colored_v105(0,1);
+   double MACDDown1 = MACD_Colored_v105(1,1);
+   double MACDSignal1 = MACD_Colored_v105(2,1);
+   double MACDHistoGram1 = MACDUp1+MACDDown1; 
+   
+   double MACDUp2 = MACD_Colored_v105(0,2);
+   double MACDDown2 = MACD_Colored_v105(1,2);
+   double MACDSignal2 = MACD_Colored_v105(2,2);
+   double MACDHistoGram2 = MACDUp2+MACDDown2; 
+
+   bool bigSpread = checkSpread();
+
    if (isLong||isShort) { 
       resetSupportAndResistance();
+      
+      if (RENKO_AUTO_TRADE && !bigSpread) {
+         bool needToClose = false;
+         double profit = getProfit(magic);
+         if (profit>0) {
+            if (isLong) {
+               if (MACDHistoGram0<MACDHistoGram1 && MACDHistoGram1<MACDHistoGram2) {
+                  needToClose = true;     
+               }
+            }
+            if (isShort) {
+               if (MACDHistoGram0>MACDHistoGram1 && MACDHistoGram1>MACDHistoGram2) {
+                  needToClose = true;  
+               }  
+            }
+         }
+         if (needToClose) closeTrades("tradeRenko");
+      }
+      
    }
 
    if (!(isLong||isShort)) {
@@ -356,16 +393,8 @@ void tradeRenko() {
       bool HADirectionDown = (HAClose1<HAOpen1) && (HAClose0<HAOpen0);
    
       double RSI = RenkoRSI();
-   
-      double MACDUp0 = MACD_Colored_v105(0,0);
-      double MACDDown0 = MACD_Colored_v105(1,0);
-      double MACDSignal0 = MACD_Colored_v105(2,0);
-      double MACDHistoGram0 = MACDUp0+MACDDown0; 
-   
-      double MACDUp1 = MACD_Colored_v105(0,1);
-      double MACDDown1 = MACD_Colored_v105(1,1);
-      double MACDSignal1 = MACD_Colored_v105(2,1);
-      double MACDHistoGram1 = MACDUp1+MACDDown1; 
+    
+      bool goLong = false, goShort = false;
     
       // maldaLog("RSI="+RSI+" MACDSignal="+MACDSignal0+" MACDUp="+MACDUp0+" MACDDown="+MACDDown0+ "MACDHistogram="+(MACDHistoGram0));
       if (RSI>55) {
@@ -374,9 +403,10 @@ void tradeRenko() {
                // check to  go long
                //start_immediately = true;
                //go(LONG);
-               if ((MACDHistoGram0>MACDHistoGram1) && (MACDHistoGram1>MACDSignal1)) {
+               if ((MACDHistoGram0>MACDHistoGram1) && (MACDHistoGram1>MACDSignal1)) { 
                   maldaLog("RENKO GO LONG!!!");
                   Alert(Symbol6()+" RENKO GO LONG!!!");
+                  goLong = true;
                }
             } else {
                maldaLog("HA direction NOT up!!!");
@@ -392,12 +422,32 @@ void tradeRenko() {
                if ((MACDHistoGram0<MACDHistoGram1) && (MACDHistoGram1<MACDSignal1)) {
                   maldaLog("RENKO GO SHORT!!!");
                   Alert(Symbol6()+" RENKO GO SHORT!!!");
+                  goShort = true;
                } 
             } else {
                maldaLog("HA direction NOT down!!!");
             }
          }
       }
+      
+      if (RENKO_AUTO_TRADE && !bigSpread) {
+         double sl,tp;
+         
+         if (goLong) {
+            sl = Bid - pip * stop_distance;
+            tp = Bid + pip * stop_distance;
+            // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
+            buy(lots, sl, tp, magic, comment, "tradeRenko");   
+         }
+         if (goShort) {
+            sl = Ask + pip * stop_distance;
+            tp = Ask - pip * stop_distance;
+            // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
+            sell(lots, sl, tp, magic, comment, "tradeRenko");
+         }
+         
+      }
+      
    }
 }
 
@@ -1898,7 +1948,7 @@ void info(){
            "\n" + SP + "profit target: "+ profit_target + " AccountProfit target: "+DoubleToStr(ACCOUNT_PROFIT_TARGET,Digits) +
            "\n" + SP + "Trading enabled from " + START_HOUR + ":" + START_MINUTES + " to " + END_HOUR + ":" + END_MINUTES + " local time"+stoppedInfo+
            "\n" + SP + "Stop for 1 percent risk: " + DoubleToStr(STOP_FOR_1_PERCENT_RISK(),3) + " / "+ DoubleToStr(RISK_STOPDISTANCE_DIVISOR,1) + 
-           "\n" + SP + "IS RENKO CHART: " + IS_RENKO_CHART +
+           "\n" + SP + "IS RENKO CHART: " + IS_RENKO_CHART + " AUTOTRADE:" + RENKO_AUTO_TRADE +  
            "\n" + stringToAppendToInfo);
 
    if (last_be_plot == 0 || TimeCurrent() - last_be_plot > 300){ // every 5 minutes
