@@ -298,17 +298,6 @@ void findSupportAndResistance(double &support,double &resistance) {
       }
    }
    
-   if (resistance!=NO_RESISTANCE) { 
-      place_SL_Line(resistance,"highResistance","Resistance");
-   } else {
-      ObjectDelete("highResistance");
-   }
-   if (support!=NO_SUPPORT) {
-      place_SL_Line(support,"lowSupport","Support");
-   } else {
-      ObjectDelete("lowSupport");
-   }
-   
 }
 
 void tradeRenko() {
@@ -368,6 +357,17 @@ void tradeRenko() {
    if (!(isLong||isShort)) {
       
       findSupportAndResistance(support,resistance);
+
+      if (resistance!=NO_RESISTANCE) { 
+         place_SL_Line(resistance,"highResistance","Resistance");
+      } else {
+         ObjectDelete("highResistance");
+      }
+      if (support!=NO_SUPPORT) {
+         place_SL_Line(support,"lowSupport","Support");
+      } else {
+         ObjectDelete("lowSupport");
+      }
 
       // verifica se posso entrare
       /*
