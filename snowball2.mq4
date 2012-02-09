@@ -9,7 +9,7 @@
 #include <offline_charts.mqh> 
 //#include <oanda.mqh> 
 
-extern double lots = 0.01; // lots to use per trade
+extern double lots = 0.02; // lots to use per trade
 //extern double oanda_factor = 25000;
 extern int stop_distance = 5;
 extern int min_stop_distance = 10;
@@ -53,9 +53,10 @@ double FOLLOW_PRICE_minutePriceValue=0;
 ///////////////////////////////////////
 extern bool IS_RENKO_CHART = true;
 extern bool RENKO_AUTO_TRADE = true;
+extern bool RENKO_USE_TAKEPROFIT = false;
 
 extern double ACCOUNT_EURO = 250;
-extern double RISK_STOPDISTANCE_DIVISOR = 1;
+extern double RISK_STOPDISTANCE_DIVISOR = 0.5;
 extern bool NO_STOPS = true;
 extern double MAX_SPREAD_PIPS = 2.5;
 
@@ -198,51 +199,61 @@ int getShiftOfLastTrend(int direction,double &outValue) {
    return (iRes);
 }
 
+double LOWER_MA(int shift) {
+   return (iMA(NULL,0,5,0,MODE_SMMA, PRICE_LOW, shift));
+}
+
+double HIGHER_MA(int shift) {
+   return (iMA(NULL,0,5,0,MODE_SMMA, PRICE_HIGH, shift));
+}
+
+bool isOppositeCandleCloseOK(int direction, int candle1shift) {
+   int i;
+   for (i=candle1shift-1;i>0;i--) {
+      getHeikenAshiValues(i);
+      if (direction==-1 && (HAClose>HAOpen)) {
+         if (HAClose>LOWER_MA(i)) return (true);
+      } else if (direction==1 && (HAClose<HAOpen)) {
+         if (HAClose<HIGHER_MA(i)) return (true);
+      } else {
+         return (false);
+      }
+   }
+   
+   return (false); 
+}
+
 int findOtherSide(int direction, int shiftStart,double &outValue) {
    
    outValue = 0;
    if (direction<0) outValue = 100000;
    
-   bool candle1found = false;
    int candle1shift = -1;
    int i;
+   
    for (i=shiftStart-1;i>0;i--) {
       getHeikenAshiValues(i);
       if (direction*HAClose>direction*HAOpen) { // candela blu con direction==1, candela nera non direction==-1
-         candle1found = true;
-         if (direction==-1 && outValue>HALow) {
+         
+         if (direction==-1 && outValue>HALow && HAClose<LOWER_MA(i)) {
             outValue = HALow;
             candle1shift = i;
-         } else if (direction==1 && outValue<HAHigh) {
+         } else if (direction==1 && outValue<HAHigh && HAClose>HIGHER_MA(i)) {
             outValue = HAHigh;
             candle1shift = i;
          }
-      }
-   }
-   if (!candle1found) return (-1);
-   
-   // trova candela opposta con chiusura dentro alle minibollingher (medie mobili sel prezzo alto e basso
-   
-   double MA;
-   bool candle2found = false;
-   for (i=candle1shift-1;i>0;i--) {
-      getHeikenAshiValues(i);
-      if (direction==-1 && (HAClose>HAOpen)) {
-         MA = iMA(NULL,0,5,0,MODE_SMMA, PRICE_LOW, i);
-         if (HAClose>MA) {
-            candle2found = true;
+         
+         // trova candela opposta con chiusura dentro alle minibollingher (medie mobili sel prezzo alto e basso
+         if (isOppositeCandleCloseOK(direction,candle1shift)) {
+            return (candle1shift);   
          }
-      } else if (direction==1 && (HAClose<HAOpen)) {
-         MA = iMA(NULL,0,5,0,MODE_SMMA, PRICE_HIGH, i);
-         if (HAClose<MA) {
-            candle2found = true;
-         }
+         
       }
    }
    
-   if (!candle2found) return (-1);   
+   return (-1); 
    
-   return (candle1shift);
+   
 }
 
 #define NO_SUPPORT -1
@@ -431,17 +442,19 @@ void tradeRenko() {
       }
       
       if (RENKO_AUTO_TRADE && !bigSpread) {
-         double sl,tp;
+         double sl=0,tp=0;
          
          if (goLong) {
             sl = Bid - pip * stop_distance;
             tp = Bid + pip * stop_distance;
+            if (!RENKO_USE_TAKEPROFIT) tp=0;
             // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
             buy(lots, sl, tp, magic, comment, "tradeRenko");   
          }
          if (goShort) {
             sl = Ask + pip * stop_distance;
             tp = Ask - pip * stop_distance;
+            if (!RENKO_USE_TAKEPROFIT) tp=0; 
             // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
             sell(lots, sl, tp, magic, comment, "tradeRenko");
          }
@@ -1948,7 +1961,7 @@ void info(){
            "\n" + SP + "profit target: "+ profit_target + " AccountProfit target: "+DoubleToStr(ACCOUNT_PROFIT_TARGET,Digits) +
            "\n" + SP + "Trading enabled from " + START_HOUR + ":" + START_MINUTES + " to " + END_HOUR + ":" + END_MINUTES + " local time"+stoppedInfo+
            "\n" + SP + "Stop for 1 percent risk: " + DoubleToStr(STOP_FOR_1_PERCENT_RISK(),3) + " / "+ DoubleToStr(RISK_STOPDISTANCE_DIVISOR,1) + 
-           "\n" + SP + "IS RENKO CHART: " + IS_RENKO_CHART + " AUTOTRADE:" + RENKO_AUTO_TRADE +  
+           "\n" + SP + "IS RENKO CHART: " + IS_RENKO_CHART + " AUTOTRADE:" + RENKO_AUTO_TRADE +  " USE_TAKEPROFIT:"+RENKO_USE_TAKEPROFIT+
            "\n" + stringToAppendToInfo);
 
    if (last_be_plot == 0 || TimeCurrent() - last_be_plot > 300){ // every 5 minutes
