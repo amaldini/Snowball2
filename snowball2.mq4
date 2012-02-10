@@ -350,14 +350,20 @@ void tradeRenko() {
          double profit = getProfit(magic);
          if (profit>0) {
             if (isLong) {
+               /*
                if (MACDHistoGram0<MACDHistoGram1 && MACDHistoGram1<MACDHistoGram2) {
                   needToClose = true;     
                }
+               */
+               if (MACDSignal0>MACDHistoGram0) needToClose = true;
             }
             if (isShort) {
+               /*
                if (MACDHistoGram0>MACDHistoGram1 && MACDHistoGram1>MACDHistoGram2) {
                   needToClose = true;  
-               }  
+               }
+               */ 
+               if (MACDSignal0<MACDHistoGram0) needToClose = true;
             }
          }
          if (needToClose) closeTrades("tradeRenko");
