@@ -269,13 +269,51 @@ void resetSupportAndResistance() {
    resistanceShift=0;
 }
 
+double findManualSR(string command) {
+
+   for (int i = 0; i < ObjectsTotal(); i++) {
+      name = ObjectName(i);
+
+      // is this an object that contains our command?
+      if (StringFind(ObjectDescription(name), command) == 0) {
+         double price = 0;
+         int type = ObjectType(name);
+
+         // we only care about certain types of objects
+         if (type == OBJ_HLINE) {
+            price = ObjectGet(name, OBJPROP_PRICE1);
+            ObjectDelete(name);            
+            return (price);
+         }
+      }
+   }
+
+   return(-1); // line not found
+}  
+
+
+int srNumBars=0;
 void findSupportAndResistance(double &support,double &resistance) {
    double high=0,low=0;
    
    int shiftUp;
    int shiftDown;
    
+   // aggiusta gli shift in base alle nuove barre generate
+   int nBars = Bars;
+   if (srNumBars==0) {
+      srNumBars = nBars;
+   } else if (srNumBars<nBars) {
+      int delta = nBars-srNumBars;
+      if (resistance!=NO_RESISTANCE) resistanceShift+=delta;
+      if (support!=NO_SUPPORT) supportShift+=delta;
+      srNumBars = nBars;
+   }
+   ////////////////////////////////////////////////////////
+   
    if (resistance!=NO_RESISTANCE && support!=NO_SUPPORT) return;
+   
+   double value;
    
    if (resistance==NO_RESISTANCE && support==NO_SUPPORT) {
       shiftUp = getShiftOfLastTrend(1,high);
@@ -299,6 +337,12 @@ void findSupportAndResistance(double &support,double &resistance) {
          support = low;
          supportShift = shiftDown;
       }
+   } else {
+      value = findManualSR("resistance");
+      if (value>0) {
+         resistance = value;
+         resistanceShift = 0;
+      }
    }
    
    if (support!=NO_SUPPORT) {
@@ -307,9 +351,15 @@ void findSupportAndResistance(double &support,double &resistance) {
          resistance = high;
          resistanceShift = shiftUp; 
       }
+   } else {
+      value = findManualSR("support");
+      if (value>0) {
+         support = value;
+         supportShift = 0;      
+      }
    }
    
-}
+} 
 
 void tradeRenko() {
 
@@ -376,12 +426,12 @@ void tradeRenko() {
       findSupportAndResistance(support,resistance);
 
       if (resistance!=NO_RESISTANCE) { 
-         place_SL_Line(resistance,"highResistance","Resistance");
+         place_SL_Line(resistance,"highResistance","Auto Resistance");
       } else {
          ObjectDelete("highResistance");
       }
       if (support!=NO_SUPPORT) {
-         place_SL_Line(support,"lowSupport","Support");
+         place_SL_Line(support,"lowSupport","Auto Support");
       } else {
          ObjectDelete("lowSupport");
       }
