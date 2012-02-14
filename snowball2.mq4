@@ -310,10 +310,21 @@ void findSupportAndResistance(double &support,double &resistance) {
       srNumBars = nBars;
    }
    ////////////////////////////////////////////////////////
+   double value;
+   value = findManualSR("resistance");
+   if (value>0) {
+      resistance = value;
+      resistanceShift = 0;
+   }
+   
+   value = findManualSR("support");
+   if (value>0) {
+      support = value;
+      supportShift = 0;      
+   }
+   
    
    if (resistance!=NO_RESISTANCE && support!=NO_SUPPORT) return;
-   
-   double value;
    
    if (resistance==NO_RESISTANCE && support==NO_SUPPORT) {
       shiftUp = getShiftOfLastTrend(1,high);
@@ -337,12 +348,6 @@ void findSupportAndResistance(double &support,double &resistance) {
          support = low;
          supportShift = shiftDown;
       }
-   } else {
-      value = findManualSR("resistance");
-      if (value>0) {
-         resistance = value;
-         resistanceShift = 0;
-      }
    }
    
    if (support!=NO_SUPPORT) {
@@ -351,13 +356,7 @@ void findSupportAndResistance(double &support,double &resistance) {
          resistance = high;
          resistanceShift = shiftUp; 
       }
-   } else {
-      value = findManualSR("support");
-      if (value>0) {
-         support = value;
-         supportShift = 0;      
-      }
-   }
+   } 
    
 } 
 
