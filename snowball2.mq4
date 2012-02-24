@@ -261,8 +261,13 @@ int findOtherSide(int direction, int shiftStart,double &outValue) {
 
 double support=NO_SUPPORT; int supportShift = 0;
 double resistance =NO_RESISTANCE; int resistanceShift = 0;
+bool supportResistanceAlreadyReset = false;
 
 void resetSupportAndResistance() {
+   
+   if (supportResistanceAlreadyReset) return;
+   
+   supportResistanceAlreadyReset = true;
    support = NO_SUPPORT; // <== questi default fanno si che sia impossibile che il prezzo rompa il supporto/resistenza
    resistance = NO_RESISTANCE;
    supportShift=0;
@@ -293,7 +298,7 @@ double findManualSR(string command) {
 
 
 int srNumBars=0;
-void findSupportAndResistance(double &support,double &resistance) {
+void findSupportAndResistance(double &support,double &resistance,bool onlyManual) {
    double high=0,low=0;
    
    int shiftUp;
@@ -323,7 +328,7 @@ void findSupportAndResistance(double &support,double &resistance) {
       supportShift = 0;      
    }
    
-   
+   if (onlyManual) return;
    if (resistance!=NO_RESISTANCE && support!=NO_SUPPORT) return;
    
    if (resistance==NO_RESISTANCE && support==NO_SUPPORT) {
@@ -391,8 +396,21 @@ void tradeRenko() {
 
    bool bigSpread = checkSpread();
 
+   findSupportAndResistance(support,resistance,(isLong||isShort));
+
+   if (resistance!=NO_RESISTANCE) { 
+      place_SL_Line(resistance,"highResistance","Auto Resistance");
+   } else {
+      ObjectDelete("highResistance");
+   }
+   if (support!=NO_SUPPORT) {
+      place_SL_Line(support,"lowSupport","Auto Support");
+   } else {
+      ObjectDelete("lowSupport");
+   }
+
    if (isLong||isShort) { 
-      resetSupportAndResistance();
+      resetSupportAndResistance(); // <--- resetta solo una volta, poi se l'utente imposta manualmente quello viene mantenuto....
       
       if (RENKO_AUTO_TRADE && !bigSpread) {
          bool needToClose = false;
@@ -421,19 +439,8 @@ void tradeRenko() {
    }
 
    if (!(isLong||isShort)) {
-      
-      findSupportAndResistance(support,resistance);
-
-      if (resistance!=NO_RESISTANCE) { 
-         place_SL_Line(resistance,"highResistance","Auto Resistance");
-      } else {
-         ObjectDelete("highResistance");
-      }
-      if (support!=NO_SUPPORT) {
-         place_SL_Line(support,"lowSupport","Auto Support");
-      } else {
-         ObjectDelete("lowSupport");
-      }
+   
+      supportResistanceAlreadyReset = false;
 
       // verifica se posso entrare
       /*
