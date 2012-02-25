@@ -9,7 +9,7 @@
 #include <offline_charts.mqh> 
 //#include <oanda.mqh> 
 
-extern double lots = 0.01; // lots to use per trade
+extern double lots = 0.02; // lots to use per trade
 //extern double oanda_factor = 25000;
 extern int stop_distance = 5;
 extern int min_stop_distance = 10;
@@ -55,8 +55,8 @@ extern bool IS_RENKO_CHART = true;
 extern bool RENKO_AUTO_TRADE = true;
 extern bool RENKO_USE_TAKEPROFIT = false;
 
-extern double ACCOUNT_EURO = 100;
-extern double RISK_STOPDISTANCE_DIVISOR = 0.5;
+extern double ACCOUNT_EURO = 600;
+extern double RISK_STOPDISTANCE_DIVISOR = 1;
 extern bool NO_STOPS = true;
 extern double MAX_SPREAD_PIPS = 2.5;
 
