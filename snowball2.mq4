@@ -433,7 +433,9 @@ void tradeRenko() {
                if (MACDSignal0<MACDHistoGram0) needToClose = true;
             }
          }
-         if (needToClose) closeTrades("tradeRenko");
+         if (needToClose) {
+            closeOpenOrders(-1, magic);
+         }
       }
       
    }
