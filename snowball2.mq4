@@ -56,10 +56,10 @@ extern bool RENKO_AUTO_TRADE = true;
 extern bool RENKO_USE_TAKEPROFIT = false;
 
 extern double     RENKO_BreakEven       = 10;    // Profit Lock in pips  
-extern double     RENKO_LockGainPips    = 1; 
+extern double     RENKO_LockGainPips    = 2; 
 extern double     RENKO_BreakEven2    = 20;
 extern double     RENKO_LockGainPips2 = 10;
-extern double     RENKO_AutoSLPips = 10;
+extern double     RENKO_AutoSLPips = 15;
 
 extern double ACCOUNT_EURO = 600;
 extern double RISK_STOPDISTANCE_DIVISOR = 1;
@@ -136,8 +136,10 @@ double HAOpen;
 // ---- Trailing Stops
 double trailStopMaxBid=0;
 double trailStopMinAsk=100000000;
-void TrailStops(double BE,double LG,double AutoSL)
+double TrailStops(double BE,double LG,double AutoSL)
 {        
+   
+    double value = 0;
 
     if (Ask<trailStopMinAsk) trailStopMinAsk = Ask;
     if (Bid>trailStopMaxBid) trailStopMaxBid = Bid;
@@ -166,6 +168,8 @@ void TrailStops(double BE,double LG,double AutoSL)
                       doCycle=true;
                       break; // cycle again starting from 0 (HELLO FIFO!)
                    }
+                   
+                   value = BuyStop;
 			      
 			       }
                 if ( mode==OP_SELL )
@@ -182,10 +186,13 @@ void TrailStops(double BE,double LG,double AutoSL)
                       break; // cycle again starting from 0 (HELLO FIFO!)
    		          }   
                  
+                   value = SellStop;
                 }
              }   
           } 
       }
+      
+      return (value);
 }
 
 
@@ -499,8 +506,11 @@ void tradeRenko() {
             closeOpenOrders(-1, magic);
          }
          
-         TrailStops(RENKO_BreakEven,RENKO_LockGainPips,RENKO_AutoSLPips);
-         TrailStops(RENKO_BreakEven2,RENKO_LockGainPips2,RENKO_AutoSLPips);
+         double v1 = TrailStops(RENKO_BreakEven,RENKO_LockGainPips,RENKO_AutoSLPips);
+         if (v1>0) place_SL_Line(v1,"BE_t1","BreakEven 1");
+         double v2 = TrailStops(RENKO_BreakEven2,RENKO_LockGainPips2,RENKO_AutoSLPips);
+         if (v2>0) place_SL_Line(v2,"BE_t2","BreakEven 2");
+      
       }
       
    }
