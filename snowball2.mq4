@@ -2092,6 +2092,10 @@ void info(){
            "\n" + SP + "Trading enabled from " + START_HOUR + ":" + START_MINUTES + " to " + END_HOUR + ":" + END_MINUTES + " local time"+stoppedInfo+
            "\n" + SP + "Stop for 1 percent risk: " + DoubleToStr(STOP_FOR_1_PERCENT_RISK(),3) + " / "+ DoubleToStr(RISK_STOPDISTANCE_DIVISOR,1) + 
            "\n" + SP + "IS RENKO CHART: " + IS_RENKO_CHART + " AUTOTRADE:" + RENKO_AUTO_TRADE +  " USE_TAKEPROFIT:"+RENKO_USE_TAKEPROFIT+
+                       " BE1: "+DoubleToStr(RENKO_BreakEven,2) + 
+                       "("+DoubleToStr(RENKO_LockGainPips,2)+
+                       ") BE2: "+DoubleToStr(RENKO_BreakEven2,2) +
+                       "("+DoubleToStr(RENKO_LockGainPips2,2)+")"+
            "\n" + stringToAppendToInfo);
 
    if (last_be_plot == 0 || TimeCurrent() - last_be_plot > 300){ // every 5 minutes
