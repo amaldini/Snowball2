@@ -134,60 +134,58 @@ double HAClose;
 double HAOpen;
 
 // ---- Trailing Stops
-void TrailStops()
+double trailStopMaxBid=0;
+double trailStopMinAsk=100000000;
+void TrailStops(double BE,double LG,double AutoSL)
 {        
-    int total=OrdersTotal();
-    for (int cnt=0;cnt<total;cnt++)
-    { 
-     OrderSelect(cnt, SELECT_BY_POS);   
-     int mode=OrderType();    
-        if ( OrderSymbol()==Symbol() ) 
-        {
-            if ( mode==OP_BUY )
-            {  
-               double BuyStop = OrderOpenPrice()-pip*RENKO_AutoSLPips;
-               Comment("Digit: "+Digits+" Point: "+Point+ " PointsPerPip:"+points_per_pip+"\n"+
-               "OrderOpenPrice:"+OrderOpenPrice()+"\n"+
-               "Stop loss will be at: "+(OrderOpenPrice()+pip*RENKO_LockGainPips)+
-               "BreakEven trigger will be at: "+(OrderOpenPrice()+pip*RENKO_BreakEven));
-               if ( Bid-OrderOpenPrice()>pip*RENKO_BreakEven ) 
-               {
-                  BuyStop = OrderOpenPrice()+pip*RENKO_LockGainPips;
-               }
-               if ( RENKO_BreakEven2>RENKO_BreakEven && ((Bid-OrderOpenPrice())>pip*RENKO_BreakEven2)) {
-                  BuyStop = OrderOpenPrice()+pip*RENKO_LockGainPips2;
-               }
-               
-               if (OrderStopLoss()<BuyStop || OrderStopLoss()==0) {
-                  OrderModify(OrderTicket(),OrderOpenPrice(),
-                              NormalizeDouble(BuyStop, Digits),
-                              OrderTakeProfit(),0,LightGreen);
-               }
-			      
-			   }
-            if ( mode==OP_SELL )
+
+    if (Ask<trailStopMinAsk) trailStopMinAsk = Ask;
+    if (Bid>trailStopMaxBid) trailStopMaxBid = Bid;
+
+    bool doCycle=true;
+    while (doCycle) {
+      doCycle=false;
+      int total=OrdersTotal();
+      for (int cnt=0;cnt<total;cnt++)
+      { 
+         OrderSelect(cnt, SELECT_BY_POS);   
+         int mode=OrderType();    
+            if ( OrderSymbol()==Symbol() ) 
             {
-               double SellStop = OrderOpenPrice()+pip*RENKO_AutoSLPips;
-               Comment("Digit: "+Digits+" Point: "+Point+ " PointsPerPip:"+points_per_pip+"\n"+
-               "OrderOpenPrice:"+OrderOpenPrice()+"\n"+
-               "Stop loss will be at: "+(OrderOpenPrice()-pip*RENKO_LockGainPips)+
-               "BreakEven trigger will be at: "+(OrderOpenPrice()-pip*RENKO_BreakEven));
-               if ( OrderOpenPrice()-Ask>pip*RENKO_BreakEven ) 
-               {
-                  SellStop = OrderOpenPrice()-pip*RENKO_LockGainPips;
-               }
-               if ( RENKO_BreakEven2>RENKO_BreakEven && ((OrderOpenPrice()-Ask)>pip*RENKO_BreakEven2)) {
-                  SellStop = OrderOpenPrice()-pip*RENKO_LockGainPips2;
-               }
-               if (OrderStopLoss()>SellStop || OrderStopLoss()==0) {
-                  OrderModify(OrderTicket(),OrderOpenPrice(),
-   		                  NormalizeDouble(SellStop, Digits),
-   		                  OrderTakeProfit(),0,Yellow);	 
-   		      }   
+                if ( mode==OP_BUY )
+                {  
+                   double BuyStop = OrderOpenPrice()-pip*AutoSL;
+                   if ( trailStopMaxBid-OrderOpenPrice()>pip*BE ) 
+                   {
+                      BuyStop = OrderOpenPrice()+pip*LG;
+                   }
+               
+                   if (Bid<BuyStop) {
+                      maldaLog("TrailStops: Close order "+OrderTicket()+" at BreakEven: "+Bid);
+                      orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, CLR_SELL_ARROW);
+                      doCycle=true;
+                      break; // cycle again starting from 0 (HELLO FIFO!)
+                   }
+			      
+			       }
+                if ( mode==OP_SELL )
+                {
+                   double SellStop = OrderOpenPrice()+pip*AutoSL;
+                   if ( OrderOpenPrice()-trailStopMinAsk>pip*BE ) 
+                   {
+                      SellStop = OrderOpenPrice()-pip*LG;
+                   }
+                   if (Ask>SellStop ) {
+                      maldaLog("TrailStops: Close order "+OrderTicket()+" at BreakEven: "+Ask);
+                      orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, CLR_BUY_ARROW);
+   		             doCycle=true;
+                      break; // cycle again starting from 0 (HELLO FIFO!)
+   		          }   
                  
-            }
-         }   
-      } 
+                }
+             }   
+          } 
+      }
 }
 
 
@@ -501,7 +499,8 @@ void tradeRenko() {
             closeOpenOrders(-1, magic);
          }
          
-         TrailStops();
+         TrailStops(RENKO_BreakEven,RENKO_LockGainPips,RENKO_AutoSLPips);
+         TrailStops(RENKO_BreakEven2,RENKO_LockGainPips2,RENKO_AutoSLPips);
       }
       
    }
@@ -509,6 +508,8 @@ void tradeRenko() {
    if (!(isLong||isShort)) {
    
       supportResistanceAlreadyReset = false;
+      trailStopMaxBid =0;
+      trailStopMinAsk = 10000000;
 
       // verifica se posso entrare
       /*
