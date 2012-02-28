@@ -55,6 +55,12 @@ extern bool IS_RENKO_CHART = true;
 extern bool RENKO_AUTO_TRADE = true;
 extern bool RENKO_USE_TAKEPROFIT = false;
 
+extern double     RENKO_BreakEven       = 10;    // Profit Lock in pips  
+extern double     RENKO_LockGainPips    = 1; 
+extern double     RENKO_BreakEven2    = 20;
+extern double     RENKO_LockGainPips2 = 10;
+extern double     RENKO_AutoSLPips = 10;
+
 extern double ACCOUNT_EURO = 600;
 extern double RISK_STOPDISTANCE_DIVISOR = 1;
 extern bool NO_STOPS = true;
@@ -126,6 +132,64 @@ double HALow;
 double HAHigh;
 double HAClose;
 double HAOpen;
+
+// ---- Trailing Stops
+void TrailStops()
+{        
+    int total=OrdersTotal();
+    for (int cnt=0;cnt<total;cnt++)
+    { 
+     OrderSelect(cnt, SELECT_BY_POS);   
+     int mode=OrderType();    
+        if ( OrderSymbol()==Symbol() ) 
+        {
+            if ( mode==OP_BUY )
+            {  
+               double BuyStop = OrderOpenPrice()-pip*RENKO_AutoSLPips;
+               Comment("Digit: "+Digits+" Point: "+Point+ " PointsPerPip:"+points_per_pip+"\n"+
+               "OrderOpenPrice:"+OrderOpenPrice()+"\n"+
+               "Stop loss will be at: "+(OrderOpenPrice()+pip*RENKO_LockGainPips)+
+               "BreakEven trigger will be at: "+(OrderOpenPrice()+pip*RENKO_BreakEven));
+               if ( Bid-OrderOpenPrice()>pip*RENKO_BreakEven ) 
+               {
+                  BuyStop = OrderOpenPrice()+pip*RENKO_LockGainPips;
+               }
+               if ( RENKO_BreakEven2>RENKO_BreakEven && ((Bid-OrderOpenPrice())>pip*RENKO_BreakEven2)) {
+                  BuyStop = OrderOpenPrice()+pip*RENKO_LockGainPips2;
+               }
+               
+               if (OrderStopLoss()<BuyStop || OrderStopLoss()==0) {
+                  OrderModify(OrderTicket(),OrderOpenPrice(),
+                              NormalizeDouble(BuyStop, Digits),
+                              OrderTakeProfit(),0,LightGreen);
+               }
+			      
+			   }
+            if ( mode==OP_SELL )
+            {
+               double SellStop = OrderOpenPrice()+pip*RENKO_AutoSLPips;
+               Comment("Digit: "+Digits+" Point: "+Point+ " PointsPerPip:"+points_per_pip+"\n"+
+               "OrderOpenPrice:"+OrderOpenPrice()+"\n"+
+               "Stop loss will be at: "+(OrderOpenPrice()-pip*RENKO_LockGainPips)+
+               "BreakEven trigger will be at: "+(OrderOpenPrice()-pip*RENKO_BreakEven));
+               if ( OrderOpenPrice()-Ask>pip*RENKO_BreakEven ) 
+               {
+                  SellStop = OrderOpenPrice()-pip*RENKO_LockGainPips;
+               }
+               if ( RENKO_BreakEven2>RENKO_BreakEven && ((OrderOpenPrice()-Ask)>pip*RENKO_BreakEven2)) {
+                  SellStop = OrderOpenPrice()-pip*RENKO_LockGainPips2;
+               }
+               if (OrderStopLoss()>SellStop || OrderStopLoss()==0) {
+                  OrderModify(OrderTicket(),OrderOpenPrice(),
+   		                  NormalizeDouble(SellStop, Digits),
+   		                  OrderTakeProfit(),0,Yellow);	 
+   		      }   
+                 
+            }
+         }   
+      } 
+}
+
 
 void getHeikenAshiValues(int candleIndex) {
    HALow = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HALOW, candleIndex);
@@ -436,6 +500,8 @@ void tradeRenko() {
          if (needToClose) {
             closeOpenOrders(-1, magic);
          }
+         
+         TrailStops();
       }
       
    }
