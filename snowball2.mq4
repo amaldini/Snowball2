@@ -60,6 +60,7 @@ extern double     RENKO_LockGainPips    = 2;
 extern double     RENKO_BreakEven2    = 20;
 extern double     RENKO_LockGainPips2 = 10;
 extern double     RENKO_AutoSLPips = 15;
+extern double     RENKO_PYRAMID_Pips = 20; 
 
 extern double ACCOUNT_EURO = 600;
 extern double RISK_STOPDISTANCE_DIVISOR = 1;
@@ -140,6 +141,7 @@ double TrailStops(double BE,double LG,double AutoSL)
 {        
    
     double value = 0;
+    bool firstValueAssigned = false;
 
     if (Ask<trailStopMinAsk) trailStopMinAsk = Ask;
     if (Bid>trailStopMaxBid) trailStopMaxBid = Bid;
@@ -168,8 +170,10 @@ double TrailStops(double BE,double LG,double AutoSL)
                       doCycle=true;
                       break; // cycle again starting from 0 (HELLO FIFO!)
                    }
-                   
-                   value = BuyStop;
+                   if (!firstValueAssigned || BuyStop>value) { 
+                        value = BuyStop;
+                        firstValueAssigned = true;
+                   }
 			      
 			       }
                 if ( mode==OP_SELL )
@@ -186,7 +190,11 @@ double TrailStops(double BE,double LG,double AutoSL)
                       break; // cycle again starting from 0 (HELLO FIFO!)
    		          }   
                  
-                   value = SellStop;
+                   if (!firstValueAssigned || SellStop<value) { 
+                        value = SellStop;
+                        firstValueAssigned = true;
+                   }
+                 
                 }
              }   
           } 
@@ -504,18 +512,51 @@ void tradeRenko() {
          }
          if (needToClose) {
             closeOpenOrders(-1, magic);
+         } else { // non chiudo
+            double v1 = TrailStops(RENKO_BreakEven,RENKO_LockGainPips,RENKO_AutoSLPips);
+            if (v1>0) place_SL_Line(v1,"BE_t1","BreakEven 1");
+            double v2 = TrailStops(RENKO_BreakEven2,RENKO_LockGainPips2,RENKO_AutoSLPips);
+            if (v2>0) place_SL_Line(v2,"BE_t2","BreakEven 2");
+            
+            
+            if (RENKO_PYRAMID_Pips>0) {
+               int nOrders;
+               double basePrice;
+            
+               // se sono a distanza di RENKO_PYRAMID_PIPS dall'ultimo acquisto teorico, 
+               // che é dato dal primo_buy_price+RENKO_PYRAMID_PIPS*(nOpenTrades),
+               // apro un nuovo trade
+            
+               // PYRAMID ??
+               if (isLong) { // long
+                  nOrders = getNumOpenOrders(OP_BUY, magic);
+               } else { // short 
+                  nOrders = getNumOpenOrders(OP_SELL, magic);
+               }
+            
+               if (nOrders>0) {
+                  basePrice = getPyramidBase();
+            
+                  // DEVO VERIFICARE CHE LE CONDIZIONI PER L'INGRESSO SIANO ANCORA VALIDE!?!?!?
+                  if (isLong) {
+                     //    10                 10               1
+                     if (((Bid-basePrice)/RENKO_PYRAMID_Pips)>=nOrders) renkoBuy();
+                  } else {
+                     if (((basePrice-Ask)/RENKO_PYRAMID_Pips)>=nOrders) renkoSell();
+                  }
+            
+               }
+            }
+           
          }
-         
-         double v1 = TrailStops(RENKO_BreakEven,RENKO_LockGainPips,RENKO_AutoSLPips);
-         if (v1>0) place_SL_Line(v1,"BE_t1","BreakEven 1");
-         double v2 = TrailStops(RENKO_BreakEven2,RENKO_LockGainPips2,RENKO_AutoSLPips);
-         if (v2>0) place_SL_Line(v2,"BE_t2","BreakEven 2");
-      
       }
       
    }
 
    if (!(isLong||isShort)) {
+   
+      ObjectDelete("BE_t1");
+      ObjectDelete("BE_t2");
    
       supportResistanceAlreadyReset = false;
       trailStopMaxBid =0;
@@ -586,23 +627,33 @@ void tradeRenko() {
          double sl=0,tp=0;
          
          if (goLong) {
-            sl = Bid - pip * stop_distance;
-            tp = Bid + pip * stop_distance;
-            if (!RENKO_USE_TAKEPROFIT) tp=0;
-            // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
-            buy(lots, sl, tp, magic, comment, "tradeRenko");   
+            renkoBuy();  
          }
          if (goShort) {
-            sl = Ask + pip * stop_distance;
-            tp = Ask - pip * stop_distance;
-            if (!RENKO_USE_TAKEPROFIT) tp=0; 
-            // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
-            sell(lots, sl, tp, magic, comment, "tradeRenko");
+            renkoSell();
          }
          
       }
       
    }
+}
+
+void renkoBuy() {
+   double sl=0,tp=0;
+   sl = calcStopLossByPrice(OP_BUY,Bid);
+   tp = Bid + pip * stop_distance;
+   if (!RENKO_USE_TAKEPROFIT) tp=0;
+   // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
+   buy(lots, sl, tp, magic, comment, "tradeRenko"); 
+}
+
+void renkoSell() {
+   double sl=0,tp=0;
+   sl = calcStopLossByPrice(OP_SELL,Ask);
+   tp = Ask - pip * stop_distance;
+   if (!RENKO_USE_TAKEPROFIT) tp=0; 
+   // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
+   sell(lots, sl, tp, magic, comment, "tradeRenko");
 }
 
 int getStopDistance() {
@@ -2106,7 +2157,8 @@ void info(){
                        " BE1: "+DoubleToStr(RENKO_BreakEven,2) + 
                        "("+DoubleToStr(RENKO_LockGainPips,2)+
                        ") BE2: "+DoubleToStr(RENKO_BreakEven2,2) +
-                       "("+DoubleToStr(RENKO_LockGainPips2,2)+")"+
+                       "("+DoubleToStr(RENKO_LockGainPips2,2) +
+                       ") SL: "+DoubleToStr(RENKO_AutoSLPips,2)+
            "\n" + stringToAppendToInfo);
 
    if (last_be_plot == 0 || TimeCurrent() - last_be_plot > 300){ // every 5 minutes
