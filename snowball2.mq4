@@ -442,6 +442,63 @@ void findSupportAndResistance(double &support,double &resistance,bool onlyManual
    
 } 
 
+bool renkoPyramidOk(double MACDHistoGram0,double MACDHistoGram1,double MACDSignal1) {
+   getHeikenAshiValues(1);
+   double HAOpen1 = HAOpen;
+   double HAClose1 = HAClose;
+   double HAHigh1 = HAHigh;
+   double HALow1 = HALow;
+
+   getHeikenAshiValues(0);
+   double HAOpen0 = HAOpen;
+   double HAClose0 = HAClose;
+   double HAHigh0 = HAHigh;
+   double HALow0 = HALow;  
+
+   bool HADirectionUP = (HAClose1>HAOpen1) && (HAClose0>HAOpen0);
+   bool HADirectionDown = (HAClose1<HAOpen1) && (HAClose0<HAOpen0);
+
+   double RSI = RenkoRSI();
+ 
+   bool goLong = false, goShort = false;
+ 
+   // maldaLog("RSI="+RSI+" MACDSignal="+MACDSignal0+" MACDUp="+MACDUp0+" MACDDown="+MACDDown0+ "MACDHistogram="+(MACDHistoGram0));
+   if (RSI>55) {
+      // if (HAClose0>resistance && HAClose1>resistance) {  
+         if (HADirectionUP) { // blue candles
+            // check to  go long
+            //start_immediately = true;
+            //go(LONG);
+            if ((MACDHistoGram0>MACDHistoGram1) && (MACDHistoGram1>MACDSignal1)) { 
+               // maldaLog("RENKO GO LONG!!!");
+               // Alert(Symbol6()+" RENKO GO LONG!!!");
+               goLong = true;
+            }
+         } else {
+            // maldaLog("HA direction NOT up!!!");
+         }
+      // }
+   }
+   if (RSI<45) { 
+      // if (HAClose0<support && HAClose1<support) { 
+         if (HADirectionDown) { // black candles
+            // check to go short
+            // start_immediately = true;
+            // go(SHORT);
+            if ((MACDHistoGram0<MACDHistoGram1) && (MACDHistoGram1<MACDSignal1)) {
+               // maldaLog("RENKO GO SHORT!!!");
+               // Alert(Symbol6()+" RENKO GO SHORT!!!");
+               goShort = true;
+            } 
+         } else {
+            // maldaLog("HA direction NOT down!!!");
+         }
+      // }
+   }
+   
+   return (goLong || goShort);
+}
+
 void tradeRenko() {
 
    if (!IS_RENKO_CHART) return;
@@ -534,7 +591,7 @@ void tradeRenko() {
                   nOrders = getNumOpenOrders(OP_SELL, magic);
                }
             
-               if (nOrders>0) {
+               if (nOrders>0 && renkoPyramidOk(MACDHistoGram0,MACDHistoGram1,MACDSignal1)) {
                   basePrice = getPyramidBase();
             
                   // DEVO VERIFICARE CHE LE CONDIZIONI PER L'INGRESSO SIANO ANCORA VALIDE!?!?!?
