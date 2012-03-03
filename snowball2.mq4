@@ -499,6 +499,48 @@ bool renkoPyramidOk(double MACDHistoGram0,double MACDHistoGram1,double MACDSigna
    return (goLong || goShort);
 }
 
+void closeLastOrder(int mode) {
+
+    double best=0;
+    int bestTicket = 0;
+    bool found = false;
+    int clr = CLR_BUY_ARROW;
+    if (mode==OP_BUY) {
+      clr = CLR_SELL_ARROW;
+    }
+
+   int total=OrdersTotal();
+   for (int cnt=0;cnt<total;cnt++)
+   { 
+      if (OrderSelect(cnt, SELECT_BY_POS)) {
+         int oType = OrderType();
+            
+         if ( isMyOrder(magic) && oType==mode ) {
+            if ( mode==OP_BUY && (OrderOpenPrice()>best || !found))
+            {  
+              best = OrderOpenPrice();
+              bestTicket = OrderTicket(); 
+              found = true; 
+            }
+            if ( mode==OP_SELL && (OrderOpenPrice()<best || !found) )
+            {
+              best = OrderOpenPrice();
+              bestTicket = OrderTicket();
+              found = true;
+            }
+          }
+       }   
+   } 
+   
+      
+   if (found) {
+      if (OrderSelect(bestTicket,SELECT_BY_TICKET)) {
+         maldaLog("Scale out "+OrderTicket()+" at "+DoubleToStr((Bid+Ask/2),4));
+         orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, clr);         
+      }
+   }
+}
+
 void tradeRenko() {
 
    if (!IS_RENKO_CHART) return;
@@ -591,8 +633,8 @@ void tradeRenko() {
                   nOrders = getNumOpenOrders(OP_SELL, magic);
                }
             
+               basePrice = getPyramidBase();
                if (nOrders>0 && renkoPyramidOk(MACDHistoGram0,MACDHistoGram1,MACDSignal1)) {
-                  basePrice = getPyramidBase();
             
                   // DEVO VERIFICARE CHE LE CONDIZIONI PER L'INGRESSO SIANO ANCORA VALIDE!?!?!?
                   if (isLong) {
@@ -603,6 +645,15 @@ void tradeRenko() {
                   }
             
                }
+               
+               if (nOrders>0) {
+                  if (isLong) {
+                     if (((Bid-basePrice)/RENKO_PYRAMID_Pips)<(nOrders-2)) closeLastOrder(OP_BUY);
+                  } else {
+                     if (((basePrice-Ask)/RENKO_PYRAMID_Pips)<(nOrders-2)) closeLastOrder(OP_SELL);
+                  }
+               }              
+               
             }
            
          }
