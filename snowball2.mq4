@@ -55,11 +55,13 @@ extern bool IS_RENKO_CHART = true;
 extern bool RENKO_AUTO_TRADE = true;
 extern bool RENKO_USE_TAKEPROFIT = false;
 
+/*
 extern double     RENKO_BreakEven       = 10;    // Profit Lock in pips  
 extern double     RENKO_LockGainPips    = 2; 
 extern double     RENKO_BreakEven2    = 20;
 extern double     RENKO_LockGainPips2 = 10;
 extern double     RENKO_AutoSLPips = 15;
+*/
 extern double     RENKO_PYRAMID_Pips = 20; 
 
 extern double ACCOUNT_EURO = 600;
@@ -612,11 +614,12 @@ void tradeRenko() {
          if (needToClose) {
             closeOpenOrders(-1, magic);
          } else { // non chiudo
+            /*
             double v1 = TrailStops(RENKO_BreakEven,RENKO_LockGainPips,RENKO_AutoSLPips);
             if (v1>0) place_SL_Line(v1,"BE_t1","BreakEven 1");
             double v2 = TrailStops(RENKO_BreakEven2,RENKO_LockGainPips2,RENKO_AutoSLPips);
             if (v2>0) place_SL_Line(v2,"BE_t2","BreakEven 2");
-            
+            */
             
             if (RENKO_PYRAMID_Pips>0) {
                int nOrders;
@@ -2262,11 +2265,7 @@ void info(){
            "\n" + SP + "Trading enabled from " + START_HOUR + ":" + START_MINUTES + " to " + END_HOUR + ":" + END_MINUTES + " local time"+stoppedInfo+
            "\n" + SP + "Stop for 1 percent risk: " + DoubleToStr(STOP_FOR_1_PERCENT_RISK(),3) + " / "+ DoubleToStr(RISK_STOPDISTANCE_DIVISOR,1) + 
            "\n" + SP + "IS RENKO CHART: " + IS_RENKO_CHART + " AUTOTRADE:" + RENKO_AUTO_TRADE +  " USE_TAKEPROFIT:"+RENKO_USE_TAKEPROFIT+
-                       " BE1: "+DoubleToStr(RENKO_BreakEven,2) + 
-                       "("+DoubleToStr(RENKO_LockGainPips,2)+
-                       ") BE2: "+DoubleToStr(RENKO_BreakEven2,2) +
-                       "("+DoubleToStr(RENKO_LockGainPips2,2) +
-                       ") SL: "+DoubleToStr(RENKO_AutoSLPips,2)+
+                       " PYR: "+DoubleToStr(RENKO_PYRAMID_Pips,2)+
            "\n" + stringToAppendToInfo);
 
    if (last_be_plot == 0 || TimeCurrent() - last_be_plot > 300){ // every 5 minutes
