@@ -65,7 +65,7 @@ extern double     RENKO_AutoSLPips = 15;
 extern double     RENKO_PYRAMID_Pips = 20; 
 
 extern double ACCOUNT_EURO = 600;
-extern double RISK_STOPDISTANCE_DIVISOR = 1;
+extern double RISK_STOPDISTANCE_DIVISOR = 1.9;
 extern bool NO_STOPS = false;
 extern double MAX_SPREAD_PIPS = 2.5;
 
@@ -642,18 +642,18 @@ void tradeRenko() {
                   // DEVO VERIFICARE CHE LE CONDIZIONI PER L'INGRESSO SIANO ANCORA VALIDE!?!?!?
                   if (isLong) {
                      //    10                 10               1
-                     if (((Bid-basePrice)/RENKO_PYRAMID_Pips)>=nOrders) renkoBuy();
+                     if (((Bid-basePrice)/(RENKO_PYRAMID_Pips*pip))>=nOrders) renkoBuy();
                   } else {
-                     if (((basePrice-Ask)/RENKO_PYRAMID_Pips)>=nOrders) renkoSell();
+                     if (((basePrice-Ask)/(RENKO_PYRAMID_Pips*pip))>=nOrders) renkoSell();
                   }
             
                }
                
                if (nOrders>0) {
                   if (isLong) {
-                     if (((Bid-basePrice)/RENKO_PYRAMID_Pips)<(nOrders-2)) closeLastOrder(OP_BUY);
+                     if (((Bid-basePrice)/(RENKO_PYRAMID_Pips*pip))<(nOrders-2)) closeLastOrder(OP_BUY);
                   } else {
-                     if (((basePrice-Ask)/RENKO_PYRAMID_Pips)<(nOrders-2)) closeLastOrder(OP_SELL);
+                     if (((basePrice-Ask)/(RENKO_PYRAMID_Pips*pip))<(nOrders-2)) closeLastOrder(OP_SELL);
                   }
                }              
                
