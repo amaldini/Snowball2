@@ -642,9 +642,9 @@ void tradeRenko() {
                   // DEVO VERIFICARE CHE LE CONDIZIONI PER L'INGRESSO SIANO ANCORA VALIDE!?!?!?
                   if (isLong) {
                      //    10                 10               1
-                     if (((Bid-basePrice)/(RENKO_PYRAMID_Pips*pip))>=nOrders) renkoBuy();
+                     if (((Bid-basePrice)/(RENKO_PYRAMID_Pips*pip))>=nOrders) renkoBuy(nOrders);
                   } else {
-                     if (((basePrice-Ask)/(RENKO_PYRAMID_Pips*pip))>=nOrders) renkoSell();
+                     if (((basePrice-Ask)/(RENKO_PYRAMID_Pips*pip))>=nOrders) renkoSell(nOrders);
                   }
             
                }
@@ -738,10 +738,10 @@ void tradeRenko() {
          double sl=0,tp=0;
          
          if (goLong) {
-            renkoBuy();  
+            renkoBuy(0);  
          }
          if (goShort) {
-            renkoSell();
+            renkoSell(0);
          }
          
       }
@@ -749,22 +749,26 @@ void tradeRenko() {
    }
 }
 
-void renkoBuy() {
+void renkoBuy(int level) {
    double sl=0,tp=0;
    sl = calcStopLossByPrice(OP_BUY,Bid);
    tp = Bid + pip * stop_distance;
    if (!RENKO_USE_TAKEPROFIT) tp=0;
+   double numLots = lots;
+   if (level==1 || level==2) numLots*=2;
    // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
-   buy(lots, sl, tp, magic, comment, "tradeRenko"); 
+   buy(numLots, sl, tp, magic, comment, "tradeRenko"); 
 }
 
-void renkoSell() {
+void renkoSell(int level) {
    double sl=0,tp=0;
    sl = calcStopLossByPrice(OP_SELL,Ask);
    tp = Ask - pip * stop_distance;
    if (!RENKO_USE_TAKEPROFIT) tp=0; 
+   double numLots = lots;
+   if (level==1 || level==2) numLots*=2;
    // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
-   sell(lots, sl, tp, magic, comment, "tradeRenko");
+   sell(numLots, sl, tp, magic, comment, "tradeRenko");
 }
 
 int getStopDistance() {
