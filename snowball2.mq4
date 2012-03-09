@@ -537,7 +537,7 @@ void closeLastOrder(int mode) {
       
    if (found) {
       if (OrderSelect(bestTicket,SELECT_BY_TICKET)) {
-         maldaLog("Scale out "+OrderTicket()+" at "+DoubleToStr((Bid+Ask/2),4));
+         maldaLog("Scale out "+OrderTicket()+" at "+DoubleToStr(((Bid+Ask)/2),4));
          orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, clr);         
       }
    }
