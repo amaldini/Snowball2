@@ -19,7 +19,7 @@ extern double profit_target = 0;
 extern int auto_tp = 2; // auto-takeprofit this many levels (roughly) above the BE point
 extern bool stopWhenAutoTP=true;
 ////////////////////////////////////////
-extern bool useBreakEven=true;
+extern bool useBreakEven=false;
 extern double breakEvenOffset=2;
 ////////////////////////////////////////
 extern bool breakoutMode=false;
