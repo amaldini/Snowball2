@@ -2326,7 +2326,7 @@ void info(){
          pb = getPyramidBase();
          lp = ObjectGet("profit", OBJPROP_PRICE1);
          if (pb==0) pb = getLine();
-         maldaLog("lp:"+lp+" pb:"+pb);
+         // maldaLog("lp:"+lp+" pb:"+pb);
          tp = getTheoreticProfitRenko(MathAbs(lp-pb),RENKO_PYRAMID_Pips);
          ObjectSetText("profit", "¯¯¯ " + DoubleToStr(MathRound(realized - getGlobal("realized") + tp), 0) + " " + AccountCurrency() + " profit projection ¯¯¯");
       }
