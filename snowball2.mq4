@@ -136,6 +136,20 @@ double HAHigh;
 double HAClose;
 double HAOpen;
 
+/**
+* return the floating profit that would result if
+* price would be the specified distance away from
+* the base of the pyramid
+*/ 
+double getTheoreticProfitRenko(double distance,double pyrDistance){
+   int n = MathFloor(distance / (pyrDistance * pip));
+   double remain = distance - n * pyrDistance * pip;
+   int mult = n * (n + 1) / 2;
+   double profit = MarketInfo(Symbol(), MODE_TICKVALUE) * lots * pyrDistance * points_per_pip * mult;
+   profit = profit + MarketInfo(Symbol(), MODE_TICKVALUE) * lots * (remain/Point) * (n + 1);
+   return(profit);
+}
+
 // ---- Trailing Stops
 double trailStopMaxBid=0;
 double trailStopMinAsk=100000000;
@@ -2283,29 +2297,41 @@ void info(){
    // and calculate your profit, should price reach this position
    // and then write this number into the text object. You can
    // move it around on the chart to get profit projections for
-   // any price level you want. 
-   if (ObjectFind("profit") != -1){
-      pb = getPyramidBase();
-      lp = ObjectGet("profit", OBJPROP_PRICE1);
-      if (pb ==0){
-         if (direction == SHORT){
-            pb = getLine() - stop_distance * pip;
-         }
-         if (direction == LONG){
-            pb = getLine() + stop_distance * pip;
-         }
-         if (direction == BIDIR){
-            if (lp < getLine()){
+   // any price level you want.
+   if (!IS_RENKO_CHART) { 
+      if (ObjectFind("profit") != -1){
+         pb = getPyramidBase();
+         lp = ObjectGet("profit", OBJPROP_PRICE1);
+         if (pb ==0){
+            if (direction == SHORT){
                pb = getLine() - stop_distance * pip;
             }
-            if (lp >= getLine()){
+            if (direction == LONG){
                pb = getLine() + stop_distance * pip;
             }
+            if (direction == BIDIR){
+               if (lp < getLine()){
+                  pb = getLine() - stop_distance * pip;
+               }
+               if (lp >= getLine()){
+                  pb = getLine() + stop_distance * pip;
+               }
+            }
          }
+         tp = getTheoreticProfit(MathAbs(lp - pb));
+         ObjectSetText("profit", "¯¯¯ " + DoubleToStr(MathRound(realized - getGlobal("realized") + tp), 0) + " " + AccountCurrency() + " profit projection ¯¯¯");
       }
-      tp = getTheoreticProfit(MathAbs(lp - pb));
-      ObjectSetText("profit", "¯¯¯ " + DoubleToStr(MathRound(realized - getGlobal("realized") + tp), 0) + " " + AccountCurrency() + " profit projection ¯¯¯");
-   }
+   } else { // RENKO
+      if (ObjectFind("profit") != -1) {
+         pb = getPyramidBase();
+         lp = ObjectGet("profit", OBJPROP_PRICE1);
+         if (pb==0) pb = getLine();
+         maldaLog("lp:"+lp+" pb:"+pb);
+         tp = getTheoreticProfitRenko(MathAbs(lp-pb),RENKO_PYRAMID_Pips);
+         ObjectSetText("profit", "¯¯¯ " + DoubleToStr(MathRound(realized - getGlobal("realized") + tp), 0) + " " + AccountCurrency() + " profit projection ¯¯¯");
+      }
+   
+   }  
    
 }
 
