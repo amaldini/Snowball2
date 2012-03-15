@@ -15,7 +15,7 @@ extern int stop_distance = 5;
 extern int min_stop_distance = 10;
 extern bool dynamicStopDistance = false;
 ////////////////////////////////////////
-extern double profit_target = 0;
+extern double profit_target = 12;
 extern int auto_tp = 2; // auto-takeprofit this many levels (roughly) above the BE point
 extern bool stopWhenAutoTP=true;
 ////////////////////////////////////////
@@ -62,7 +62,7 @@ extern double     RENKO_BreakEven2    = 20;
 extern double     RENKO_LockGainPips2 = 10;
 extern double     RENKO_AutoSLPips = 15;
 */
-extern double     RENKO_PYRAMID_Pips = 20; 
+extern double     RENKO_PYRAMID_Pips = 5; 
 
 extern double ACCOUNT_EURO = 600;
 extern double RISK_STOPDISTANCE_DIVISOR = 1.9;
@@ -2279,7 +2279,7 @@ void info(){
            "\n" + SP + "realized: " + DoubleToStr(realized - getGlobal("realized"), 2) + "  floating: " + DoubleToStr(floating, 2) +
            "\n" + SP + "profit: " + DoubleToStr(cycle_total_profit, 2) + " " + AccountCurrency() + "  current level: " + level_abs +
            "\n" + SP + "auto-tp: " + auto_tp + " levels (" + DoubleToStr(auto_tp_price, Digits) + ", " + DoubleToStr(auto_tp_profit, 2) + " " + AccountCurrency() + ")" +
-           "\n" + SP + "profit target: "+ profit_target + " AccountProfit target: "+DoubleToStr(ACCOUNT_PROFIT_TARGET,Digits) +
+           "\n" + SP + "profit target: "+ DoubleToStr(profit_target,2) + " AccountProfit target: "+DoubleToStr(ACCOUNT_PROFIT_TARGET,2) +
            "\n" + SP + "Trading enabled from " + START_HOUR + ":" + START_MINUTES + " to " + END_HOUR + ":" + END_MINUTES + " local time"+stoppedInfo+
            "\n" + SP + "Stop for 1 percent risk: " + DoubleToStr(STOP_FOR_1_PERCENT_RISK(),3) + " / "+ DoubleToStr(RISK_STOPDISTANCE_DIVISOR,1) + 
            "\n" + SP + "IS RENKO CHART: " + IS_RENKO_CHART + " AUTOTRADE:" + RENKO_AUTO_TRADE +  " USE_TAKEPROFIT:"+RENKO_USE_TAKEPROFIT+
