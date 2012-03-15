@@ -1421,9 +1421,9 @@ void stop(string who){
    ifLevel0_disableMAEntry(who+"->stop");
 }
 
-void closeTrades(string who) {
-   closeOpenOrders(OP_BUY,-1);
-   closeOpenOrders(OP_SELL,-1);
+void closeTrades(string who, int magic) {
+   closeOpenOrders(OP_BUY,magic);
+   closeOpenOrders(OP_SELL,magic);
    ifLevel0_disableMAEntry(who+"->closeTrades");
 }
 
@@ -1600,7 +1600,7 @@ void checkButtons(){
          pause();
       }
       if (labelButton("close", 15, 15*3, 1, "close", White)) {
-         closeTrades("checkButtons");
+         closeTrades("checkButtons",magic);
       }
       
       if (labelButton("toggle_breakout2", 15, 15*4, 1, getBreakOutButtonDescription(), getBreakOutButtonColor())) {
@@ -1681,7 +1681,7 @@ void checkAutoTP(){
          if (stopWhenAutoTP) {
             stop("checkAutoTP");
          } else {
-            closeTrades("checkAutoTP");
+            closeTrades("checkAutoTP",magic);
             auto_tp_price = 0;
          }
       }
@@ -1689,7 +1689,7 @@ void checkAutoTP(){
          if (stopWhenAutoTP) {
             stop("checkAutoTP");
          } else {
-            closeTrades("checkAutoTP");
+            closeTrades("checkAutoTP",magic);
             auto_tp_price = 0;
          }
       }
@@ -1757,10 +1757,10 @@ void checkStopToBreakEven() {
 
 void checkProfitTarget() {
    if (profit_target>0 && lastFloating>profit_target) {
-      closeTrades("checkProfitTarget");
+      closeTrades("checkProfitTarget",magic);
    }
    if (ACCOUNT_PROFIT_TARGET>0.1 && AccountProfit()>ACCOUNT_PROFIT_TARGET) {
-      closeTrades("checkProfitTarget(AccountProfit)");
+      closeTrades("checkProfitTarget(AccountProfit)",-1);
    } 
 }
 
