@@ -64,7 +64,7 @@ extern double     RENKO_AutoSLPips = 15;
 */
 extern double     RENKO_PYRAMID_Pips = 5; 
 
-extern double ACCOUNT_EURO = 600;
+extern double ACCOUNT_EURO = 540;
 extern double RISK_STOPDISTANCE_DIVISOR = 1.9;
 extern bool NO_STOPS = false;
 extern double MAX_SPREAD_PIPS = 2.5;
@@ -861,6 +861,10 @@ double STOP_FOR_1_PERCENT_RISK() {
    double MaximumCapitalInDollars = ACCOUNT_EURO * EURUSD / 100;   
    
    double StopPips = MaximumCapitalInDollars / pipValueInDollars;
+   
+   place_SL_Line(currentQuote+StopPips*pip,"OnePercentRiskUp","One percent risk");
+   place_SL_Line(currentQuote-StopPips*pip,"OnePercentRiskDown","One percent risk");
+   
    return (StopPips);
 }
 
