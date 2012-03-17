@@ -54,7 +54,7 @@ double FOLLOW_PRICE_minutePriceValue=0;
 extern bool IS_RENKO_CHART = true;
 extern bool RENKO_AUTO_TRADE = true;
 extern bool RENKO_USE_TAKEPROFIT = false;
-
+extern bool RENKO_SCALEOUT = false;
 /*
 extern double     RENKO_BreakEven       = 10;    // Profit Lock in pips  
 extern double     RENKO_LockGainPips    = 2; 
@@ -65,7 +65,7 @@ extern double     RENKO_AutoSLPips = 15;
 extern double     RENKO_PYRAMID_Pips = 5; 
 
 extern double ACCOUNT_EURO = 540;
-extern double RISK_STOPDISTANCE_DIVISOR = 1.9;
+extern double RISK_STOPDISTANCE_DIVISOR = 1;
 extern bool NO_STOPS = false;
 extern double MAX_SPREAD_PIPS = 2.5;
 
@@ -650,7 +650,7 @@ void tradeRenko() {
                   nOrders = getNumOpenOrders(OP_SELL, magic);
                }
             
-               basePrice = getPyramidBase();
+               basePrice = getPyramidBase1();
                if (nOrders>0 && renkoPyramidOk(MACDHistoGram0,MACDHistoGram1,MACDSignal1)) {
             
                   // DEVO VERIFICARE CHE LE CONDIZIONI PER L'INGRESSO SIANO ANCORA VALIDE!?!?!?
@@ -663,7 +663,7 @@ void tradeRenko() {
             
                }
                
-               if (nOrders>0) {
+               if (nOrders>0 && RENKO_SCALEOUT) {
                   if (isLong) {
                      if (((Bid-basePrice)/(RENKO_PYRAMID_Pips*pip))<(nOrders-2)) closeLastOrder(OP_BUY);
                   } else {
@@ -772,6 +772,16 @@ void renkoBuy(int level) {
    if (level==1 || level==2) numLots*=2;
    // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
    buy(numLots, sl, tp, magic, comment, "tradeRenko"); 
+   if (!RENKO_SCALEOUT) {
+      double divisor = RISK_STOPDISTANCE_DIVISOR;
+      if (divisor<=0) divisor = 1;
+      double stopPips = STOP_FOR_1_PERCENT_RISK()/ divisor;
+      double ptop = getPyramidTop();
+      if (ptop>0) {
+         double stopValue = NormalizeDouble(ptop-stopPips*pip,Digits);
+         moveStop(OP_BUY,magic,stopValue);
+      }   
+   }
 }
 
 void renkoSell(int level) {
@@ -783,6 +793,16 @@ void renkoSell(int level) {
    if (level==1 || level==2) numLots*=2;
    // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
    sell(numLots, sl, tp, magic, comment, "tradeRenko");
+   if (!RENKO_SCALEOUT) {
+      double divisor = RISK_STOPDISTANCE_DIVISOR;
+      if (divisor<=0) divisor = 1;
+      double stopPips = STOP_FOR_1_PERCENT_RISK()/ divisor;
+      double ptop = getPyramidTop();
+      if (ptop>0) {
+         double stopValue = NormalizeDouble(ptop+stopPips*pip,Digits); 
+         moveStop(OP_SELL, magic, stopValue );
+      }      
+   }
 }
 
 int getStopDistance() {
@@ -2327,7 +2347,7 @@ void info(){
       }
    } else { // RENKO
       if (ObjectFind("profit") != -1) {
-         pb = getPyramidBase();
+         pb = getPyramidBase1();
          lp = ObjectGet("profit", OBJPROP_PRICE1);
          if (pb==0) pb = getLine();
          // maldaLog("lp:"+lp+" pb:"+pb);
@@ -2462,7 +2482,6 @@ void plotBreakEven(){
    }
 }
 
-
 /**
 * return the entry price of the first order of the pyramid.
 * return 0 if we are flat.
@@ -2510,6 +2529,22 @@ double getPyramidBase1(){
       }
    }
    return(base);
+}
+
+double getPyramidTop(){
+   int i;
+   double pmin = 999999;
+   double top = 0;
+   for (i=0; i<OrdersTotal(); i++){
+      OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
+      if (isMyOrder(magic) && OrderType() < 2){
+         if (OrderProfit() < pmin){
+            top = OrderOpenPrice();
+            pmin = OrderProfit();
+         }
+      }
+   }
+   return(top);
 }
 
 /**
