@@ -64,7 +64,6 @@ extern double     RENKO_AutoSLPips = 15;
 */
 extern double     RENKO_PYRAMID_Pips = 5; 
 
-extern double ACCOUNT_EURO = 540;
 extern double RISK_STOPDISTANCE_DIVISOR = 1;
 extern bool NO_STOPS = false;
 extern double MAX_SPREAD_PIPS = 2.5;
@@ -838,6 +837,15 @@ double getOrderStopLoss(int op,double SL) {
    }
 }
 
+double ACCOUNT_EURO() {
+
+   if (AccountCurrency()=="EUR") {
+      return (AccountBalance());
+   } else {
+      return (0);
+   }
+}
+
 double STOP_FOR_1_PERCENT_RISK() {
 
    double toDestCurrency;
@@ -878,7 +886,7 @@ double STOP_FOR_1_PERCENT_RISK() {
 
    // maldaLog("pipValueInDollars:"+pipValueInDollars);
 
-   double MaximumCapitalInDollars = ACCOUNT_EURO * EURUSD / 100;   
+   double MaximumCapitalInDollars = ACCOUNT_EURO() * EURUSD / 100;   
    
    double StopPips = MaximumCapitalInDollars / pipValueInDollars;
    
@@ -2308,6 +2316,8 @@ void info(){
            "\n" + SP + "Stop for 1 percent risk: " + DoubleToStr(STOP_FOR_1_PERCENT_RISK(),3) + " / "+ DoubleToStr(RISK_STOPDISTANCE_DIVISOR,1) + 
            "\n" + SP + "IS RENKO CHART: " + IS_RENKO_CHART + " AUTOTRADE:" + RENKO_AUTO_TRADE +  " USE_TAKEPROFIT:"+RENKO_USE_TAKEPROFIT+
                        " PYR: "+DoubleToStr(RENKO_PYRAMID_Pips,2)+
+                       " AccountEquity:"+DoubleToStr(AccountEquity(),2)+AccountCurrency()+
+                       " AccountBalance:"+DoubleToStr(AccountBalance(),2)+AccountCurrency()+
            "\n" + stringToAppendToInfo);
 
    if (last_be_plot == 0 || TimeCurrent() - last_be_plot > 300){ // every 5 minutes
