@@ -606,7 +606,9 @@ void tradeRenko() {
       if (RENKO_AUTO_TRADE && !bigSpread) {
          bool needToClose = false;
          double profit = getProfit(magic);
-         if (profit>0) {
+         if (profit>0 && profit>2) { // <--- chiude solo con un profitto significativo, 
+                                     //      altrimenti si rischia che vengano aperti tanti trade in sequenza nella stessa direzione 
+                                     //      con guadagno nullo e prezzi sempre più sfavorevoli
             if (isLong) {
                /*
                if (MACDHistoGram0<MACDHistoGram1 && MACDHistoGram1<MACDHistoGram2) {
