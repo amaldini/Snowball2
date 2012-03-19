@@ -15,7 +15,7 @@ extern int stop_distance = 5;
 extern int min_stop_distance = 10;
 extern bool dynamicStopDistance = false;
 ////////////////////////////////////////
-extern double profit_target = 12;
+extern double profit_target = 20;
 extern int auto_tp = 2; // auto-takeprofit this many levels (roughly) above the BE point
 extern bool stopWhenAutoTP=true;
 ////////////////////////////////////////
@@ -770,7 +770,7 @@ void renkoBuy(int level) {
    tp = Bid + pip * stop_distance;
    if (!RENKO_USE_TAKEPROFIT) tp=0;
    double numLots = lots;
-   if (level==1 || level==2) numLots*=2;
+   // if (level==1 || level==2) numLots*=2;
    // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
    buy(numLots, sl, tp, magic, comment, "tradeRenko"); 
    if (!RENKO_SCALEOUT) {
@@ -791,7 +791,7 @@ void renkoSell(int level) {
    tp = Ask - pip * stop_distance;
    if (!RENKO_USE_TAKEPROFIT) tp=0; 
    double numLots = lots;
-   if (level==1 || level==2) numLots*=2;
+   // if (level==1 || level==2) numLots*=2;
    // maldaLog("buying at "+NormalizeDouble(Ask,5)+" with stop loss="+sl);
    sell(numLots, sl, tp, magic, comment, "tradeRenko");
    if (!RENKO_SCALEOUT) {
