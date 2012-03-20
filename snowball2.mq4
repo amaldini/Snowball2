@@ -1848,8 +1848,8 @@ bool checkSpread() {
    bool spreadTooBig = false;
    
    if (spread>MAX_SPREAD_PIPS) {
-      closeOpenOrders(OP_SELLSTOP,magic);
-      closeOpenOrders(OP_BUYSTOP,magic);
+      // closeOpenOrders(OP_SELLSTOP,magic);
+      // closeOpenOrders(OP_BUYSTOP,magic);
       spreadTooBig = true;
       ObjectSet("lblSpread",OBJPROP_COLOR,Red);
    }
