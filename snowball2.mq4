@@ -141,11 +141,17 @@ double HAOpen;
 * the base of the pyramid
 */ 
 double getTheoreticProfitRenko(double distance,double pyrDistance){
-   int n = MathFloor(distance / (pyrDistance * pip));
-   double remain = distance - n * pyrDistance * pip;
-   int mult = n * (n + 1) / 2;
-   double profit = MarketInfo(Symbol(), MODE_TICKVALUE) * lots * pyrDistance * points_per_pip * mult;
-   profit = profit + MarketInfo(Symbol(), MODE_TICKVALUE) * lots * (remain/Point) * (n + 1);
+
+   double profit = 0;
+
+   if (pyrDistance>0) {
+      int n = MathFloor(distance / (pyrDistance * pip));
+      double remain = distance - n * pyrDistance * pip;
+      int mult = n * (n + 1) / 2;
+      profit = MarketInfo(Symbol(), MODE_TICKVALUE) * lots * pyrDistance * points_per_pip * mult;
+      profit = profit + MarketInfo(Symbol(), MODE_TICKVALUE) * lots * (remain/Point) * (n + 1);
+   }
+
    return(profit);
 }
 
@@ -2565,11 +2571,20 @@ double getPyramidTop(){
 * the base of the pyramid
 */ 
 double getTheoreticProfit(double distance){
-   int n = MathFloor(distance / (stop_distance * pip));
-   double remain = distance - n * stop_distance * pip;
-   int mult = n * (n + 1) / 2;
-   double profit = MarketInfo(Symbol(), MODE_TICKVALUE) * lots * stop_distance * points_per_pip * mult;
-   profit = profit + MarketInfo(Symbol(), MODE_TICKVALUE) * lots * (remain/Point) * (n + 1);
+
+   double profit = 0;
+
+   if (stop_distance>0) {
+
+      int n = MathFloor(distance / (stop_distance * pip));
+      double remain = distance - n * stop_distance * pip;
+      int mult = n * (n + 1) / 2;
+      profit = MarketInfo(Symbol(), MODE_TICKVALUE) * lots * stop_distance * points_per_pip * mult;
+      profit = profit + MarketInfo(Symbol(), MODE_TICKVALUE) * lots * (remain/Point) * (n + 1);
+
+   } else {
+      maldaLog("Warning: getTheoreticProfit divide by zero!");
+   }
    return(profit);
 }
 
