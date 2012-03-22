@@ -62,7 +62,7 @@ extern double     RENKO_BreakEven2    = 20;
 extern double     RENKO_LockGainPips2 = 10;
 extern double     RENKO_AutoSLPips = 15;
 */
-extern double     RENKO_PYRAMID_Pips = 5; 
+extern double     RENKO_PYRAMID_Pips = 20; 
 
 extern double RISK_STOPDISTANCE_DIVISOR = 1;
 extern bool NO_STOPS = false;
