@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="9"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <MainUnitHasCreateFormStatements Value="False"/>
+        <MainUnitHasTitleStatement Value="False"/>
+      </Flags>
+      <MainUnit Value="0"/>
+      <ResourceType Value="res"/>
+      <UseXPManifest Value="True"/>
+      <Icon Value="0"/>
+      <ActiveWindowIndexAtStart Value="0"/>
+    </General>
+    <i18n>
+      <EnableI18N LFM="False"/>
+    </i18n>
+    <VersionInfo>
+      <StringTable ProductVersion=""/>
+    </VersionInfo>
+    <BuildModes Count="1" Active="Default">
+      <Item1 Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IncludeFileFilter Value="*.(pas|pp|inc|lfm|lpr|lrs|lpi|lpk|sh|xml)"/>
+      <ExcludeFileFilter Value="*.(bak|ppu|o|so);*~;backup"/>
+    </PublishOptions>
+    <RunParams>
+      <local>
+        <FormatVersion Value="1"/>
+      </local>
+    </RunParams>
+    <Units Count="5">
+      <Unit0>
+        <Filename Value="MT4Library.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="MT4Library"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="0"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="116"/>
+        <CursorPos X="16" Y="136"/>
+        <UsageCount Value="37"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="C:\lazarus\fpc\2.6.0\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <EditorIndex Value="1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="155"/>
+        <CursorPos X="20" Y="175"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="C:\lazarus\fpc\2.6.0\source\packages\fcl-registry\src\regdef.inc"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="3" Y="28"/>
+        <UsageCount Value="8"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="C:\lazarus\fpc\2.6.0\source\packages\fcl-registry\src\registry.pp"/>
+        <UnitName Value="registry"/>
+        <EditorIndex Value="3"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="24"/>
+        <CursorPos X="14" Y="85"/>
+        <UsageCount Value="19"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="C:\lazarus\fpc\2.6.0\source\rtl\objpas\classes\classesh.inc"/>
+        <EditorIndex Value="2"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="586"/>
+        <CursorPos X="3" Y="551"/>
+        <UsageCount Value="18"/>
+        <Loaded Value="True"/>
+      </Unit4>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="C:\lazarus\fpc\2.6.0\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <Caret Line="32" Column="69" TopLine="1"/>
+      </Position1>
+      <Position2>
+        <Filename Value="C:\lazarus\fpc\2.6.0\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <Caret Line="145" Column="35" TopLine="109"/>
+      </Position2>
+      <Position3>
+        <Filename Value="C:\lazarus\fpc\2.6.0\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <Caret Line="146" Column="35" TopLine="110"/>
+      </Position3>
+      <Position4>
+        <Filename Value="C:\lazarus\fpc\2.6.0\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <Caret Line="163" Column="34" TopLine="127"/>
+      </Position4>
+      <Position5>
+        <Filename Value="C:\lazarus\fpc\2.6.0\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <Caret Line="164" Column="34" TopLine="128"/>
+      </Position5>
+      <Position6>
+        <Filename Value="C:\lazarus\fpc\2.6.0\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <Caret Line="181" Column="59" TopLine="145"/>
+      </Position6>
+      <Position7>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="76" Column="50" TopLine="53"/>
+      </Position7>
+      <Position8>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="2" Column="8" TopLine="1"/>
+      </Position8>
+      <Position9>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="1" Column="17" TopLine="1"/>
+      </Position9>
+      <Position10>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="3" Column="5" TopLine="1"/>
+      </Position10>
+      <Position11>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="1" Column="9" TopLine="1"/>
+      </Position11>
+      <Position12>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="3" Column="5" TopLine="1"/>
+      </Position12>
+      <Position13>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="1" Column="19" TopLine="1"/>
+      </Position13>
+      <Position14>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="3" Column="5" TopLine="1"/>
+      </Position14>
+      <Position15>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="1" Column="4" TopLine="1"/>
+      </Position15>
+      <Position16>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="57" Column="105" TopLine="49"/>
+      </Position16>
+      <Position17>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="48" Column="19" TopLine="28"/>
+      </Position17>
+      <Position18>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="49" Column="37" TopLine="28"/>
+      </Position18>
+      <Position19>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="62" Column="6" TopLine="58"/>
+      </Position19>
+      <Position20>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="90" Column="17" TopLine="74"/>
+      </Position20>
+      <Position21>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="92" Column="7" TopLine="75"/>
+      </Position21>
+      <Position22>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="90" Column="4" TopLine="72"/>
+      </Position22>
+      <Position23>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="91" Column="7" TopLine="66"/>
+      </Position23>
+      <Position24>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="112" Column="37" TopLine="92"/>
+      </Position24>
+      <Position25>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="33" Column="35" TopLine="25"/>
+      </Position25>
+      <Position26>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="28" Column="44" TopLine="12"/>
+      </Position26>
+      <Position27>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="37" Column="17" TopLine="19"/>
+      </Position27>
+      <Position28>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="29" Column="6" TopLine="13"/>
+      </Position28>
+      <Position29>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="136" Column="52" TopLine="107"/>
+      </Position29>
+      <Position30>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="128" Column="26" TopLine="112"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="9"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="MT4Library"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Linking>
+      <Options>
+        <ExecutableType Value="Library"/>
+      </Options>
+    </Linking>
+    <Other>
+      <CompilerPath Value="$(CompPath)"/>
+    </Other>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>
