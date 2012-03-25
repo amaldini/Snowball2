@@ -32,7 +32,7 @@ extern bool useMAExit=false;
 extern int useMA_Period=14;
 extern int MA_NumBarsToReenableEntry=4;
 ////////////////////////////////////////
-extern int exitBars=0;
+extern int exitBars=0;  // <--- se 0 controllo disabilitato
 extern int exitBarsLevel=2;
 extern bool exitBarsHeikenAshi=true;
 ////////////////////////////////////////
@@ -569,12 +569,13 @@ void closeLastOrder(int mode) {
 }
 
 void tradeRenkoSlave() {
-   double pyrBaseAndPyrPips[2];
+   double lotsPyrBaseAndPyrPips[3];
    int longOrShort[2];
    
-   if (GetSymbolStatus(Symbol6(),longOrShort,pyrBaseAndPyrPips)) {
-      double masterPyrBase = pyrBaseAndPyrPips[0];
-      double masterPyrPips = pyrBaseAndPyrPips[1];
+   if (GetSymbolStatus(Symbol6(),longOrShort,lotsPyrBaseAndPyrPips)) {
+      lots = lotsPyrBaseAndPyrPips[0];
+      double masterPyrBase = lotsPyrBaseAndPyrPips[1];
+      double masterPyrPips = lotsPyrBaseAndPyrPips[2];
       
       bool masterIsLong = (longOrShort[0]!=0);
       bool masterIsShort = (longOrShort[1]!=0);
@@ -608,7 +609,7 @@ void tradeRenko() {
    if (isMasterAccount()) {
       double pyrBase = 0;
       if (isLong||isShort) pyrBase = getPyramidBase1();
-      string res = PostSymbolStatus(Symbol6(),isLong,isShort,pyrBase, RENKO_PYRAMID_Pips);
+      string res = PostSymbolStatus(Symbol6(),lots,isLong,isShort,pyrBase, RENKO_PYRAMID_Pips);
       // maldaLog(res);
       // tradeRenkoSlave();
    }
