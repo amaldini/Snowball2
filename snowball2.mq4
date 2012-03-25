@@ -7,6 +7,7 @@
 
 #include <common_functions.mqh>
 #include <offline_charts.mqh> 
+#include <MT4Communication.mqh>
 //#include <oanda.mqh> 
 
 extern double lots = 0.01; // lots to use per trade
@@ -55,6 +56,10 @@ extern bool IS_RENKO_CHART = true;
 extern bool RENKO_AUTO_TRADE = true;
 extern bool RENKO_USE_TAKEPROFIT = false;
 extern bool RENKO_SCALEOUT = false;
+
+extern int ACCOUNT_NUMBER_MASTER=741645;
+extern int ACCOUNT_NUMBER_SLAVE=475883;
+
 /*
 extern double     RENKO_BreakEven       = 10;    // Profit Lock in pips  
 extern double     RENKO_LockGainPips    = 2; 
@@ -156,8 +161,9 @@ double getTheoreticProfitRenko(double distance,double pyrDistance){
 }
 
 // ---- Trailing Stops
-double trailStopMaxBid=0;
-double trailStopMinAsk=100000000;
+//double trailStopMaxBid=0;
+//double trailStopMinAsk=100000000;
+/*
 double TrailStops(double BE,double LG,double AutoSL)
 {        
    
@@ -223,7 +229,7 @@ double TrailStops(double BE,double LG,double AutoSL)
       
       return (value);
 }
-
+*/
 
 void getHeikenAshiValues(int candleIndex) {
    HALow = iCustom(NULL,0,"Heiken Ashi", HAcolor1,HAcolor2,HAcolor3,HAcolor4, HALOW, candleIndex);
@@ -562,7 +568,30 @@ void closeLastOrder(int mode) {
    }
 }
 
+void tradeRenkoSlave() {
+   double pyrBaseAndPyrPips[2];
+   int longOrShort[2];
+   
+   if (GetSymbolStatus(Symbol6(),longOrShort,pyrBaseAndPyrPips)) {
+      double masterPyrBase = pyrBaseAndPyrPips[0];
+      double masterPyrPips = pyrBaseAndPyrPips[1];
+      
+      bool masterIsLong = (longOrShort[0]!=0);
+      bool masterIsShort = (longOrShort[1]!=0);
+      
+      maldaLog(masterPyrBase);
+      maldaLog(masterPyrPips);
+      maldaLog(masterIsLong);
+      maldaLog(masterIsShort);
+   } 
+}
+
 void tradeRenko() {
+
+   if (isSlaveAccount()) {
+      tradeRenkoSlave();
+      return;
+   }
 
    if (!IS_RENKO_CHART) return;
 
@@ -574,6 +603,14 @@ void tradeRenko() {
       isLong = true;
    } else if (getNumOpenOrders(OP_SELL, magic)>0) {
       isShort = true;
+   }
+
+   if (isMasterAccount()) {
+      double pyrBase = 0;
+      if (isLong||isShort) pyrBase = getPyramidBase1();
+      string res = PostSymbolStatus(Symbol6(),isLong,isShort,pyrBase, RENKO_PYRAMID_Pips);
+      // maldaLog(res);
+      // tradeRenkoSlave();
    }
 
    double MACDUp0 = MACD_Colored_v105(0,0);
@@ -691,8 +728,8 @@ void tradeRenko() {
       ObjectDelete("BE_t2");
    
       supportResistanceAlreadyReset = false;
-      trailStopMaxBid =0;
-      trailStopMinAsk = 10000000;
+      // trailStopMaxBid =0;
+      // trailStopMinAsk = 10000000;
 
       // verifica se posso entrare
       /*
@@ -944,7 +981,8 @@ void defaults(){
    IS_ECN_BROKER = true; // different market order procedure when resuming after pause
 
    if (RISK_STOPDISTANCE_DIVISOR>0) {
-      stop_distance = STOP_FOR_1_PERCENT_RISK()/RISK_STOPDISTANCE_DIVISOR;
+      double stopValue = STOP_FOR_1_PERCENT_RISK()/RISK_STOPDISTANCE_DIVISOR;
+      if (stopValue>0) stop_distance = stopValue;
    }
    /*
    
@@ -2255,6 +2293,14 @@ void moveOrders(double d){
    }
 }
 
+bool isMasterAccount() {
+   return (AccountNumber()==ACCOUNT_NUMBER_MASTER);
+}
+
+bool isSlaveAccount() {
+   return (AccountNumber()==ACCOUNT_NUMBER_SLAVE);
+}
+
 void info(){
    double floating;
    double pb, lp, tp;
@@ -2311,6 +2357,11 @@ void info(){
    string stoppedInfo ="";
    if (stopped) stoppedInfo = " (STOPPED)";
    
+   string masterOrSlave = "?";
+   if (isMasterAccount()) masterOrSlave = "MASTER";
+   if (isSlaveAccount()) masterOrSlave = "SLAVE";
+   
+   
    Comment("\n" + SP + name + magic + ", " + dir +
            "\n" + SP + Symbol() + " IsTesting:" + IsTesting() + 
            "\n" + SP + "1 pip is " + DoubleToStr(pip, Digits) + " " + Symbol6() +
@@ -2326,6 +2377,7 @@ void info(){
                        " PYR: "+DoubleToStr(RENKO_PYRAMID_Pips,2)+
                        " AccountEquity:"+DoubleToStr(AccountEquity(),2)+AccountCurrency()+
                        " AccountBalance:"+DoubleToStr(AccountBalance(),2)+AccountCurrency()+
+                       " Master or Slave:"+masterOrSlave+
            "\n" + stringToAppendToInfo);
 
    if (last_be_plot == 0 || TimeCurrent() - last_be_plot > 300){ // every 5 minutes

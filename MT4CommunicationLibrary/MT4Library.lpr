@@ -40,15 +40,15 @@ end;
 
 // strings from and to Metatrader will always be passed
 // as PChar which is a pointer to a nullterminated C-string.
-function PostSymbolStatus(symbolName:PChar; isLong:boolean; isShort:boolean; pyramidBase: double; renkoPyramidPips: double): PChar; stdcall;
+function PostSymbolStatus(symbolName:PChar; isLong:integer; isShort:integer; pyramidBase: double; renkoPyramidPips: double): PChar; stdcall;
 var
   s :ansistring; // reference counted and memory managed strings.
 begin
   // our PChar will be copied into an ansistring automatically,
   // no need to worry about the ugly details of memory allocation.
   // s := 'Hello ' + FloatToStr(symbolName) + ' ' + y + '!';
-  s := BoolToStr(isLong)+';'+
-       BoolToStr(isShort)+';'+
+  s := IntToStr(isLong)+';'+
+       IntToStr(isShort)+';'+
        FloatToStr(pyramidBase)+';'+
        FloatToStr(renkoPyramidPips);
   // cast it back into a pointer. Metatrader will copy the
