@@ -783,7 +783,7 @@ void tradeRenko() {
                //go(LONG);
                if ((MACDHistoGram0>MACDHistoGram1) && (MACDHistoGram1>MACDSignal1)) { 
                   maldaLog("RENKO GO LONG!!!");
-                  Alert(Symbol6()+" RENKO GO LONG!!!");
+                  // Alert(Symbol6()+" RENKO GO LONG!!!");
                   goLong = true;
                }
             } else {
@@ -799,7 +799,7 @@ void tradeRenko() {
                // go(SHORT);
                if ((MACDHistoGram0<MACDHistoGram1) && (MACDHistoGram1<MACDSignal1)) {
                   maldaLog("RENKO GO SHORT!!!");
-                  Alert(Symbol6()+" RENKO GO SHORT!!!");
+                  // Alert(Symbol6()+" RENKO GO SHORT!!!");
                   goShort = true;
                } 
             } else {
