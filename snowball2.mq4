@@ -573,7 +573,7 @@ void tradeRenkoSlave() {
    int longOrShort[2];
    
    if (GetSymbolStatus(Symbol6(),longOrShort,lotsPyrBaseAndPyrPips)) {
-      lots = lotsPyrBaseAndPyrPips[0];
+      double masterLots = lotsPyrBaseAndPyrPips[0];
       double masterPyrBase = lotsPyrBaseAndPyrPips[1];
       double masterPyrPips = lotsPyrBaseAndPyrPips[2];
       
@@ -584,6 +584,21 @@ void tradeRenkoSlave() {
       maldaLog(masterPyrPips);
       maldaLog(masterIsLong);
       maldaLog(masterIsShort);
+      
+      if (!running) {
+         lots = masterLots;
+         stop_distance = masterPyrPips;
+         if (masterIsLong) {
+            go(SHORT);
+         }
+         if (masterIsShort) {
+            go(LONG);
+         }
+      } else { // running
+         if (!(masterIsLong||masterIsShort)) {
+            stop("tradeRenkoSlave");
+         }
+      }
    } 
 }
 
