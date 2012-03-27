@@ -67,7 +67,7 @@ extern double     RENKO_BreakEven2    = 20;
 extern double     RENKO_LockGainPips2 = 10;
 extern double     RENKO_AutoSLPips = 15;
 */
-extern double     RENKO_PYRAMID_Pips = 20; 
+extern double     RENKO_PYRAMID_Pips = 30; 
 
 extern double RISK_STOPDISTANCE_DIVISOR = 1;
 extern bool NO_STOPS = false;
@@ -139,6 +139,10 @@ double HALow;
 double HAHigh;
 double HAClose;
 double HAOpen;
+
+extern bool GRID_TRADING = true;
+extern double GRID_TRADING_STEP = 10; // pips
+extern int GRID_TRADING_PENDINGORDERS = 2;
 
 /**
 * return the floating profit that would result if
@@ -602,10 +606,157 @@ void tradeRenkoSlave() {
    } 
 }
 
+int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTypes[]) {
+   
+   // int numOpenOrders = getNumOpenOrders(-1,magic);
+   // if (numOpenOrders<=0) return(0);
+     
+   // int tickets[];
+   // double prices[];
+   
+   int total = OrdersTotal();
+
+   if (total<=0) return(0);
+
+   ArrayResize(tickets, total);
+   ArrayResize(prices, total);
+   ArrayResize(orderTypes,total);
+   
+   // collect order tickets and prices
+   int idx=0;
+   for (int cnt = 0; cnt < total; cnt++) {
+      OrderSelect(cnt, SELECT_BY_POS, MODE_TRADES);
+      if (isMyOrder(magic)) {
+         orderTypes[idx] = OrderType();
+         tickets[idx] = OrderTicket();
+         prices[idx] = OrderOpenPrice();
+         idx++;
+      }
+   }
+   
+   return (idx);
+}
+
+void tradeGrid_Slave() {
+   // verifica se per 2 livelli sotto al prezzo c'é l'ordine
+   
+   int tickets[],orderTypes[];
+   double openPrices[];
+   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes);
+   
+   double gridStart;
+   if (numOrders == 0) {
+      gridStart = NormalizeDouble((Ask+Bid)/2,Digits);
+   } else {
+      gridStart = openPrices[0];
+   } 
+   
+   int i;
+   int danglers=0;
+   for (i=0;i<numOrders;i++) {
+      if (orderTypes[i]==OP_SELL) danglers++;
+   }
+   int addedOrders = 0;
+   int nLevels=0;
+   if (danglers<2) {
+      for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
+         double price = NormalizeDouble(gridStart-GRID_TRADING_STEP*i*pip,Digits);
+         if (price<Bid) {
+            // verifico di non avere già un ordine a questo livello
+            bool found = false;
+            for (int j=0;j<numOrders;j++) {
+               if (MathAbs(openPrices[j]-price)<pip) {
+                  found=true;
+                  nLevels++;
+               }
+            }
+            if (!found) {
+               nLevels++;
+               gridSell(price);
+               maldaLog("pending sell at:"+DoubleToStr(price,Digits));           
+            }
+         }
+      }
+   }
+   
+   maldaLog("tradeGrid_Slave");
+}
+
+void tradeGrid_Master() {
+
+   int tickets[],orderTypes[];
+   double openPrices[];
+   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes);
+   
+   double gridStart;
+   if (numOrders == 0) {
+      gridStart = NormalizeDouble((Ask+Bid)/2,Digits);
+   } else {
+      gridStart = openPrices[0];
+   } 
+   
+   int i;
+   int danglers=0;
+   for (i=0;i<numOrders;i++) {
+      if (orderTypes[i]==OP_BUY) danglers++;
+   }
+   int addedOrders = 0;
+   int nLevels=0;
+   if (danglers<2) {
+      for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
+         double price = NormalizeDouble(gridStart+GRID_TRADING_STEP*i*pip,Digits);
+         if (price>Ask) {
+            // verifico di non avere già un ordine a questo livello
+            bool found = false;
+            for (int j=0;j<numOrders;j++) {
+               if (MathAbs(openPrices[j]-price)<pip) {
+                  found=true;
+                  nLevels++;
+               }
+            }
+            if (!found) {
+               nLevels++;
+               gridBuy(price);
+               maldaLog("pending buy at:"+DoubleToStr(price,Digits));           
+            }
+         }
+      }
+   }
+
+   maldaLog("tradeGrid_Master");
+}
+
+void gridBuy(double price) {
+   double sl=0,tp=0;
+   sl = price - pip * GRID_TRADING_STEP * 5;
+   tp = price + pip * GRID_TRADING_STEP;
+   double numLots = lots;
+   buyStop(numLots, price, sl, tp, magic, comment, "gridBuy");
+}
+
+void gridSell(double price) {
+   double sl=0,tp=0;
+   sl = price + pip * GRID_TRADING_STEP * 5;
+   tp = price - pip * GRID_TRADING_STEP;
+   double numLots = lots;
+   sellStop(numLots, price, sl, tp, magic, comment, "gridSell");
+}
+
 void tradeRenko() {
 
    if (isSlaveAccount()) {
+   
+      if (GRID_TRADING) {
+         tradeGrid_Slave();
+         return;
+      }
+   
       tradeRenkoSlave();
+      return;
+   }
+   
+   if (GRID_TRADING) {
+      tradeGrid_Master();
       return;
    }
 
@@ -2067,7 +2218,9 @@ void trade(){
       placeLine(Bid);
    }
    
-   deleteDuplicatedOrders(magic,start);
+   if (!GRID_TRADING) {
+      deleteDuplicatedOrders(magic,start);
+   }
 }
 
 void deleteDuplicatedOrders(int magic,double start) {
