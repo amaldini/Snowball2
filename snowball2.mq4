@@ -658,9 +658,9 @@ void tradeGrid_Slave() {
    }
    int addedOrders = 0;
    int nLevels=0;
-   if (danglers<2) {
+   if (danglers<1) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
-         double price = NormalizeDouble(gridStart-GRID_TRADING_STEP*i*pip,Digits);
+         double price = NormalizeDouble(gridStart-(0.5+GRID_TRADING_STEP)*i*pip,Digits);
          if (price<Bid) {
             // verifico di non avere già un ordine a questo livello
             bool found = false;
@@ -679,7 +679,7 @@ void tradeGrid_Slave() {
       }
    }
    
-   maldaLog("tradeGrid_Slave");
+   maldaLog("tradeGrid_Slave("+ danglers +") danglers");
 }
 
 void tradeGrid_Master() {
@@ -704,7 +704,7 @@ void tradeGrid_Master() {
    int nLevels=0;
    if (danglers<2) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
-         double price = NormalizeDouble(gridStart+GRID_TRADING_STEP*i*pip,Digits);
+         double price = NormalizeDouble(gridStart+(0.5+GRID_TRADING_STEP)*i*pip,Digits);
          if (price>Ask) {
             // verifico di non avere già un ordine a questo livello
             bool found = false;
@@ -723,7 +723,7 @@ void tradeGrid_Master() {
       }
    }
 
-   maldaLog("tradeGrid_Master");
+   maldaLog("tradeGrid_Master (" + danglers +") danglers");
 }
 
 void gridBuy(double price) {
