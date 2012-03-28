@@ -702,7 +702,7 @@ void tradeGrid_Master() {
    }
    int addedOrders = 0;
    int nLevels=0;
-   if (danglers<2) {
+   if (danglers<1) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
          double price = NormalizeDouble(gridStart+(0.5+GRID_TRADING_STEP)*i*pip,Digits);
          if (price>Ask) {
