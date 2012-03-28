@@ -728,7 +728,7 @@ void tradeGrid_Master() {
 
 void gridBuy(double price) {
    double sl=0,tp=0;
-   sl = price - pip * GRID_TRADING_STEP * 5;
+   sl = NormalizeDouble(price - pip * GRID_TRADING_STEP * 3,Digits);
    tp = price + pip * GRID_TRADING_STEP;
    double numLots = lots;
    buyStop(numLots, price, sl, tp, magic, comment, "gridBuy");
@@ -736,7 +736,7 @@ void gridBuy(double price) {
 
 void gridSell(double price) {
    double sl=0,tp=0;
-   sl = price + pip * GRID_TRADING_STEP * 5;
+   sl = NormalizeDouble(price + pip * GRID_TRADING_STEP * 3,Digits);
    tp = price - pip * GRID_TRADING_STEP;
    double numLots = lots;
    sellStop(numLots, price, sl, tp, magic, comment, "gridSell");
