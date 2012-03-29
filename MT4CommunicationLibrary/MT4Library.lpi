@@ -41,9 +41,9 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="1" Y="2"/>
-        <UsageCount Value="39"/>
+        <TopLine Value="22"/>
+        <CursorPos X="37" Y="45"/>
+        <UsageCount Value="41"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -52,7 +52,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="202"/>
         <CursorPos X="10" Y="218"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
@@ -69,7 +69,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="24"/>
         <CursorPos X="14" Y="85"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -78,7 +78,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="586"/>
         <CursorPos X="3" Y="551"/>
-        <UsageCount Value="19"/>
+        <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
@@ -87,132 +87,133 @@
         <UnitName Value="MT4Communication"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="3"/>
-        <CursorPos X="1" Y="4"/>
-        <UsageCount Value="20"/>
+        <TopLine Value="21"/>
+        <CursorPos X="25" Y="46"/>
+        <FoldState Value=" TMiO01t"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit5>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="1" Column="9" TopLine="1"/>
+        <Caret Line="90" Column="17" TopLine="74"/>
       </Position1>
       <Position2>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="3" Column="5" TopLine="1"/>
+        <Caret Line="92" Column="7" TopLine="75"/>
       </Position2>
       <Position3>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="1" Column="19" TopLine="1"/>
+        <Caret Line="90" Column="4" TopLine="72"/>
       </Position3>
       <Position4>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="3" Column="5" TopLine="1"/>
+        <Caret Line="91" Column="7" TopLine="66"/>
       </Position4>
       <Position5>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="1" Column="4" TopLine="1"/>
+        <Caret Line="112" Column="37" TopLine="92"/>
       </Position5>
       <Position6>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="57" Column="105" TopLine="49"/>
+        <Caret Line="33" Column="35" TopLine="25"/>
       </Position6>
       <Position7>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="48" Column="19" TopLine="28"/>
+        <Caret Line="28" Column="44" TopLine="12"/>
       </Position7>
       <Position8>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="49" Column="37" TopLine="28"/>
+        <Caret Line="37" Column="17" TopLine="19"/>
       </Position8>
       <Position9>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="62" Column="6" TopLine="58"/>
+        <Caret Line="29" Column="6" TopLine="13"/>
       </Position9>
       <Position10>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="90" Column="17" TopLine="74"/>
+        <Caret Line="136" Column="52" TopLine="107"/>
       </Position10>
       <Position11>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="92" Column="7" TopLine="75"/>
+        <Caret Line="128" Column="26" TopLine="112"/>
       </Position11>
       <Position12>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="90" Column="4" TopLine="72"/>
+        <Caret Line="50" Column="17" TopLine="35"/>
       </Position12>
       <Position13>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="91" Column="7" TopLine="66"/>
+        <Caret Line="51" Column="8" TopLine="35"/>
       </Position13>
       <Position14>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="112" Column="37" TopLine="92"/>
+        <Caret Line="132" Column="36" TopLine="115"/>
       </Position14>
       <Position15>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="33" Column="35" TopLine="25"/>
+        <Caret Line="16" Column="49" TopLine="3"/>
       </Position15>
       <Position16>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="28" Column="44" TopLine="12"/>
+        <Caret Line="108" Column="21" TopLine="101"/>
       </Position16>
       <Position17>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="37" Column="17" TopLine="19"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
       </Position17>
       <Position18>
-        <Filename Value="MT4Library.lpr"/>
-        <Caret Line="29" Column="6" TopLine="13"/>
+        <Filename Value="mt4communication.pas"/>
+        <Caret Line="9" Column="121" TopLine="1"/>
       </Position18>
       <Position19>
-        <Filename Value="MT4Library.lpr"/>
-        <Caret Line="136" Column="52" TopLine="107"/>
+        <Filename Value="mt4communication.pas"/>
+        <Caret Line="6" Column="1" TopLine="1"/>
       </Position19>
       <Position20>
-        <Filename Value="MT4Library.lpr"/>
-        <Caret Line="128" Column="26" TopLine="112"/>
+        <Filename Value="mt4communication.pas"/>
+        <Caret Line="7" Column="32" TopLine="1"/>
       </Position20>
       <Position21>
-        <Filename Value="MT4Library.lpr"/>
-        <Caret Line="50" Column="17" TopLine="35"/>
+        <Filename Value="mt4communication.pas"/>
+        <Caret Line="20" Column="36" TopLine="1"/>
       </Position21>
       <Position22>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="51" Column="8" TopLine="35"/>
+        <Caret Line="15" Column="19" TopLine="13"/>
       </Position22>
       <Position23>
         <Filename Value="MT4Library.lpr"/>
-        <Caret Line="132" Column="36" TopLine="115"/>
+        <Caret Line="31" Column="24" TopLine="13"/>
       </Position23>
       <Position24>
-        <Filename Value="MT4Library.lpr"/>
-        <Caret Line="16" Column="49" TopLine="3"/>
+        <Filename Value="mt4communication.pas"/>
+        <Caret Line="44" Column="50" TopLine="31"/>
       </Position24>
       <Position25>
-        <Filename Value="MT4Library.lpr"/>
-        <Caret Line="108" Column="21" TopLine="101"/>
+        <Filename Value="mt4communication.pas"/>
+        <Caret Line="15" Column="62" TopLine="10"/>
       </Position25>
       <Position26>
-        <Filename Value="MT4Library.lpr"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
+        <Filename Value="mt4communication.pas"/>
+        <Caret Line="23" Column="62" TopLine="7"/>
       </Position26>
       <Position27>
-        <Filename Value="mt4communication.pas"/>
-        <Caret Line="9" Column="121" TopLine="1"/>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="43" Column="37" TopLine="19"/>
       </Position27>
       <Position28>
         <Filename Value="mt4communication.pas"/>
-        <Caret Line="6" Column="1" TopLine="1"/>
+        <Caret Line="46" Column="68" TopLine="24"/>
       </Position28>
       <Position29>
-        <Filename Value="mt4communication.pas"/>
-        <Caret Line="7" Column="32" TopLine="1"/>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
       </Position29>
       <Position30>
-        <Filename Value="mt4communication.pas"/>
-        <Caret Line="20" Column="36" TopLine="1"/>
+        <Filename Value="MT4Library.lpr"/>
+        <Caret Line="44" Column="32" TopLine="22"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

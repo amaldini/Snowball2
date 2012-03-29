@@ -1,4 +1,4 @@
-// {$define TESTING}
+//{$define TESTING}
 
 {$IFDEF TESTING}
 program MT4Library;
@@ -14,7 +14,8 @@ uses
 exports
   PostSymbolStatus,
   GetSymbolStatus,
-  ClearSymbolStatus;
+  ClearSymbolStatus,
+  getGridMode;
 
 {$IFDEF TESTING}
 
@@ -23,7 +24,7 @@ var a:TIPair;
    r:boolean;
    i:integer;
 begin
-  for i:=1 to 1000 do
+  for i:=1 to 10 do
   begin
     Writeln('');
     Writeln('Iteration #'+IntToStr(i));
@@ -38,6 +39,10 @@ begin
     r:= GetSymbolStatus('EURUSD',a,b);
     Writeln('GetSymbolStatus: '+BoolToStr(r));
   end;
+
+  Writeln('setGridMode/getGridMode TEST:');
+  setGridMode('EURUSDtest',1,'TEST OK!');
+  Writeln(getGridMode('EURUSDTest',1));
   readln;
 end.
 {$ELSE}

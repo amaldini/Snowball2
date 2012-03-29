@@ -12,10 +12,45 @@ function ClearSymbolStatus(symbolName:PChar):boolean;stdcall;
 function PostSymbolStatus(symbolName:PChar;lots:double;isLong:integer; isShort:integer; pyramidBase: double; renkoPyramidPips: double): PChar; stdcall;
 function GetSymbolStatus(symbolName:PChar; var longOrShort:TIPair;var lotsPyramidBaseAndPips:TD_Terna):boolean;stdcall;
 
+function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;
+function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
+
 implementation
 
 uses
   Classes, SysUtils, Registry;
+
+// R = RENKOASHI WITH SUPPORT / RESISTANCE BREAKOUT, OR RENKO SLAVE
+// G
+// AG = ANTI GRID
+function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;
+begin
+   With TRegistry.Create do
+   try
+      RootKey:=HKEY_CURRENT_USER;
+      if (isMaster<>0) then symbolName:=PChar(symbolName+'_MASTER');
+      if OpenKey('Software\VB and VBA Program Settings\MT4Channel\GridMode',true) then
+         WriteString(symbolName,gridMode);
+      finally
+         free;
+      end;
+   result:=true;
+end;
+
+function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
+begin
+  result:=PChar('');
+  With TRegistry.Create do
+       try
+         RootKey:=HKEY_CURRENT_USER;
+         if (isMaster<>0) then symbolName:=PChar(symbolName+'_MASTER');
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\GridMode') then
+         If ValueExists(symbolName) then
+            result:=PChar(ReadString(symbolName)); // Or whatever it is. ReadInteger/ReadBool
+       finally
+         free;
+       end;
+end;
 
 function ClearSymbolStatus(symbolName:PChar):boolean;stdcall;
 begin
