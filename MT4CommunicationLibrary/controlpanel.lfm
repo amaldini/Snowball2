@@ -54,6 +54,7 @@ object Form1: TForm1
       Top = 56
       Width = 71
       Caption = 'ANTI-GRID'
+      Enabled = False
       TabOrder = 2
     end
   end
@@ -89,6 +90,7 @@ object Form1: TForm1
       Top = 56
       Width = 71
       Caption = 'ANTI-GRID'
+      Enabled = False
       TabOrder = 2
     end
   end
