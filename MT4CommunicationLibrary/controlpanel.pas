@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ComCtrls, Grids, SynMemo;
+  StdCtrls, ComCtrls, Grids, mt4communication;
 
 type
 
@@ -50,8 +50,30 @@ begin
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
+var isMaster:integer;
+    symbol:PChar;
+    masterMode:PChar;
+    slaveMode:PChar;
 begin
-  StatusBar1.SimpleText := 'Changes applied to '+listbox1.GetSelectedText;
+  symbol:=PChar(listbox1.getSelectedText);
+
+  masterMode:=''; slaveMode:='';
+
+  isMaster:=1;
+  if (longWait.Checked) then masterMode:='W';
+  if (longGrid.Checked) then masterMode:='G';
+  if (longAntiGrid.Checked) then masterMode:='A';
+  setGridMode(symbol,isMaster,masterMode);
+
+  isMaster:=0;
+  if (shortWait.Checked) then slaveMode:='W';
+  if (shortGrid.Checked) then slaveMode:='G';
+  if (shortAntiGrid.Checked) then slaveMode:='A';
+  setGridMode(symbol,isMaster,PChar(slaveMode));
+
+  StatusBar1.SimpleText :=
+                        'Changes applied to '+listbox1.GetSelectedText+' '+
+                        masterMode+'/'+slaveMode;
 end;
 
 end.
