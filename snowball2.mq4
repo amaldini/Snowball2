@@ -1247,10 +1247,8 @@ int deinit(){
 string gridMode;
 
 void onTick(){
-   
-   maldaLog("onTick");
-   
-   gridMode = "W";
+
+   recordEquity(name+Symbol6(), PERIOD_H1, magic);
    
    checkDailyCycle();
    
@@ -1259,23 +1257,21 @@ void onTick(){
       info();
       return(0);
    }
-
-   maldaLog("before gridMode");
    
-   string gridMode = "W";
+   // if GridMode is waiting... delete all pending orders and exit
    if (isMasterAccount()) {
       gridMode = getGridMode(Symbol6(),1);
    } else if (isSlaveAccount()) {
       gridMode = getGridMode(Symbol6(),0);
    }
    
-   maldaLog("gridMode:"+gridMode);
    if (gridMode=="W"||gridMode=="") {
       maldaLog("waiting...");
+      closeOpenOrders(OP_SELLSTOP, magic);
+      closeOpenOrders(OP_BUYSTOP, magic);
       return(0);
    }
 
-   recordEquity(name+Symbol6(), PERIOD_H1, magic);
    //checkOanda(magic, oanda_factor);
    checkLines();
    checkButtons();
