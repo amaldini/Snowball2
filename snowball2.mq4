@@ -1261,16 +1261,19 @@ void onTick(){
    }
 
    maldaLog("before gridMode");
-   /*
+   
    string gridMode = "W";
    if (isMasterAccount()) {
       gridMode = getGridMode(Symbol6(),1);
    } else if (isSlaveAccount()) {
       gridMode = getGridMode(Symbol6(),0);
    }
-   */
+   
    maldaLog("gridMode:"+gridMode);
-   return(0);
+   if (gridMode=="W"||gridMode=="") {
+      maldaLog("waiting...");
+      return(0);
+   }
 
    recordEquity(name+Symbol6(), PERIOD_H1, magic);
    //checkOanda(magic, oanda_factor);
