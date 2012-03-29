@@ -25,6 +25,7 @@ type
     ShortAntiGrid: TRadioButton;
     StatusBar1: TStatusBar;
     procedure Button1Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
 
   private
@@ -91,6 +92,11 @@ begin
   StatusBar1.SimpleText :=
                         'Changes applied to '+listbox1.GetSelectedText+' '+
                         masterMode+'/'+slaveMode;
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+
 end;
 
 end.

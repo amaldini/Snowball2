@@ -9,5 +9,7 @@ bool ClearSymbolStatus(string symbolName);
 string PostSymbolStatus(string symbolName,double lots,int isLong, int isShort,double pyramidBase, double renkoPyramidPips);
 bool GetSymbolStatus(string symbolName,int& longOrShort[],double& lotsPyramidBaseAndPips[]); 
 
+string getGridMode(string symbolName,int isMaster); 
+
 
 
