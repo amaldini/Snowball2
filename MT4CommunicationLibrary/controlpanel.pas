@@ -44,9 +44,26 @@ implementation
 
 
 procedure TForm1.ListBox1Click(Sender: TObject);
+var symbol:PChar;
+    isMaster:integer;
+    mode:PChar;
 begin
   GroupBox1.Enabled:=true;
   GroupBox2.Enabled:=true;
+
+  symbol:=PChar(listbox1.getSelectedText);
+
+  isMaster:=1;
+  mode:=getGridMode(symbol,isMaster);
+  if ((mode='W') or (mode='')) then longWait.Checked:=true;
+  if (mode='G') then longGrid.Checked:=true;
+  if (mode='A') then longAntiGrid.Checked:=true;
+
+  isMaster:=0;
+  mode:=getGridMode(symbol,isMaster);
+  if ((mode='W') or (mode='')) then shortWait.Checked:=true;
+  if (mode='G') then shortGrid.Checked:=true;
+  if (mode='A') then shortAntiGrid.Checked:=true;
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
