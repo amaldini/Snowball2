@@ -16,7 +16,7 @@ function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;
 function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
 
 function getBalanceAndNAV(isMaster:integer;var balanceAndNAV:TD_Terna):boolean;stdcall;
-function setBalanceAndNAV(isMaster:integer;balance:double;NAV:double):boolean;
+function setBalanceAndNAV(isMaster:integer;balance:double;NAV:double):boolean;stdcall;
 
 implementation
 
@@ -28,7 +28,7 @@ function getBalanceAndNAV(isMaster:integer;var balanceAndNAV:TD_Terna):boolean;s
 begin
 end;
 
-function setBalanceAndNAV(isMaster:integer;balance:double;NAV:double):boolean;
+function setBalanceAndNAV(isMaster:integer;balance:double;NAV:double):boolean;stdcall;
 begin
 end;
 
