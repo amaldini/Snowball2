@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ComCtrls, Grids, SynEdit, SynHighlighterIni, mt4communication;
+  StdCtrls, ComCtrls, mt4communication;
 
 type
 
@@ -14,6 +14,8 @@ type
 
   TForm1 = class(TForm)
     Button1: TButton;
+    Button2: TButton;
+    Button3: TButton;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     Label1: TLabel;
@@ -30,6 +32,7 @@ type
     StatusBar1: TStatusBar;
     Timer1: TTimer;
     procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
@@ -102,13 +105,18 @@ begin
 
 end;
 
+function getSelectedSymbol():PChar;
+begin
+     result:=PChar(form1.listbox1.getSelectedText);
+end;
+
 procedure TForm1.Button1Click(Sender: TObject);
 var isMaster:integer;
     symbol:PChar;
     masterMode:PChar;
     slaveMode:PChar;
 begin
-  symbol:=PChar(listbox1.getSelectedText);
+  symbol:=getSelectedSymbol();
 
   masterMode:=''; slaveMode:='';
 
@@ -127,6 +135,12 @@ begin
   StatusBar1.SimpleText :=
                         'Changes applied to '+listbox1.GetSelectedText+' '+
                         masterMode+'/'+slaveMode;
+end;
+
+procedure TForm1.Button2Click(Sender: TObject);
+var symbol:PChar;
+begin
+  // setGridMode(s
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
