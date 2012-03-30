@@ -29,7 +29,29 @@ begin
 end;
 
 function setBalanceAndNAV(isMaster:integer;balance:double;NAV:double):boolean;stdcall;
+var
+     s :ansistring; // reference counted and memory managed strings.
+     entry:ansistring;
 begin
+    // our PChar will be copied into an ansistring automatically,
+    // no need to worry about the ugly details of memory allocation.
+    // s := 'Hello ' + FloatToStr(symbolName) + ' ' + y + '!';
+    s := FloatToStr(balance)+';'+
+         FloatToStr(NAV);
+    // cast it back into a pointer. Metatrader will copy the
+    // string from the pointer into it's own memory.
+    if (isMaster<>0) then entry := 'BalanceAndNAV_Master'
+    else entry := 'BalanceAndNAV_Slave';
+    With TRegistry.Create do
+         try
+            RootKey:=HKEY_CURRENT_USER;
+            if OpenKey('Software\VB and VBA Program Settings\MT4Channel\BalanceAndNAV',true) then
+            WriteString(entry,s);
+         finally
+            free;
+         end;
+
+    result := true;
 end;
 
 
