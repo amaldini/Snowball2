@@ -25,8 +25,49 @@ uses
 
 
 function getBalance_NAV_UsedMargin(isMaster:integer;var values:TD_Terna):boolean;stdcall;
+var
+   list:TStringList;
+   i:integer;
+   s:string;
+   entry:ansistring;
 begin
-    result:=true;
+  if (isMaster<>0) then entry := 'BalanceAndNAV_Master'
+  else entry := 'BalanceAndNAV_Slave';
+  With TRegistry.Create do
+       try
+         RootKey:=HKEY_CURRENT_USER;
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\BalanceAndNAV') then
+         If ValueExists(entry) then
+            s:=ReadString(entry); // Or whatever it is. ReadInteger/ReadBool
+       finally
+         free;
+       end;
+  list := TStringList.Create;
+  list.Delimiter := ';';
+  list.StrictDelimiter:=true;
+  list.DelimitedText:=s;
+
+  result:=false;
+  if (list.Count=3) then
+  begin
+         for i:=0 to list.Count-1 do
+         begin
+              case i of
+              0: values[0] := strToFloat(list.valueFromIndex[i]);  // Balance
+              1: values[1] := strToFloat(list.ValueFromIndex[i]);  // NAV
+              2: values[2] := strToFloat(list.ValueFromIndex[i]);  // UsedMargin  
+              end;
+              // Writeln(list.ValueFromIndex[i]);
+         end;
+         result:=true;
+  end;
+
+
+  // Writeln(list.Count);
+
+  list.free;
+
+  result:=true;
 end;
 
 function setBalance_NAV_UsedMargin(isMaster:integer;balance:double;NAV:double;usedMargin:double):boolean;stdcall;
