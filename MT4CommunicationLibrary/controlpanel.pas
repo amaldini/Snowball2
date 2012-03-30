@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ComCtrls, Grids, mt4communication;
+  StdCtrls, ComCtrls, Grids, SynEdit, SynHighlighterIni, mt4communication;
 
 type
 
@@ -16,6 +16,10 @@ type
     Button1: TButton;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
+    Label1: TLabel;
+    lblStatsAccount1: TLabel;
+    lblStatsAccount2: TLabel;
+    lblTotals: TLabel;
     ListBox1: TListBox;
     LongWait: TRadioButton;
     LongGrid: TRadioButton;
@@ -24,9 +28,11 @@ type
     ShortGrid: TRadioButton;
     ShortAntiGrid: TRadioButton;
     StatusBar1: TStatusBar;
+    Timer1: TTimer;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
 
   private
     { private declarations }
@@ -65,6 +71,35 @@ begin
   if ((mode='W') or (mode='')) then shortWait.Checked:=true;
   if (mode='G') then shortGrid.Checked:=true;
   if (mode='A') then shortAntiGrid.Checked:=true;
+end;
+
+procedure TForm1.Timer1Timer(Sender: TObject);
+var Equity1,nav1,usedmargin1:double;
+    Equity2,nav2,usedmargin2:double;
+begin
+     Equity1:=0; nav1:=0; usedMargin1:=0;
+     Equity2:=0; nav2:=0; usedMargin2:=0;
+     if (getEquity_NAV_UsedMargin(1,Equity1,nav1,usedMargin1)) then
+        lblStatsAccount1.caption :=
+                                 floatToStr(Equity1)+sLineBreak+
+                                 sLineBreak+
+                                 floatToStr(nav1)+sLineBreak+
+                                 sLineBreak+
+                                 floatToStr(usedMargin1);
+     if (getEquity_NAV_UsedMargin(0,Equity2,nav2,usedMargin2)) then
+        lblStatsAccount2.caption :=
+                                 floatToStr(Equity2)+sLineBreak+
+                                 sLineBreak+
+                                 floatToStr(nav2)+sLineBreak+
+                                 sLineBreak+
+                                 floatToStr(usedMargin2);
+     lblTotals.caption :=
+                                 floatToStr(Equity1+Equity2)+sLineBreak+
+                                 sLineBreak+
+                                 floatToStr(nav1+nav2)+sLineBreak+
+                                 sLineBreak+
+                                 floatToStr(usedMargin1+usedMargin2);
+
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);

@@ -1,4 +1,4 @@
-// {$define TESTING}
+//{$define TESTING}
 
 {$IFDEF TESTING}
 program MT4Library;
@@ -16,8 +16,8 @@ exports
   GetSymbolStatus,
   ClearSymbolStatus,
   getGridMode,
-  setBalance_NAV_UsedMargin,
-  getBalance_NAV_UsedMargin;
+  setEquity_NAV_UsedMargin,
+  getEquity_NAV_UsedMargin;
 
 {$IFDEF TESTING}
 
@@ -25,6 +25,8 @@ var a:TIPair;
    b:TD_Terna;
    r:boolean;
    i:integer;
+
+   equity,nav,usedMargin:double;
 begin
   for i:=1 to 10 do
   begin
@@ -46,9 +48,9 @@ begin
   setGridMode('EURUSDtest',1,'TEST OK!');
   Writeln(getGridMode('EURUSDTest',1));
   readln;
-  setBalance_NAV_UsedMargin(1,100,90,10);
-  if getBalance_NAV_UsedMargin(1,b) then
-     Writeln('Balance:'+FloatToStr(b[0])+' NAV:'+FloatToStr(b[1])+' UsedMargin:'+FloatToStr(b[2]));
+  setEquity_NAV_UsedMargin(1,100,90,10);
+  if getEquity_NAV_UsedMargin(1,equity,nav,usedMargin) then
+     Writeln('Equity:'+FloatToStr(equity)+' NAV:'+FloatToStr(nav)+' UsedMargin:'+FloatToStr(usedMargin));
 
   readln;
 end.

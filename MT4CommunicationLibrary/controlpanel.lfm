@@ -1,17 +1,17 @@
 object Form1: TForm1
-  Left = 376
-  Height = 170
-  Top = 543
-  Width = 367
+  Left = 360
+  Height = 253
+  Top = 611
+  Width = 371
   Caption = 'SnowBall ControlPanel'
-  ClientHeight = 170
-  ClientWidth = 367
+  ClientHeight = 253
+  ClientWidth = 371
   OnCreate = FormCreate
   LCLVersion = '0.9.30.4'
   object ListBox1: TListBox
     Left = 8
     Height = 120
-    Top = 16
+    Top = 96
     Width = 100
     Items.Strings = (
       'EURUSD'
@@ -29,7 +29,7 @@ object Form1: TForm1
   object GroupBox1: TGroupBox
     Left = 120
     Height = 96
-    Top = 8
+    Top = 88
     Width = 112
     Caption = 'LONG'
     ClientHeight = 78
@@ -65,7 +65,7 @@ object Form1: TForm1
   object GroupBox2: TGroupBox
     Left = 240
     Height = 96
-    Top = 8
+    Top = 88
     Width = 112
     Caption = 'SHORT'
     ClientHeight = 78
@@ -101,7 +101,7 @@ object Form1: TForm1
   object Button1: TButton
     Left = 120
     Height = 25
-    Top = 114
+    Top = 194
     Width = 232
     Caption = 'Apply'
     OnClick = Button1Click
@@ -110,8 +110,46 @@ object Form1: TForm1
   object StatusBar1: TStatusBar
     Left = 0
     Height = 23
-    Top = 147
-    Width = 367
+    Top = 230
+    Width = 371
     Panels = <>
+  end
+  object Label1: TLabel
+    Left = 8
+    Height = 66
+    Top = 8
+    Width = 60
+    Alignment = taRightJustify
+    Caption = 'Balance'#13#10#13#10'NAV'#13#10#13#10'Used Margin'
+    ParentColor = False
+  end
+  object lblStatsAccount1: TLabel
+    Left = 112
+    Height = 66
+    Top = 8
+    Width = 5
+    Caption = '-'#13#10#13#10'-'#13#10#13#10'-'
+    ParentColor = False
+  end
+  object lblStatsAccount2: TLabel
+    Left = 176
+    Height = 66
+    Top = 8
+    Width = 5
+    Caption = '-'#13#10#13#10'-'#13#10#13#10'-'
+    ParentColor = False
+  end
+  object lblTotals: TLabel
+    Left = 232
+    Height = 66
+    Top = 8
+    Width = 5
+    Caption = '-'#13#10#13#10'-'#13#10#13#10'-'
+    ParentColor = False
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    left = 312
+    top = 112
   end
 end

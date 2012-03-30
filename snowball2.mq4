@@ -1298,7 +1298,7 @@ void onTick(){
 
 void sendStatsToControlPanel() {
    int isMaster = isMasterAccount();
-   setBalance_NAV_UsedMargin(isMaster,AccountBalance(), AccountEquity(),AccountMargin()); 
+   setEquity_NAV_UsedMargin(isMaster,AccountEquity(),AccountBalance(),AccountMargin()); 
 }
    
 void checkBreakEven2() {
