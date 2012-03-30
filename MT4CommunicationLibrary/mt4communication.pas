@@ -15,7 +15,7 @@ function GetSymbolStatus(symbolName:PChar; var longOrShort:TIPair;var lotsPyrami
 function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;
 function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
 
-function getBalance_NAV_UsedMargin(isMaster:integer;var balanceAndNAV:TD_Terna):boolean;stdcall;
+function getBalance_NAV_UsedMargin(isMaster:integer;var values:TD_Terna):boolean;stdcall;
 function setBalance_NAV_UsedMargin(isMaster:integer;balance:double;NAV:double;usedMargin:double):boolean;stdcall;
 
 implementation
@@ -24,8 +24,9 @@ uses
   Classes, SysUtils, Registry;
 
 
-function getBalance_NAV_UsedMargin(isMaster:integer;var balanceAndNAV:TD_Terna):boolean;stdcall;
+function getBalance_NAV_UsedMargin(isMaster:integer;var values:TD_Terna):boolean;stdcall;
 begin
+    result:=true;
 end;
 
 function setBalance_NAV_UsedMargin(isMaster:integer;balance:double;NAV:double;usedMargin:double):boolean;stdcall;
