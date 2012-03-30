@@ -15,8 +15,8 @@ function GetSymbolStatus(symbolName:PChar; var longOrShort:TIPair;var lotsPyrami
 function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;
 function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
 
-function getBalanceAndNAV(isMaster:integer;var balanceAndNAV:TD_Terna):boolean;stdcall;
-function setBalanceAndNAV(isMaster:integer;balance:double;NAV:double):boolean;stdcall;
+function getBalance_NAV_UsedMargin(isMaster:integer;var balanceAndNAV:TD_Terna):boolean;stdcall;
+function setBalance_NAV_UsedMargin(isMaster:integer;balance:double;NAV:double;usedMargin:double):boolean;stdcall;
 
 implementation
 
@@ -24,11 +24,11 @@ uses
   Classes, SysUtils, Registry;
 
 
-function getBalanceAndNAV(isMaster:integer;var balanceAndNAV:TD_Terna):boolean;stdcall;
+function getBalance_NAV_UsedMargin(isMaster:integer;var balanceAndNAV:TD_Terna):boolean;stdcall;
 begin
 end;
 
-function setBalanceAndNAV(isMaster:integer;balance:double;NAV:double):boolean;stdcall;
+function setBalance_NAV_UsedMargin(isMaster:integer;balance:double;NAV:double;usedMargin:double):boolean;stdcall;
 var
      s :ansistring; // reference counted and memory managed strings.
      entry:ansistring;
@@ -37,7 +37,8 @@ begin
     // no need to worry about the ugly details of memory allocation.
     // s := 'Hello ' + FloatToStr(symbolName) + ' ' + y + '!';
     s := FloatToStr(balance)+';'+
-         FloatToStr(NAV);
+         FloatToStr(NAV)+';'+
+         FloatToStr(UsedMargin);
     // cast it back into a pointer. Metatrader will copy the
     // string from the pointer into it's own memory.
     if (isMaster<>0) then entry := 'BalanceAndNAV_Master'
