@@ -14,8 +14,8 @@ type
 
   TForm1 = class(TForm)
     Button1: TButton;
-    Button2: TButton;
-    Button3: TButton;
+    btnCloseLong: TButton;
+    btnCloseShort: TButton;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     Label1: TLabel;
@@ -32,7 +32,8 @@ type
     StatusBar1: TStatusBar;
     Timer1: TTimer;
     procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+    procedure btnCloseLongClick(Sender: TObject);
+    procedure btnCloseShortClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
@@ -65,13 +66,13 @@ begin
 
   isMaster:=1;
   mode:=getGridMode(symbol,isMaster);
-  if ((mode='W') or (mode='')) then longWait.Checked:=true;
+  if ((mode='W') or (mode='') or (mode='CLOSE')) then longWait.Checked:=true;
   if (mode='G') then longGrid.Checked:=true;
   if (mode='A') then longAntiGrid.Checked:=true;
 
   isMaster:=0;
   mode:=getGridMode(symbol,isMaster);
-  if ((mode='W') or (mode='')) then shortWait.Checked:=true;
+  if ((mode='W') or (mode='') or (mode='CLOSE')) then shortWait.Checked:=true;
   if (mode='G') then shortGrid.Checked:=true;
   if (mode='A') then shortAntiGrid.Checked:=true;
 end;
@@ -137,15 +138,26 @@ begin
                         masterMode+'/'+slaveMode;
 end;
 
-procedure TForm1.Button2Click(Sender: TObject);
+procedure TForm1.btnCloseLongClick(Sender: TObject);
 var symbol:PChar;
 begin
-  // setGridMode(s
+  symbol:=getSelectedSymbol();
+  setGridMode(symbol,1,'CLOSE');
+  longWait.checked :=true;
+end;
+
+procedure TForm1.btnCloseShortClick(Sender: TObject);
+var symbol:PChar;
+begin
+  symbol:=getSelectedSymbol();
+  setGridMode(symbol,0,'CLOSE');
+  shortWait.checked:=true;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-
+     setEquity_NAV_UsedMargin(0,-1,-1,-1);
+     setEquity_NAV_UsedMargin(1,-1,-1,-1);
 end;
 
 end.
