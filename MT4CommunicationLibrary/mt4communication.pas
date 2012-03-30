@@ -15,10 +15,23 @@ function GetSymbolStatus(symbolName:PChar; var longOrShort:TIPair;var lotsPyrami
 function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;
 function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
 
+function getBalanceAndNAV(isMaster:integer;var balanceAndNAV:TD_Terna):boolean;stdcall;
+function setBalanceAndNAV(isMaster:integer;balance:double;NAV:double):boolean;
+
 implementation
 
 uses
   Classes, SysUtils, Registry;
+
+
+function getBalanceAndNAV(isMaster:integer;var balanceAndNAV:TD_Terna):boolean;stdcall;
+begin
+end;
+
+function setBalanceAndNAV(isMaster:integer;balance:double;NAV:double):boolean;
+begin
+end;
+
 
 // R = RENKOASHI WITH SUPPORT / RESISTANCE BREAKOUT, OR RENKO SLAVE
 // G
