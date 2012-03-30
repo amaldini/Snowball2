@@ -11,5 +11,8 @@ bool GetSymbolStatus(string symbolName,int& longOrShort[],double& lotsPyramidBas
 
 string getGridMode(string symbolName,int isMaster); 
 
+bool getBalance_NAV_UsedMargin(int isMaster,double& values[]);
+bool setBalance_NAV_UsedMargin(int isMaster,double balance, double NAV,double usedMargin);   
+
 
 

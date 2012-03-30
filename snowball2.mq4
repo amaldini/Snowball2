@@ -1269,6 +1269,7 @@ void onTick(){
       maldaLog("waiting...");
       closeOpenOrders(OP_SELLSTOP, magic);
       closeOpenOrders(OP_BUYSTOP, magic);
+      sendStatsToControlPanel();
       return(0);
    }
 
@@ -1291,8 +1292,15 @@ void onTick(){
       plotNewClosedTrades(magic);
    }
    checkForStopReduction();
+
+   sendStatsToControlPanel();
 }
 
+void sendStatsToControlPanel() {
+   int isMaster = isMasterAccount();
+   setBalance_NAV_UsedMargin(isMaster,AccountBalance(), AccountEquity(),AccountMargin()); 
+}
+   
 void checkBreakEven2() {
    
    
