@@ -12,7 +12,7 @@ function ClearSymbolStatus(symbolName:PChar):boolean;stdcall;
 function PostSymbolStatus(symbolName:PChar;lots:double;isLong:integer; isShort:integer; pyramidBase: double; renkoPyramidPips: double): PChar; stdcall;
 function GetSymbolStatus(symbolName:PChar; var longOrShort:TIPair;var lotsPyramidBaseAndPips:TD_Terna):boolean;stdcall;
 
-function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;
+function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;stdcall;
 function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
 
 function getEquity_NAV_UsedMargin(isMaster:integer;var equity:double;var NAV:double;var usedMargin:double):boolean;stdcall;
@@ -21,7 +21,7 @@ function setEquity_NAV_UsedMargin(isMaster:integer;equity:double;NAV:double;used
 implementation
 
 uses
-  Classes, SysUtils, Registry,Dialogs;
+  Classes, SysUtils, Registry; // ,Dialogs;
 
 
 function getEquity_NAV_UsedMargin(isMaster:integer;var Equity:double;var NAV:double;var usedMargin:double):boolean;stdcall;
@@ -104,7 +104,7 @@ end;
 // R = RENKOASHI WITH SUPPORT / RESISTANCE BREAKOUT, OR RENKO SLAVE
 // G
 // AG = ANTI GRID
-function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;
+function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;stdcall;
 var entry:ansistring;
 begin
    With TRegistry.Create do

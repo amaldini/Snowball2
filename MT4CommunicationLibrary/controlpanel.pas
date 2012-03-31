@@ -16,6 +16,7 @@ type
     Button1: TButton;
     btnCloseLong: TButton;
     btnCloseShort: TButton;
+    ButtonCloseAll: TButton;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     Label1: TLabel;
@@ -34,6 +35,7 @@ type
     procedure Button1Click(Sender: TObject);
     procedure btnCloseLongClick(Sender: TObject);
     procedure btnCloseShortClick(Sender: TObject);
+    procedure ButtonCloseAllClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
@@ -156,6 +158,21 @@ begin
   symbol:=getSelectedSymbol();
   setGridMode(symbol,isMaster,'CLOSE');
   shortWait.checked:=true;
+end;
+
+procedure TForm1.ButtonCloseAllClick(Sender: TObject);
+var i:integer;
+    symbol:ansistring;
+begin
+     for i := 0 to listbox1.count-1 do
+     begin
+          symbol:=listbox1.items[i];
+          setGridMode(PChar(symbol),0,'CLOSE');
+          setGridMode(PChar(symbol),1,'CLOSE');
+     end;
+     longWait.checked:=true;
+     shortWait.checked:=true;
+     statusbar1.SimpleText:='Close All command issued.';
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);

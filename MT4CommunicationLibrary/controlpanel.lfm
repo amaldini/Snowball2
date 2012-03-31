@@ -1,11 +1,12 @@
 object Form1: TForm1
-  Left = 249
+  Left = 345
   Height = 253
-  Top = 190
+  Top = 290
   Width = 371
   Caption = 'SnowBall ControlPanel'
   ClientHeight = 253
   ClientWidth = 371
+  FormStyle = fsSystemStayOnTop
   OnCreate = FormCreate
   LCLVersion = '0.9.30.4'
   object ListBox1: TListBox
@@ -164,6 +165,15 @@ object Form1: TForm1
     Width = 5
     Caption = '-'#13#10#13#10'-'#13#10#13#10'-'
     ParentColor = False
+  end
+  object ButtonCloseAll: TButton
+    Left = 296
+    Height = 17
+    Top = 8
+    Width = 51
+    Caption = 'Close All'
+    OnClick = ButtonCloseAllClick
+    TabOrder = 5
   end
   object Timer1: TTimer
     OnTimer = Timer1Timer

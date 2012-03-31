@@ -1275,6 +1275,7 @@ void onTick(){
       closeOpenOrders(OP_SELL,magic);
       maldaLog("gridMode==CLOSE: Closed open trades");
       gridMode="W";
+      setGridMode(Symbol6(),isMasterAccount(),gridMode);
    }
    
    if (gridMode=="W"||gridMode=="") {

@@ -16,6 +16,7 @@ exports
   GetSymbolStatus,
   ClearSymbolStatus,
   getGridMode,
+  setGridMode,
   setEquity_NAV_UsedMargin,
   getEquity_NAV_UsedMargin;
 

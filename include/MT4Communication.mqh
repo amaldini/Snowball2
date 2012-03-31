@@ -10,6 +10,7 @@ string PostSymbolStatus(string symbolName,double lots,int isLong, int isShort,do
 bool GetSymbolStatus(string symbolName,int& longOrShort[],double& lotsPyramidBaseAndPips[]); 
 
 string getGridMode(string symbolName,int isMaster); 
+bool   setGridMode(string symbolName,int isMaster,string gridMode);
 
 bool setEquity_NAV_UsedMargin(int isMaster,double equity, double NAV,double usedMargin);   
 
