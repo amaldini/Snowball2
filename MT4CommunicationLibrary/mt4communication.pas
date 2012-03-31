@@ -21,7 +21,7 @@ function setEquity_NAV_UsedMargin(isMaster:integer;equity:double;NAV:double;used
 implementation
 
 uses
-  Classes, SysUtils, Registry;
+  Classes, SysUtils, Registry,Dialogs;
 
 
 function getEquity_NAV_UsedMargin(isMaster:integer;var Equity:double;var NAV:double;var usedMargin:double):boolean;stdcall;
@@ -95,18 +95,24 @@ begin
     result := true;
 end;
 
+function appendMasterTagToSymbolName(isMaster:integer;symbolName:PChar):ansistring;
+begin
+     if (isMaster<>0) then result:=AnsiString(symbolName)+'_MASTER'
+     else result:=AnsiString(symbolName);
+end;
 
 // R = RENKOASHI WITH SUPPORT / RESISTANCE BREAKOUT, OR RENKO SLAVE
 // G
 // AG = ANTI GRID
 function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;
+var entry:ansistring;
 begin
    With TRegistry.Create do
    try
       RootKey:=HKEY_CURRENT_USER;
-      if (isMaster<>0) then symbolName:=PChar(symbolName+'_MASTER');
+      entry:=appendMasterTagToSymbolName(isMaster,symbolName);
       if OpenKey('Software\VB and VBA Program Settings\MT4Channel\GridMode',true) then
-         WriteString(symbolName,gridMode);
+         WriteString(entry,gridMode);
       finally
          free;
       end;
@@ -114,15 +120,17 @@ begin
 end;
 
 function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
+var
+   entry:ansistring;
 begin
   result:=PChar('');
   With TRegistry.Create do
        try
          RootKey:=HKEY_CURRENT_USER;
-         if (isMaster<>0) then symbolName:=PChar(symbolName+'_MASTER');
+         entry:=appendMasterTagToSymbolName(isMaster,symbolName);
          If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\GridMode') then
-         If ValueExists(symbolName) then
-            result:=PChar(ReadString(symbolName)); // Or whatever it is. ReadInteger/ReadBool
+         If ValueExists(entry) then
+            result:=PChar(ReadString(entry)); // Or whatever it is. ReadInteger/ReadBool
        finally
          free;
        end;

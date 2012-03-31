@@ -1263,6 +1263,18 @@ void onTick(){
       gridMode = getGridMode(Symbol6(),1);
    } else if (isSlaveAccount()) {
       gridMode = getGridMode(Symbol6(),0);
+   } else {
+      maldaLog("UNKNOWN ACCOUNT!!!");
+      return(0);
+   }
+   
+   maldaLog("GridMode:"+gridMode);
+   
+   if (gridMode=="CLOSE") {
+      closeOpenOrders(OP_BUY,magic);
+      closeOpenOrders(OP_SELL,magic);
+      maldaLog("gridMode==CLOSE: Closed open trades");
+      gridMode="W";
    }
    
    if (gridMode=="W"||gridMode=="") {

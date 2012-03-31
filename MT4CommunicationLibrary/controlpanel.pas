@@ -140,17 +140,21 @@ end;
 
 procedure TForm1.btnCloseLongClick(Sender: TObject);
 var symbol:PChar;
+    isMaster:integer;
 begin
+  isMaster:=1;
   symbol:=getSelectedSymbol();
-  setGridMode(symbol,1,'CLOSE');
+  setGridMode(symbol,isMaster,'CLOSE');
   longWait.checked :=true;
 end;
 
 procedure TForm1.btnCloseShortClick(Sender: TObject);
 var symbol:PChar;
+    isMaster:integer;
 begin
+  isMaster:=0;
   symbol:=getSelectedSymbol();
-  setGridMode(symbol,0,'CLOSE');
+  setGridMode(symbol,isMaster,'CLOSE');
   shortWait.checked:=true;
 end;
 
