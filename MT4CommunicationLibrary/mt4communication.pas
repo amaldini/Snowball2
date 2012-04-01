@@ -129,8 +129,10 @@ begin
          entry:=appendMasterTagToSymbolName(isMaster,symbolName);
          If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\GridOption_Distant') then
          If ValueExists(entry) then
+         begin
             distant[0] := ReadInteger(entry);
             result:=true; // Or whatever it is. ReadInteger/ReadBool
+         end;
        finally
          free;
        end;

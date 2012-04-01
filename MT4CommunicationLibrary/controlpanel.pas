@@ -66,6 +66,8 @@ procedure TForm1.ListBox1Click(Sender: TObject);
 var symbol:PChar;
     isMaster:integer;
     mode:PChar;
+    distant:TIPair;
+    boolValue:boolean;
 begin
   GroupBox1.Enabled:=true;
   GroupBox2.Enabled:=true;
@@ -83,17 +85,53 @@ begin
   if ((mode='W') or (mode='') or (mode='CLOSE')) then shortWait.Checked:=true;
   if (mode='G') then shortGrid.Checked:=true;
   if (mode='A') then shortAntiGrid.Checked:=true;
+
+  boolValue:=false;
+  if (getGridOptions(symbol,1,distant)) then
+  begin
+       if (distant[0]<>0) then boolValue:=true;
+  end;
+  longDistant.checked:=boolValue;
+
+  boolValue:=false;
+  if (getGridOptions(symbol,0,distant)) then
+  begin
+       if (distant[0]<>0) then boolValue:=true;
+  end;
+  shortDistant.checked:=boolValue;
+end;
+
+function getSelectedSymbol():PChar;
+begin
+     result:=PChar(form1.listbox1.getSelectedText);
 end;
 
 procedure TForm1.LongDistantClick(Sender: TObject);
+var symbol:pchar;
+    isDistant:integer;
 begin
-     LongDistant.Checked:=not longDistant.Checked;
-
+     if (form1.ListBox1.ItemIndex>=0) then
+     begin
+       symbol:=getSelectedSymbol();
+       LongDistant.Checked:=not longDistant.Checked;
+       isDistant:=0;
+       if (longDistant.checked) then isDistant:=1;
+       setGridOptions(symbol,1,isDistant);
+     end;
 end;
 
 procedure TForm1.ShortDistantClick(Sender: TObject);
+var symbol:pchar;
+    isDistant:integer;
 begin
-     ShortDistant.checked := not shortDistant.checked;
+     if (form1.listbox1.itemindex>=0) then
+     begin
+       symbol:=getSelectedSymbol();
+       ShortDistant.checked := not shortDistant.checked;
+       isDistant:=0;
+       if (shortDistant.checked) then isDistant:=1;
+       setGridOptions(symbol,0,isDistant);
+     end;
 end;
 
 procedure TForm1.Timer1Timer(Sender: TObject);
@@ -123,11 +161,6 @@ begin
                                  sLineBreak+
                                  floatToStr(usedMargin1+usedMargin2);
 
-end;
-
-function getSelectedSymbol():PChar;
-begin
-     result:=PChar(form1.listbox1.getSelectedText);
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
