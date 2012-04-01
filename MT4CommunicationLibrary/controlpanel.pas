@@ -148,6 +148,7 @@ begin
   symbol:=getSelectedSymbol();
   setGridMode(symbol,isMaster,'CLOSE');
   longWait.checked :=true;
+  statusbar1.SimpleText :='Close command issued for '+symbol+' MASTER';
 end;
 
 procedure TForm1.btnCloseShortClick(Sender: TObject);
@@ -158,6 +159,7 @@ begin
   symbol:=getSelectedSymbol();
   setGridMode(symbol,isMaster,'CLOSE');
   shortWait.checked:=true;
+  statusbar1.SimpleText :='Close command issued for '+symbol+' SLAVE';
 end;
 
 procedure TForm1.ButtonCloseAllClick(Sender: TObject);
