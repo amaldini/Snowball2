@@ -141,23 +141,23 @@ begin
 end;
 
 procedure TForm1.btnCloseLongClick(Sender: TObject);
-var symbol:PChar;
+var symbol:ansistring;
     isMaster:integer;
 begin
   isMaster:=1;
   symbol:=getSelectedSymbol();
-  setGridMode(symbol,isMaster,'CLOSE');
+  setGridMode(PChar(symbol),isMaster,'CLOSE');
   longWait.checked :=true;
   statusbar1.SimpleText :='Close command issued for '+symbol+' MASTER';
 end;
 
 procedure TForm1.btnCloseShortClick(Sender: TObject);
-var symbol:PChar;
+var symbol:ansistring;
     isMaster:integer;
 begin
   isMaster:=0;
   symbol:=getSelectedSymbol();
-  setGridMode(symbol,isMaster,'CLOSE');
+  setGridMode(PChar(symbol),isMaster,'CLOSE');
   shortWait.checked:=true;
   statusbar1.SimpleText :='Close command issued for '+symbol+' SLAVE';
 end;
