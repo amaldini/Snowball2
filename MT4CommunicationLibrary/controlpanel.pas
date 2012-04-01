@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ComCtrls, mt4communication;
+  StdCtrls, ComCtrls, Menus, mt4communication;
 
 type
 
@@ -17,6 +17,8 @@ type
     btnCloseLong: TButton;
     btnCloseShort: TButton;
     ButtonCloseAll: TButton;
+    MainMenu1: TMainMenu;
+    GridDistance: TMenuItem;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     Label1: TLabel;
@@ -27,6 +29,8 @@ type
     LongWait: TRadioButton;
     LongGrid: TRadioButton;
     LongAntiGrid: TRadioButton;
+    LongDistant: TMenuItem;
+    ShortDistant: TMenuItem;
     ShortWait: TRadioButton;
     ShortGrid: TRadioButton;
     ShortAntiGrid: TRadioButton;
@@ -38,6 +42,8 @@ type
     procedure ButtonCloseAllClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
+    procedure LongDistantClick(Sender: TObject);
+    procedure ShortDistantClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
 
   private
@@ -77,6 +83,17 @@ begin
   if ((mode='W') or (mode='') or (mode='CLOSE')) then shortWait.Checked:=true;
   if (mode='G') then shortGrid.Checked:=true;
   if (mode='A') then shortAntiGrid.Checked:=true;
+end;
+
+procedure TForm1.LongDistantClick(Sender: TObject);
+begin
+     LongDistant.Checked:=not longDistant.Checked;
+
+end;
+
+procedure TForm1.ShortDistantClick(Sender: TObject);
+begin
+     ShortDistant.checked := not shortDistant.checked;
 end;
 
 procedure TForm1.Timer1Timer(Sender: TObject);

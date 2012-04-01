@@ -15,6 +15,9 @@ function GetSymbolStatus(symbolName:PChar; var longOrShort:TIPair;var lotsPyrami
 function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;stdcall;
 function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
 
+function getGridOptions(symbolName:PChar;isMaster:integer;var distant:tiPair):boolean;stdcall;
+function setGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer):boolean;stdcall;
+
 function getEquity_NAV_UsedMargin(isMaster:integer;var equity:double;var NAV:double;var usedMargin:double):boolean;stdcall;
 function setEquity_NAV_UsedMargin(isMaster:integer;equity:double;NAV:double;usedMargin:double):boolean;stdcall;
 
@@ -99,6 +102,38 @@ function appendMasterTagToSymbolName(isMaster:integer;symbolName:PChar):ansistri
 begin
      if (isMaster<>0) then result:=AnsiString(symbolName)+'_MASTER'
      else result:=AnsiString(symbolName);
+end;
+
+function setGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer):boolean;stdcall;
+var entry:ansistring;
+begin
+   With TRegistry.Create do
+   try
+      RootKey:=HKEY_CURRENT_USER;
+      entry:=appendMasterTagToSymbolName(isMaster,symbolName);
+      if OpenKey('Software\VB and VBA Program Settings\MT4Channel\GridOption_Distant',true) then
+         WriteInteger(entry,isDistant);
+      finally
+         free;
+      end;
+   result:=true;
+end;
+
+function getGridOptions(symbolName:PChar;isMaster:integer;var distant:tiPair):boolean;stdcall;
+var entry:ansistring;
+begin
+     result:=false;
+     With TRegistry.Create do
+       try
+         RootKey:=HKEY_CURRENT_USER;
+         entry:=appendMasterTagToSymbolName(isMaster,symbolName);
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\GridOption_Distant') then
+         If ValueExists(entry) then
+            distant[0] := ReadInteger(entry);
+            result:=true; // Or whatever it is. ReadInteger/ReadBool
+       finally
+         free;
+       end;
 end;
 
 // R = RENKOASHI WITH SUPPORT / RESISTANCE BREAKOUT, OR RENKO SLAVE

@@ -1,17 +1,18 @@
 object Form1: TForm1
   Left = 345
-  Height = 253
+  Height = 268
   Top = 290
   Width = 371
   Caption = 'SnowBall ControlPanel'
-  ClientHeight = 253
+  ClientHeight = 248
   ClientWidth = 371
   FormStyle = fsSystemStayOnTop
+  Menu = MainMenu1
   OnCreate = FormCreate
   LCLVersion = '0.9.30.4'
   object ListBox1: TListBox
     Left = 8
-    Height = 120
+    Height = 122
     Top = 96
     Width = 100
     Items.Strings = (
@@ -120,7 +121,7 @@ object Form1: TForm1
   object Button1: TButton
     Left = 120
     Height = 25
-    Top = 194
+    Top = 192
     Width = 232
     Caption = 'Apply'
     OnClick = Button1Click
@@ -129,7 +130,7 @@ object Form1: TForm1
   object StatusBar1: TStatusBar
     Left = 0
     Height = 23
-    Top = 230
+    Top = 225
     Width = 371
     Panels = <>
   end
@@ -179,5 +180,20 @@ object Form1: TForm1
     OnTimer = Timer1Timer
     left = 72
     top = 104
+  end
+  object MainMenu1: TMainMenu
+    left = 298
+    top = 48
+    object GridDistance: TMenuItem
+      Caption = 'Grid Distance'
+      object LongDistant: TMenuItem
+        Caption = 'Long distant'
+        OnClick = LongDistantClick
+      end
+      object ShortDistant: TMenuItem
+        Caption = 'Short distant'
+        OnClick = ShortDistantClick
+      end
+    end
   end
 end
