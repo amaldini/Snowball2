@@ -637,12 +637,49 @@ int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTyp
    return (idx);
 }
 
+/**
+* move all entry orders by the amount of d
+*/
+void moveOrders_GRID(double d){
+   int i;
+   for(i=0; i<OrdersTotal(); i++){
+      OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
+      if (isMyOrder(magic)){
+         if (MathAbs(OrderOpenPrice() - getLine()) > GRID_TRADING_PENDINGORDERS * GRID_TRADING_STEP * pip){
+            orderDeleteReliable(OrderTicket());
+         }else{
+            orderModifyReliable(
+               OrderTicket(),
+               NormalizeDouble(OrderOpenPrice() + d,Digits),
+               NormalizeDouble(OrderStopLoss() + d,Digits), //OK
+               0,
+               0,
+               CLR_NONE
+            );
+         }
+      }
+   }
+}
+
 void tradeGrid_Slave() {
    // verifica se per 2 livelli sotto al prezzo c'é l'ordine
    
    int tickets[],orderTypes[];
    double openPrices[];
    int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes);
+   
+   int i;
+   int danglers=0;
+   double max=0;
+   for (i=0;i<numOrders;i++) {
+      if (orderTypes[i]==OP_SELL && openPrices[i]<Ask) danglers++;
+      if (openPrices[i]>max) max=openPrices[i];
+   }
+   if (numOrders>0 && danglers==0 && (max<Bid-GRID_TRADING_STEP*pip)) {
+       double delta = (Bid-GRID_TRADING_STEP*pip)-max;
+       moveOrders_GRID(delta); 
+       for (i=0;i<numOrders;i++) openPrices[i]+=delta;
+   }
    
    double gridStart;
    if (numOrders == 0) {
@@ -651,11 +688,6 @@ void tradeGrid_Slave() {
       gridStart = openPrices[0];
    } 
    
-   int i;
-   int danglers=0;
-   for (i=0;i<numOrders;i++) {
-      if (orderTypes[i]==OP_SELL && openPrices[i]<Ask) danglers++;
-   }
    int addedOrders = 0;
    int nLevels=0;
    if (danglers<1) {
@@ -686,20 +718,29 @@ void tradeGrid_Master() {
 
    int tickets[],orderTypes[];
    double openPrices[];
-   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes);
+   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes); 
+   
+   int i;
+   int danglers=0;
+   double min=10000000;
+   for (i=0;i<numOrders;i++) {
+      if (orderTypes[i]==OP_BUY && openPrices[i]>Bid) danglers++;
+      if (openPrices[i]<min) min=openPrices[i];
+   }
+   
+   if (numOrders>0 && danglers==0 && (min>Ask+GRID_TRADING_STEP*pip)) {
+      double delta = -(min-Ask+GRID_TRADING_STEP*pip);
+      moveOrders_GRID(delta);   
+      for (i=0;i<numOrders;i++) openPrices[i]+=delta;
+   }
    
    double gridStart;
    if (numOrders == 0) {
       gridStart = NormalizeDouble((Ask+Bid)/2,Digits);
    } else {
       gridStart = openPrices[0];
-   } 
-   
-   int i;
-   int danglers=0;
-   for (i=0;i<numOrders;i++) {
-      if (orderTypes[i]==OP_BUY && openPrices[i]>Bid) danglers++;
    }
+   
    int addedOrders = 0;
    int nLevels=0;
    if (danglers<1) {

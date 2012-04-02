@@ -38,12 +38,11 @@
         <Filename Value="MT4Library.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="MT4Library"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
-        <CursorPos X="15" Y="19"/>
-        <UsageCount Value="52"/>
+        <CursorPos X="17" Y="22"/>
+        <UsageCount Value="56"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -52,7 +51,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="202"/>
         <CursorPos X="10" Y="218"/>
-        <UsageCount Value="19"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
@@ -69,7 +68,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="24"/>
         <CursorPos X="14" Y="85"/>
-        <UsageCount Value="27"/>
+        <UsageCount Value="29"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -78,18 +77,19 @@
         <WindowIndex Value="0"/>
         <TopLine Value="586"/>
         <CursorPos X="3" Y="551"/>
-        <UsageCount Value="26"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="mt4communication.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="MT4Communication"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="32" Y="23"/>
-        <UsageCount Value="33"/>
+        <TopLine Value="10"/>
+        <CursorPos X="96" Y="18"/>
+        <UsageCount Value="37"/>
         <Loaded Value="True"/>
       </Unit5>
     </Units>
