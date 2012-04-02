@@ -654,11 +654,11 @@ void tradeGrid_Slave() {
    int i;
    int danglers=0;
    for (i=0;i<numOrders;i++) {
-      if (orderTypes[i]==OP_SELL) danglers++;
+      if (orderTypes[i]==OP_SELL && openPrices[i]<Ask) danglers++;
    }
    int addedOrders = 0;
    int nLevels=0;
-   // if (danglers<1) {
+   if (danglers<1) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
          double price = NormalizeDouble(gridStart-(0.5+GRID_TRADING_STEP)*i*pip,Digits);
          if (price<Bid) {
@@ -677,7 +677,7 @@ void tradeGrid_Slave() {
             }
          }
       }
-   // }
+   }
    
    maldaLog("tradeGrid_Slave("+ danglers +") danglers");
 }
@@ -698,11 +698,11 @@ void tradeGrid_Master() {
    int i;
    int danglers=0;
    for (i=0;i<numOrders;i++) {
-      if (orderTypes[i]==OP_BUY) danglers++;
+      if (orderTypes[i]==OP_BUY && openPrices[i]>Bid) danglers++;
    }
    int addedOrders = 0;
    int nLevels=0;
-   // if (danglers<1) {
+   if (danglers<1) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
          double price = NormalizeDouble(gridStart+(0.5+GRID_TRADING_STEP)*i*pip,Digits);
          if (price>Ask) {
@@ -721,7 +721,7 @@ void tradeGrid_Master() {
             }
          }
       }
-   // }
+   }
 
    maldaLog("tradeGrid_Master (" + danglers +") danglers");
 }
