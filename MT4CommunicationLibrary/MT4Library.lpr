@@ -17,8 +17,9 @@ exports
   ClearSymbolStatus,
   getGridMode,
   setGridMode,
-  setEquity_NAV_UsedMargin,
-  getEquity_NAV_UsedMargin;
+  getBalance_NAV_UsedMargin,
+  setBalance_NAV_UsedMargin,
+  getGridOptions;
 
 {$IFDEF TESTING}
 
@@ -27,7 +28,7 @@ var a:TIPair;
    r:boolean;
    i:integer;
 
-   equity,nav,usedMargin:double;
+   balance,nav,usedMargin:double;
 begin
   for i:=1 to 10 do
   begin
@@ -49,9 +50,9 @@ begin
   setGridMode('EURUSDtest',1,'TEST OK!');
   Writeln(getGridMode('EURUSDTest',1));
   readln;
-  setEquity_NAV_UsedMargin(1,100,90,10);
-  if getEquity_NAV_UsedMargin(1,equity,nav,usedMargin) then
-     Writeln('Equity:'+FloatToStr(equity)+' NAV:'+FloatToStr(nav)+' UsedMargin:'+FloatToStr(usedMargin));
+  setBalance_NAV_UsedMargin(1,100,90,10);
+  if getBalance_NAV_UsedMargin(1,balance,nav,usedMargin) then
+     Writeln('Balance:'+FloatToStr(balance)+' NAV:'+FloatToStr(nav)+' UsedMargin:'+FloatToStr(usedMargin));
 
   readln;
 end.

@@ -658,14 +658,14 @@ void tradeGrid_Slave() {
    }
    int addedOrders = 0;
    int nLevels=0;
-   if (danglers<1) {
+   // if (danglers<1) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
          double price = NormalizeDouble(gridStart-(0.5+GRID_TRADING_STEP)*i*pip,Digits);
          if (price<Bid) {
             // verifico di non avere già un ordine a questo livello
             bool found = false;
             for (int j=0;j<numOrders;j++) {
-               if (MathAbs(openPrices[j]-price)<pip) {
+               if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip) {
                   found=true;
                   nLevels++;
                }
@@ -677,7 +677,7 @@ void tradeGrid_Slave() {
             }
          }
       }
-   }
+   // }
    
    maldaLog("tradeGrid_Slave("+ danglers +") danglers");
 }
@@ -702,14 +702,14 @@ void tradeGrid_Master() {
    }
    int addedOrders = 0;
    int nLevels=0;
-   if (danglers<1) {
+   // if (danglers<1) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
          double price = NormalizeDouble(gridStart+(0.5+GRID_TRADING_STEP)*i*pip,Digits);
          if (price>Ask) {
             // verifico di non avere già un ordine a questo livello
             bool found = false;
             for (int j=0;j<numOrders;j++) {
-               if (MathAbs(openPrices[j]-price)<pip) {
+               if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip) {
                   found=true;
                   nLevels++;
                }
@@ -721,7 +721,7 @@ void tradeGrid_Master() {
             }
          }
       }
-   }
+   // }
 
    maldaLog("tradeGrid_Master (" + danglers +") danglers");
 }
@@ -1311,7 +1311,7 @@ void onTick(){
 
 void sendStatsToControlPanel() {
    int isMaster = isMasterAccount();
-   setEquity_NAV_UsedMargin(isMaster,AccountEquity(),AccountBalance(),AccountMargin()); 
+   setBalance_NAV_UsedMargin(isMaster,AccountBalance(),AccountEquity(),AccountMargin()); 
 }
    
 void checkBreakEven2() {

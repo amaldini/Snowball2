@@ -135,27 +135,27 @@ begin
 end;
 
 procedure TForm1.Timer1Timer(Sender: TObject);
-var Equity1,nav1,usedmargin1:double;
-    Equity2,nav2,usedmargin2:double;
+var Balance1,nav1,usedmargin1:double;
+    Balance2,nav2,usedmargin2:double;
 begin
-     Equity1:=0; nav1:=0; usedMargin1:=0;
-     Equity2:=0; nav2:=0; usedMargin2:=0;
-     if (getEquity_NAV_UsedMargin(1,Equity1,nav1,usedMargin1)) then
+     Balance1:=0; nav1:=0; usedMargin1:=0;
+     Balance2:=0; nav2:=0; usedMargin2:=0;
+     if (getBalance_NAV_UsedMargin(1,Balance1,nav1,usedMargin1)) then
         lblStatsAccount1.caption :=
-                                 floatToStr(Equity1)+sLineBreak+
+                                 floatToStr(Balance1)+sLineBreak+
                                  sLineBreak+
                                  floatToStr(nav1)+sLineBreak+
                                  sLineBreak+
                                  floatToStr(usedMargin1);
-     if (getEquity_NAV_UsedMargin(0,Equity2,nav2,usedMargin2)) then
+     if (getBalance_NAV_UsedMargin(0,Balance2,nav2,usedMargin2)) then
         lblStatsAccount2.caption :=
-                                 floatToStr(Equity2)+sLineBreak+
+                                 floatToStr(Balance2)+sLineBreak+
                                  sLineBreak+
                                  floatToStr(nav2)+sLineBreak+
                                  sLineBreak+
                                  floatToStr(usedMargin2);
      lblTotals.caption :=
-                                 floatToStr(Equity1+Equity2)+sLineBreak+
+                                 floatToStr(Balance1+Balance2)+sLineBreak+
                                  sLineBreak+
                                  floatToStr(nav1+nav2)+sLineBreak+
                                  sLineBreak+
@@ -229,8 +229,8 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-     setEquity_NAV_UsedMargin(0,-1,-1,-1);
-     setEquity_NAV_UsedMargin(1,-1,-1,-1);
+     setBalance_NAV_UsedMargin(0,-1,-1,-1);
+     setBalance_NAV_UsedMargin(1,-1,-1,-1);
 end;
 
 end.

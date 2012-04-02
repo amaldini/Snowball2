@@ -18,8 +18,8 @@ function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
 function getGridOptions(symbolName:PChar;isMaster:integer;var distant:tiPair):boolean;stdcall;
 function setGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer):boolean;stdcall;
 
-function getEquity_NAV_UsedMargin(isMaster:integer;var equity:double;var NAV:double;var usedMargin:double):boolean;stdcall;
-function setEquity_NAV_UsedMargin(isMaster:integer;equity:double;NAV:double;usedMargin:double):boolean;stdcall;
+function getBalance_NAV_UsedMargin(isMaster:integer;var balance:double;var NAV:double;var usedMargin:double):boolean;stdcall;
+function setBalance_NAV_UsedMargin(isMaster:integer;balance:double;NAV:double;usedMargin:double):boolean;stdcall;
 
 implementation
 
@@ -27,19 +27,19 @@ uses
   Classes, SysUtils, Registry; // ,Dialogs;
 
 
-function getEquity_NAV_UsedMargin(isMaster:integer;var Equity:double;var NAV:double;var usedMargin:double):boolean;stdcall;
+function getBalance_NAV_UsedMargin(isMaster:integer;var balance:double;var NAV:double;var usedMargin:double):boolean;stdcall;
 var
    list:TStringList;
    i:integer;
    s:string;
    entry:ansistring;
 begin
-  if (isMaster<>0) then entry := 'EquityAndNAV_Master'
-  else entry := 'EquityAndNAV_Slave';
+  if (isMaster<>0) then entry := 'BalanceAndNAV_Master'
+  else entry := 'BalanceAndNAV_Slave';
   With TRegistry.Create do
        try
          RootKey:=HKEY_CURRENT_USER;
-         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\EquityAndNAV') then
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\BalanceAndNAV') then
          If ValueExists(entry) then
             s:=ReadString(entry); // Or whatever it is. ReadInteger/ReadBool
        finally
@@ -56,7 +56,7 @@ begin
          for i:=0 to list.Count-1 do
          begin
               case i of
-              0: Equity := strToFloat(list.valueFromIndex[i]);  // Equity
+              0: Balance := strToFloat(list.valueFromIndex[i]);  // Balance
               1: NAV := strToFloat(list.ValueFromIndex[i]);  // NAV
               2: UsedMargin := strToFloat(list.ValueFromIndex[i]);  // UsedMargin
               end;
@@ -71,7 +71,7 @@ begin
   list.free;
 end;
 
-function setEquity_NAV_UsedMargin(isMaster:integer;Equity:double;NAV:double;usedMargin:double):boolean;stdcall;
+function setBalance_NAV_UsedMargin(isMaster:integer;Balance:double;NAV:double;usedMargin:double):boolean;stdcall;
 var
      s :ansistring; // reference counted and memory managed strings.
      entry:ansistring;
@@ -79,17 +79,17 @@ begin
     // our PChar will be copied into an ansistring automatically,
     // no need to worry about the ugly details of memory allocation.
     // s := 'Hello ' + FloatToStr(symbolName) + ' ' + y + '!';
-    s := FloatToStr(Equity)+';'+
+    s := FloatToStr(Balance)+';'+
          FloatToStr(NAV)+';'+
          FloatToStr(UsedMargin);
     // cast it back into a pointer. Metatrader will copy the
     // string from the pointer into it's own memory.
-    if (isMaster<>0) then entry := 'EquityAndNAV_Master'
-    else entry := 'EquityAndNAV_Slave';
+    if (isMaster<>0) then entry := 'BalanceAndNAV_Master'
+    else entry := 'BalanceAndNAV_Slave';
     With TRegistry.Create do
          try
             RootKey:=HKEY_CURRENT_USER;
-            if OpenKey('Software\VB and VBA Program Settings\MT4Channel\EquityAndNAV',true) then
+            if OpenKey('Software\VB and VBA Program Settings\MT4Channel\BalanceAndNAV',true) then
             WriteString(entry,s);
          finally
             free;
