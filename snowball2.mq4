@@ -878,7 +878,7 @@ void tradeRenko() {
             }
          }
          if (needToClose) {
-            closeOpenOrders(-1, magic);
+            closeOpenOrders(-1, magic,"tradeRenko:881");
          } else { // non chiudo
             /*
             double v1 = TrailStops(RENKO_BreakEven,RENKO_LockGainPips,RENKO_AutoSLPips);
@@ -1231,6 +1231,8 @@ void defaults(){
 int init(){
    initCalled = true;
    
+   maldaLog("init...");
+   
    if (!IsDllsAllowed()){
       MessageBox("DLL imports must be allowed!", "Snowball");
       return(-1);
@@ -1278,8 +1280,8 @@ int deinit(){
    storeVariables();
    if (UninitializeReason() == REASON_PARAMETERS){
       Comment("Parameters changed, pending orders deleted, will be replaced with the next tick");
-      closeOpenOrders(OP_SELLSTOP, magic);
-      closeOpenOrders(OP_BUYSTOP, magic);
+      closeOpenOrders(OP_SELLSTOP, magic,"deinit");
+      closeOpenOrders(OP_BUYSTOP, magic,"deinit");
    }else{
       Comment("EA removed, open orders, trades and status untouched!");
    }
@@ -1312,8 +1314,8 @@ void onTick(){
    maldaLog("GridMode:"+gridMode);
    
    if (gridMode=="CLOSE") {
-      closeOpenOrders(OP_BUY,magic);
-      closeOpenOrders(OP_SELL,magic);
+      closeOpenOrders(OP_BUY,magic,"onTick:CLOSE");
+      closeOpenOrders(OP_SELL,magic,"onTick:CLOSE");
       maldaLog("gridMode==CLOSE: Closed open trades");
       gridMode="W";
       setGridMode(Symbol6(),isMasterAccount(),gridMode);
@@ -1321,8 +1323,8 @@ void onTick(){
    
    if (gridMode=="W"||gridMode=="") {
       maldaLog("waiting...");
-      closeOpenOrders(OP_SELLSTOP, magic);
-      closeOpenOrders(OP_BUYSTOP, magic);
+      closeOpenOrders(OP_SELLSTOP, magic,"onTick:W");
+      closeOpenOrders(OP_BUYSTOP, magic,"onTick:W");
       sendStatsToControlPanel();
       return(0);
    }
@@ -1434,8 +1436,8 @@ void checkBreakEven2() {
                   maldaLog("BE2: Close order "+OrderTicket()+" at BreakEven: "+orderPrice);
                   orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, clr);
                   
-                  closeOpenOrders(OP_SELLSTOP, magic);
-                  closeOpenOrders(OP_BUYSTOP, magic);
+                  closeOpenOrders(OP_SELLSTOP, magic,"checkBreakEven2");
+                  closeOpenOrders(OP_BUYSTOP, magic,"checkBreakEven2");
                   
                   // quando si esegue una chiusura per breakeven,
                   // il massimo/minimo prezzo raggiunto si imposta=al prezzo corrente
@@ -1734,7 +1736,7 @@ void endArrow(){
 void stop(string who){
    endArrow();
    deleteStopButtons();
-   closeOpenOrders(-1, magic);
+   closeOpenOrders(-1, magic,"stop");
    running = false;
    storeVariables();
    setGlobal("realized", getProfitRealized(magic)); // store this only on pyramid close
@@ -1746,8 +1748,8 @@ void stop(string who){
 }
 
 void closeTrades(string who, int magic) {
-   closeOpenOrders(OP_BUY,magic);
-   closeOpenOrders(OP_SELL,magic);
+   closeOpenOrders(OP_BUY,magic,"closeTrades");
+   closeOpenOrders(OP_SELL,magic,"closeTrades");
    ifLevel0_disableMAEntry(who+"->closeTrades");
 }
 
@@ -1766,7 +1768,7 @@ void pause(){
    endArrow();
    deleteStopButtons();
    label("paused_level", 15, 100, 1, level, Yellow);
-   closeOpenOrders(-1, magic);
+   closeOpenOrders(-1, magic,"pause");
    running = false;
    storeVariables();
    //checkOanda(magic, oanda_factor);
@@ -2160,8 +2162,8 @@ void trade(){
    
    if (lineMoved()){
       maldaLog("Closing open orders because line moved...");
-      closeOpenOrders(OP_SELLSTOP, magic);
-      closeOpenOrders(OP_BUYSTOP, magic);
+      closeOpenOrders(OP_SELLSTOP, magic,"trade");
+      closeOpenOrders(OP_BUYSTOP, magic,"trade");
    }
    start = getLine();
    
@@ -2182,7 +2184,7 @@ void trade(){
       
          if (direction == SHORT && Ask > start){
             if (getNumOpenOrders(OP_SELLSTOP, magic) != 2){
-               closeOpenOrders(OP_SELLSTOP, magic);
+               closeOpenOrders(OP_SELLSTOP, magic,"trade");
             }else{
                moveOrders(Ask - start);
             }
@@ -2198,7 +2200,7 @@ void trade(){
          
          if (direction == LONG && Bid < start){
             if (getNumOpenOrders(OP_BUYSTOP, magic) != 2){
-               closeOpenOrders(OP_BUYSTOP, magic);
+               closeOpenOrders(OP_BUYSTOP, magic,"trade");
             }else{
                moveOrders(Bid - start);
             }
@@ -2981,8 +2983,8 @@ void checkForStopReduction() {
       
       if (prevStopDistance!=stop_distance) {
          Comment("Stop distance changed, pending orders deleted, will be replaced with the next tick");
-         closeOpenOrders(OP_SELLSTOP, magic);
-         closeOpenOrders(OP_BUYSTOP, magic);
+         closeOpenOrders(OP_SELLSTOP, magic,"trade");
+         closeOpenOrders(OP_BUYSTOP, magic,"trade");
       }
    }
 }

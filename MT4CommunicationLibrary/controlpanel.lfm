@@ -17,7 +17,7 @@ object Form1: TForm1
     Width = 100
     Items.Strings = (
       'EURUSD'
-      'GPBUSD'
+      'GBPUSD'
       'EURJPY'
       'EURGPB'
       'AUDJPY'

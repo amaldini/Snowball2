@@ -609,12 +609,12 @@ bool isOrder(int type, double price, int magic) {
 * This function won't return until all positions are closed
 * type = -1 means all types, magic = -1 means all magic numbers
 */
-void closeOpenOrders(int type, int magic) {
+void closeOpenOrders(int type, int magic,string caller) {
    int total, cnt;
    color clr;
    int order_type;
 
-   Print("closeOpenOrders(" + type + "," + magic + ")");
+   Print("closeOpenOrders(" + type + "," + magic + ") "+caller);
 
    while (getNumOpenOrders(type, magic) > 0) {
       while (IsTradeContextBusy()) {

@@ -56,6 +56,7 @@
         <ComponentName Value="Form1"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="ControlPanel"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
         <TopLine Value="205"/>
@@ -67,7 +68,6 @@
       <Unit2>
         <Filename Value="mt4communication.pas"/>
         <UnitName Value="MT4Communication"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
         <TopLine Value="71"/>
@@ -76,7 +76,7 @@
         <Loaded Value="True"/>
       </Unit2>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="controlpanel.pas"/>
         <Caret Line="192" Column="6" TopLine="165"/>
@@ -187,16 +187,12 @@
       </Position27>
       <Position28>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="92" Column="17" TopLine="133"/>
+        <Caret Line="168" Column="61" TopLine="136"/>
       </Position28>
       <Position29>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="168" Column="61" TopLine="136"/>
-      </Position29>
-      <Position30>
-        <Filename Value="controlpanel.pas"/>
         <Caret Line="150" Column="20" TopLine="134"/>
-      </Position30>
+      </Position29>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
