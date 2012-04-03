@@ -648,6 +648,7 @@ void moveOrders_GRID(double d){
          if (MathAbs(OrderOpenPrice() - getLine()) > GRID_TRADING_PENDINGORDERS * GRID_TRADING_STEP * pip){
             orderDeleteReliable(OrderTicket());
          }else{
+            maldaLog("GRID: moving order "+OrderTicket()+" by "+DoubleToStr(d,Digits));
             orderModifyReliable(
                OrderTicket(),
                NormalizeDouble(OrderOpenPrice() + d,Digits),
@@ -675,11 +676,15 @@ void tradeGrid_Slave() {
       if (orderTypes[i]==OP_SELL && openPrices[i]<Ask) danglers++;
       if (openPrices[i]>max) max=openPrices[i];
    }
-   if (numOrders>0 && danglers==0 && (max<Bid-GRID_TRADING_STEP*pip)) {
-       double delta = (Bid-GRID_TRADING_STEP*pip)-max;
-       moveOrders_GRID(delta); 
-       for (i=0;i<numOrders;i++) openPrices[i]+=delta;
-   }
+   int distant[];
+   distant[0]=0;
+   if (getGridOptions(Symbol6(),0,distant)) {
+      if (distant[0]!=0 && numOrders>0 && danglers==0 && (max<Bid-GRID_TRADING_STEP*pip)) {
+          double delta = (Bid-GRID_TRADING_STEP*pip)-max;
+          moveOrders_GRID(delta); 
+          for (i=0;i<numOrders;i++) openPrices[i]+=delta;
+      }
+   }  
    
    double gridStart;
    if (numOrders == 0) {
@@ -728,11 +733,15 @@ void tradeGrid_Master() {
       if (openPrices[i]<min) min=openPrices[i];
    }
    
-   if (numOrders>0 && danglers==0 && (min>Ask+GRID_TRADING_STEP*pip)) {
-      double delta = -(min-Ask+GRID_TRADING_STEP*pip);
-      moveOrders_GRID(delta);   
-      for (i=0;i<numOrders;i++) openPrices[i]+=delta;
-   }
+   int distant[];
+   distant[0]=0;
+   if (getGridOptions(Symbol6(),1,distant)) {
+      if (distant[0]!=0 && numOrders>0 && danglers==0 && (min>Ask+GRID_TRADING_STEP*pip)) {
+         double delta = -(min-Ask+GRID_TRADING_STEP*pip);
+         moveOrders_GRID(delta);   
+         for (i=0;i<numOrders;i++) openPrices[i]+=delta;
+      }   
+   } 
    
    double gridStart;
    if (numOrders == 0) {
