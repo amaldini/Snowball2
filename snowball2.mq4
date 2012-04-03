@@ -676,7 +676,7 @@ void tradeGrid_Slave() {
       if (orderTypes[i]==OP_SELL && openPrices[i]<Ask) danglers++;
       if (openPrices[i]>max) max=openPrices[i];
    }
-   int distant[];
+   int distant[2];
    distant[0]=0;
    if (getGridOptions(Symbol6(),0,distant)) {
       if (distant[0]!=0 && numOrders>0 && danglers==0 && (max<Bid-GRID_TRADING_STEP*pip)) {
@@ -737,11 +737,11 @@ void tradeGrid_Master() {
       if (openPrices[i]<min) min=openPrices[i];
    }
    
-   int distant[];
+   int distant[2];
    distant[0]=0;
    if (getGridOptions(Symbol6(),1,distant)) {
       if (distant[0]!=0 && numOrders>0 && danglers==0 && (min>Ask+GRID_TRADING_STEP*pip)) {
-         double delta = -(min-Ask+GRID_TRADING_STEP*pip);
+         double delta = -(min-(Ask+GRID_TRADING_STEP*pip));
          moveOrders_GRID(delta);   
          for (i=0;i<numOrders;i++) openPrices[i]+=delta;
       }   
@@ -1307,6 +1307,8 @@ int deinit(){
 string gridMode;
 
 void onTick(){
+
+   maldaLog("onTick...");
 
    recordEquity(name+Symbol6(), PERIOD_H1, magic);
    

@@ -43,7 +43,6 @@
         <Filename Value="SnowBallControlPanel.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="SnowBallControlPanel"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
@@ -68,9 +67,10 @@
       <Unit2>
         <Filename Value="mt4communication.pas"/>
         <UnitName Value="MT4Communication"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="71"/>
+        <TopLine Value="5"/>
         <CursorPos X="32" Y="78"/>
         <UsageCount Value="17"/>
         <Loaded Value="True"/>
