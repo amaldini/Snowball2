@@ -698,7 +698,11 @@ void tradeGrid_Slave() {
    if (danglers<1) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
          double price = NormalizeDouble(gridStart-(0.5+GRID_TRADING_STEP)*i*pip,Digits);
-         if (price<Bid) {
+         
+         bool condition1 = (price<Bid && distant[0]==0); 
+         bool condition2 = (price<(Bid-GRID_TRADING_STEP*pip/2) && distant[0]!=0);
+         
+         if (condition1 || condition2) {
             // verifico di non avere già un ordine a questo livello
             bool found = false;
             for (int j=0;j<numOrders;j++) {
@@ -755,7 +759,11 @@ void tradeGrid_Master() {
    if (danglers<1) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
          double price = NormalizeDouble(gridStart+(0.5+GRID_TRADING_STEP)*i*pip,Digits);
-         if (price>Ask) {
+         
+         bool condition1 = (price>Ask && distant[0]==0); 
+         bool condition2 = (price>(Ask+GRID_TRADING_STEP*pip/2) && distant[0]!=0);
+         
+         if (condition1 || condition2) {
             // verifico di non avere già un ordine a questo livello
             bool found = false;
             for (int j=0;j<numOrders;j++) {
