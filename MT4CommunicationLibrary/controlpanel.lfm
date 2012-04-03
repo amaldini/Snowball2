@@ -19,7 +19,7 @@ object Form1: TForm1
       'EURUSD'
       'GBPUSD'
       'EURJPY'
-      'EURGPB'
+      'EURGBP'
       'AUDJPY'
       'EURCHF'
       'USDCHF'
