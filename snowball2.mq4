@@ -1,8 +1,8 @@
 //+----------------------------------------------------------------------------------+
-//|                        Copyright © 2010, Bernd Kreuss, Andrea Maldini            |
+//|                        Copyright ï¿½ 2010, Bernd Kreuss, Andrea Maldini            |
 //|                        PayPal donations go here -> 7bit@arcor.de                 |
 //+----------------------------------------------------------------------------------+
-#property copyright "© Bernd Kreuss, Version 2010.6.11.1 - Andrea Maldini November 2011"
+#property copyright "ï¿½ Bernd Kreuss, Version 2010.6.11.1 - Andrea Maldini November 2011"
 #property link      "http://sites.google.com/site/prof7bit/"
 
 #include <common_functions.mqh>
@@ -143,6 +143,8 @@ double HAOpen;
 extern bool GRID_TRADING = true;
 extern double GRID_TRADING_STEP = 10; // pips
 extern int GRID_TRADING_PENDINGORDERS = 2;
+extern double GRID_TAKEPROFIT = 9.5; // pips
+extern double GRID_STOP_PIPS = 30; // pips
 
 /**
 * return the floating profit that would result if
@@ -444,12 +446,12 @@ void findSupportAndResistance(double &support,double &resistance,bool onlyManual
       shiftDown = getShiftOfLastTrend(-1,low); 
    
       if (shiftUp<shiftDown) {
-         // ultimo trend é stato UP
+         // ultimo trend ï¿½ stato UP
          resistance = high; resistanceShift = shiftUp;
       }
       
       if (shiftDown<shiftUp) {
-         // ultimo trend é stato DOWN
+         // ultimo trend ï¿½ stato DOWN
          support = low; supportShift = shiftDown; 
       }
    } 
@@ -663,7 +665,7 @@ void moveOrders_GRID(double d){
 }
 
 void tradeGrid_Slave() {
-   // verifica se per 2 livelli sotto al prezzo c'é l'ordine
+   // verifica se per 2 livelli sotto al prezzo c'ï¿½ l'ordine
    
    int tickets[],orderTypes[];
    double openPrices[];
@@ -703,7 +705,7 @@ void tradeGrid_Slave() {
          bool condition2 = (price<(Bid-GRID_TRADING_STEP*pip/2) && distant[0]!=0);
          
          if (condition1 || condition2) {
-            // verifico di non avere già un ordine a questo livello
+            // verifico di non avere giï¿½ un ordine a questo livello
             bool found = false;
             for (int j=0;j<numOrders;j++) {
                if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip) {
@@ -764,7 +766,7 @@ void tradeGrid_Master() {
          bool condition2 = (price>(Ask+GRID_TRADING_STEP*pip/2) && distant[0]!=0);
          
          if (condition1 || condition2) {
-            // verifico di non avere già un ordine a questo livello
+            // verifico di non avere giï¿½ un ordine a questo livello
             bool found = false;
             for (int j=0;j<numOrders;j++) {
                if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip) {
@@ -786,16 +788,16 @@ void tradeGrid_Master() {
 
 void gridBuy(double price) {
    double sl=0,tp=0;
-   sl = NormalizeDouble(price - pip * GRID_TRADING_STEP * 3,Digits);
-   tp = price + pip * (GRID_TRADING_STEP-0.5);
+   sl = NormalizeDouble(price - pip * GRID_STOP_PIPS,Digits);
+   tp = price + pip * GRID_TAKEPROFIT;
    double numLots = lots;
    buyStop(numLots, price, sl, tp, magic, comment, "gridBuy");
 }
 
 void gridSell(double price) {
    double sl=0,tp=0;
-   sl = NormalizeDouble(price + pip * GRID_TRADING_STEP * 3,Digits);
-   tp = price - pip * (GRID_TRADING_STEP-0.5);
+   sl = NormalizeDouble(price + pip * GRID_STOP_PIPS,Digits);
+   tp = price - pip * GRID_TAKEPROFIT;
    double numLots = lots;
    sellStop(numLots, price, sl, tp, magic, comment, "gridSell");
 }
@@ -876,7 +878,7 @@ void tradeRenko() {
          double profit = getProfit(magic);
          if (profit>0 && profit>2) { // <--- chiude solo con un profitto significativo, 
                                      //      altrimenti si rischia che vengano aperti tanti trade in sequenza nella stessa direzione 
-                                     //      con guadagno nullo e prezzi sempre più sfavorevoli
+                                     //      con guadagno nullo e prezzi sempre piï¿½ sfavorevoli
             if (isLong) {
                /*
                if (MACDHistoGram0<MACDHistoGram1 && MACDHistoGram1<MACDHistoGram2) {
@@ -909,7 +911,7 @@ void tradeRenko() {
                double basePrice;
             
                // se sono a distanza di RENKO_PYRAMID_PIPS dall'ultimo acquisto teorico, 
-               // che é dato dal primo_buy_price+RENKO_PYRAMID_PIPS*(nOpenTrades),
+               // che ï¿½ dato dal primo_buy_price+RENKO_PYRAMID_PIPS*(nOpenTrades),
                // apro un nuovo trade
             
                // PYRAMID ??
@@ -1379,7 +1381,7 @@ void sendStatsToControlPanel() {
 void checkBreakEven2() {
    
    
-   // TODO: armed é da calcolare al volo per ogni trade (non mettere in variabile statica)
+   // TODO: armed ï¿½ da calcolare al volo per ogni trade (non mettere in variabile statica)
    //       in base al massimo / minimo prezzo raggiunto.
    //       
    #define VERYBIG 10000000
@@ -1428,7 +1430,7 @@ void checkBreakEven2() {
                }
                // if (armed) maldaLog("BreakEven armed..."); 
    
-               double orderPrice; // lo calcolo in base allo stoploss perché dopo un resume 
+               double orderPrice; // lo calcolo in base allo stoploss perchï¿½ dopo un resume 
                                   // i prezzi sono tutti uguali mentre gli stop loss sono diversi  
         
                bool isToClose = false;
@@ -2069,7 +2071,7 @@ void checkStopToBreakEven() {
          if (isMyOrder(magic)) {
                int type = OrderType();
    
-               double orderPrice; // lo calcolo in base allo stoploss perché dopo un resume 
+               double orderPrice; // lo calcolo in base allo stoploss perchï¿½ dopo un resume 
                                   // i prezzi sono tutti uguali mentre gli stop loss sono diversi  
         
                bool isToClose = false;
@@ -2091,7 +2093,7 @@ void checkStopToBreakEven() {
                if (isToClose) {
                   maldaLog("Close order "+OrderTicket()+" at BreakEven: "+orderPrice);
                   orderCloseReliable(OrderTicket(), OrderLots(), 0, 999, clr);
-                  maxLevel = 0; // <== verrà ricalcolato successivamente
+                  maxLevel = 0; // <== verrï¿½ ricalcolato successivamente
                   doCycle=true;
                   break; // cycle again starting from 0 (HELLO FIFO!)
                }
@@ -2682,7 +2684,7 @@ void info(){
             }
          }
          tp = getTheoreticProfit(MathAbs(lp - pb));
-         ObjectSetText("profit", "¯¯¯ " + DoubleToStr(MathRound(realized - getGlobal("realized") + tp), 0) + " " + AccountCurrency() + " profit projection ¯¯¯");
+         ObjectSetText("profit", "ï¿½ï¿½ï¿½ " + DoubleToStr(MathRound(realized - getGlobal("realized") + tp), 0) + " " + AccountCurrency() + " profit projection ï¿½ï¿½ï¿½");
       }
    } else { // RENKO
       if (ObjectFind("profit") != -1) {
@@ -2691,7 +2693,7 @@ void info(){
          if (pb==0) pb = getLine();
          // maldaLog("lp:"+lp+" pb:"+pb);
          tp = getTheoreticProfitRenko(MathAbs(lp-pb),RENKO_PYRAMID_Pips);
-         ObjectSetText("profit", "¯¯¯ " + DoubleToStr(MathRound(realized - getGlobal("realized") + tp), 0) + " " + AccountCurrency() + " profit projection ¯¯¯");
+         ObjectSetText("profit", "ï¿½ï¿½ï¿½ " + DoubleToStr(MathRound(realized - getGlobal("realized") + tp), 0) + " " + AccountCurrency() + " profit projection ï¿½ï¿½ï¿½");
       }
    
    }  
@@ -2976,7 +2978,7 @@ void checkForStopReduction() {
          stopAlreadyReduced = true;
       }
       
-      // altrimenti riduco di 1 pip all'ora (solo se il prezzo é sufficientemente lontano
+      // altrimenti riduco di 1 pip all'ora (solo se il prezzo ï¿½ sufficientemente lontano
       
       double newStopDistance = stop_distance-1;
       if (newStopDistance>=min_stop_distance) {
