@@ -653,7 +653,7 @@ void moveOrders_GRID(double d){
                OrderTicket(),
                NormalizeDouble(OrderOpenPrice() + d,Digits),
                NormalizeDouble(OrderStopLoss() + d,Digits), //OK
-               0,
+               NormalizeDouble(OrderTakeProfit() + d, Digits),
                0,
                CLR_NONE
             );
@@ -697,7 +697,7 @@ void tradeGrid_Slave() {
    int nLevels=0;
    if (danglers<1) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
-         double price = NormalizeDouble(gridStart-(0.5+GRID_TRADING_STEP)*i*pip,Digits);
+         double price = NormalizeDouble(gridStart-GRID_TRADING_STEP*i*pip,Digits);
          
          bool condition1 = (price<Bid && distant[0]==0); 
          bool condition2 = (price<(Bid-GRID_TRADING_STEP*pip/2) && distant[0]!=0);
@@ -758,7 +758,7 @@ void tradeGrid_Master() {
    int nLevels=0;
    if (danglers<1) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
-         double price = NormalizeDouble(gridStart+(0.5+GRID_TRADING_STEP)*i*pip,Digits);
+         double price = NormalizeDouble(gridStart+GRID_TRADING_STEP*i*pip,Digits);
          
          bool condition1 = (price>Ask && distant[0]==0); 
          bool condition2 = (price>(Ask+GRID_TRADING_STEP*pip/2) && distant[0]!=0);
@@ -787,7 +787,7 @@ void tradeGrid_Master() {
 void gridBuy(double price) {
    double sl=0,tp=0;
    sl = NormalizeDouble(price - pip * GRID_TRADING_STEP * 3,Digits);
-   tp = price + pip * GRID_TRADING_STEP;
+   tp = price + pip * (GRID_TRADING_STEP-0.5);
    double numLots = lots;
    buyStop(numLots, price, sl, tp, magic, comment, "gridBuy");
 }
@@ -795,7 +795,7 @@ void gridBuy(double price) {
 void gridSell(double price) {
    double sl=0,tp=0;
    sl = NormalizeDouble(price + pip * GRID_TRADING_STEP * 3,Digits);
-   tp = price - pip * GRID_TRADING_STEP;
+   tp = price - pip * (GRID_TRADING_STEP-0.5);
    double numLots = lots;
    sellStop(numLots, price, sl, tp, magic, comment, "gridSell");
 }
