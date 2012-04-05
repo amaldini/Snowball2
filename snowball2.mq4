@@ -143,7 +143,7 @@ double HAOpen;
 extern bool GRID_TRADING = true;
 extern double GRID_TRADING_STEP = 10; // pips
 extern int GRID_TRADING_PENDINGORDERS = 2;
-extern double GRID_TAKEPROFIT = 9.5; // pips
+extern double GRID_TAKEPROFIT = 60; // pips
 extern double GRID_STOP_PIPS = 30; // pips
 
 /**
@@ -665,7 +665,12 @@ void moveOrders_GRID(double d){
 }
 
 void tradeGrid_Slave() {
-   // verifica se per 2 livelli sotto al prezzo c'� l'ordine
+   
+   double GRID_BreakEven = GRID_TRADING_STEP;
+   double GRID_LockGainPips = 2;
+   double GRID_BreakEven2 = GRID_TRADING_STEP /2 * 3;
+   double GRID_LockGainPips2 = GRID_TRADING_STEP;
+   GRID_TrailStops(pip,GRID_BreakEven, GRID_LockGainPips,GRID_BreakEven2,GRID_LockGainPips2);
    
    int tickets[],orderTypes[];
    double openPrices[];
@@ -726,6 +731,12 @@ void tradeGrid_Slave() {
 }
 
 void tradeGrid_Master() {
+
+   double GRID_BreakEven = GRID_TRADING_STEP;
+   double GRID_LockGainPips = 2;
+   double GRID_BreakEven2 = GRID_TRADING_STEP /2 * 3;
+   double GRID_LockGainPips2 = GRID_TRADING_STEP;
+   GRID_TrailStops(pip,GRID_BreakEven, GRID_LockGainPips,GRID_BreakEven2,GRID_LockGainPips2);
 
    int tickets[],orderTypes[];
    double openPrices[];
