@@ -21,10 +21,44 @@ function setGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer):boo
 function getBalance_NAV_UsedMargin(isMaster:integer;var balance:double;var NAV:double;var usedMargin:double):boolean;stdcall;
 function setBalance_NAV_UsedMargin(isMaster:integer;balance:double;NAV:double;usedMargin:double):boolean;stdcall;
 
+function getMultiplierForMicroLot(symbolName:PChar):integer;stdcall;
+function setMultiplierForMicroLot(symbolName:PChar;multiplier:integer):boolean;stdcall;
+
 implementation
 
 uses
   Classes, SysUtils, Registry; // ,Dialogs;
+
+
+function setMultiplierForMicroLot(symbolName:PChar;multiplier:integer):boolean;stdcall;
+var entry:ansistring;
+begin
+   With TRegistry.Create do
+   try
+      RootKey:=HKEY_CURRENT_USER;
+      entry:=AnsiString(symbolName);
+      if OpenKey('Software\VB and VBA Program Settings\MT4Channel\MultipliersForMicroLots',true) then
+         WriteInteger(entry,multiplier);
+      finally
+         free;
+      end;
+   result:=true;
+end;
+
+function getMultiplierForMicroLot(symbolName:PChar):integer;stdcall;
+var entry:ansistring;
+begin
+     result:=1; // default
+     With TRegistry.Create do
+       try
+         RootKey:=HKEY_CURRENT_USER;
+         entry:=AnsiString(symbolName);
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\MultipliersForMicroLots') then
+         If ValueExists(entry) then result:=ReadInteger(entry);
+       finally
+         free;
+       end;
+end;
 
 
 function getBalance_NAV_UsedMargin(isMaster:integer;var balance:double;var NAV:double;var usedMargin:double):boolean;stdcall;

@@ -13,6 +13,7 @@ string getGridMode(string symbolName,int isMaster);
 bool   setGridMode(string symbolName,int isMaster,string gridMode);
 
 bool   getGridOptions(string symbolName,int isMaster,int& distant[]); 
+int    getMultiplierForMicroLot(string symbolName);
 
 bool setBalance_NAV_UsedMargin(int isMaster,double balance, double NAV,double usedMargin);   
 

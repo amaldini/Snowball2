@@ -40,8 +40,8 @@
         <UnitName Value="MT4Library"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="33"/>
-        <CursorPos X="17" Y="22"/>
+        <TopLine Value="4"/>
+        <CursorPos X="37" Y="22"/>
         <UsageCount Value="56"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -87,8 +87,8 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="96" Y="18"/>
+        <TopLine Value="22"/>
+        <CursorPos X="1" Y="24"/>
         <UsageCount Value="37"/>
         <Loaded Value="True"/>
       </Unit5>

@@ -19,7 +19,9 @@ exports
   setGridMode,
   getBalance_NAV_UsedMargin,
   setBalance_NAV_UsedMargin,
-  getGridOptions;
+  getGridOptions,
+  getMultiplierForMicroLot,
+  setMultiplierForMicroLot;
 
 {$IFDEF TESTING}
 

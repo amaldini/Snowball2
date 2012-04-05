@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 345
+  Left = 627
   Height = 268
-  Top = 290
+  Top = 406
   Width = 371
   Caption = 'SnowBall ControlPanel'
   ClientHeight = 248
@@ -193,6 +193,45 @@ object Form1: TForm1
       object ShortDistant: TMenuItem
         Caption = 'Short distant'
         OnClick = ShortDistantClick
+      end
+      object MenuItem1: TMenuItem
+        Caption = '-'
+      end
+      object Lots001: TMenuItem
+        AutoCheck = True
+        Caption = '0.01 Lots'
+        Default = True
+        GroupIndex = 1
+        RadioItem = True
+        OnClick = Lots001Click
+      end
+      object Lots002: TMenuItem
+        AutoCheck = True
+        Caption = '0.02 Lots'
+        GroupIndex = 1
+        RadioItem = True
+        OnClick = Lots002Click
+      end
+      object Lots003: TMenuItem
+        AutoCheck = True
+        Caption = '0.03 Lots'
+        GroupIndex = 1
+        RadioItem = True
+        OnClick = Lots003Click
+      end
+      object Lots004: TMenuItem
+        AutoCheck = True
+        Caption = '0.04 Lots'
+        GroupIndex = 1
+        RadioItem = True
+        OnClick = Lots004Click
+      end
+      object Lots005: TMenuItem
+        AutoCheck = True
+        Caption = '0.05 Lots'
+        GroupIndex = 1
+        RadioItem = True
+        OnClick = Lots005Click
       end
     end
   end

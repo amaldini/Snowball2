@@ -30,6 +30,12 @@ type
     LongGrid: TRadioButton;
     LongAntiGrid: TRadioButton;
     LongDistant: TMenuItem;
+    MenuItem1: TMenuItem;
+    Lots001: TMenuItem;
+    Lots002: TMenuItem;
+    Lots003: TMenuItem;
+    Lots004: TMenuItem;
+    Lots005: TMenuItem;
     ShortDistant: TMenuItem;
     ShortWait: TRadioButton;
     ShortGrid: TRadioButton;
@@ -43,6 +49,11 @@ type
     procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure LongDistantClick(Sender: TObject);
+    procedure Lots001Click(Sender: TObject);
+    procedure Lots002Click(Sender: TObject);
+    procedure Lots003Click(Sender: TObject);
+    procedure Lots004Click(Sender: TObject);
+    procedure Lots005Click(Sender: TObject);
     procedure ShortDistantClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
 
@@ -68,6 +79,7 @@ var symbol:PChar;
     mode:PChar;
     distant:TIPair;
     boolValue:boolean;
+    multiplierForMicroLot:integer;
 begin
   GroupBox1.Enabled:=true;
   GroupBox2.Enabled:=true;
@@ -99,6 +111,15 @@ begin
        if (distant[0]<>0) then boolValue:=true;
   end;
   shortDistant.checked:=boolValue;
+
+  multiplierForMicroLot:=getMultiplierForMicroLot(symbol);
+  case multiplierForMicroLot of
+  1:Lots001.checked:=true;
+  2:Lots002.checked:=true;
+  3:Lots003.checked:=true;
+  4:Lots004.checked:=true;
+  5:Lots005.checked:=true;
+  end;
 end;
 
 function getSelectedSymbol():PChar;
@@ -118,6 +139,41 @@ begin
        if (longDistant.checked) then isDistant:=1;
        setGridOptions(symbol,1,isDistant);
      end;
+end;
+
+procedure _setLotMultiplierForMicrolot(multiplier:integer);
+var symbol:pchar;
+begin
+     if (form1.ListBox1.ItemIndex>=0) then
+     begin
+          symbol:=getSelectedSymbol();
+          setMultiplierForMicroLot(symbol,multiplier);
+     end;
+end;
+
+procedure TForm1.Lots001Click(Sender: TObject);
+begin
+     _setLotMultiplierForMicrolot(1);
+end;
+
+procedure TForm1.Lots002Click(Sender: TObject);
+begin
+     _setLotMultiplierForMicrolot(2);
+end;
+
+procedure TForm1.Lots003Click(Sender: TObject);
+begin
+     _setLotMultiplierForMicrolot(3);
+end;
+
+procedure TForm1.Lots004Click(Sender: TObject);
+begin
+     _setLotMultiplierForMicrolot(4);
+end;
+
+procedure TForm1.Lots005Click(Sender: TObject);
+begin
+     _setLotMultiplierForMicrolot(5);
 end;
 
 procedure TForm1.ShortDistantClick(Sender: TObject);

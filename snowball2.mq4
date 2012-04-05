@@ -801,16 +801,27 @@ void gridBuy(double price) {
    double sl=0,tp=0;
    sl = NormalizeDouble(price - pip * GRID_STOP_PIPS,Digits);
    tp = price + pip * GRID_TAKEPROFIT;
-   double numLots = lots;
-   buyStop(numLots, price, sl, tp, magic, comment, "gridBuy");
+   int multiplier = getMultiplierForMicroLot(Symbol6());
+   if (multiplier>=1 && multiplier<=5) {
+      double numLots = 0.01*multiplier;
+      buyStop(numLots, price, sl, tp, magic, comment, "gridBuy");
+   } else {
+      maldaLog("MULTIPLIER OUT OF RANGE!!!");
+   }
 }
 
 void gridSell(double price) {
    double sl=0,tp=0;
    sl = NormalizeDouble(price + pip * GRID_STOP_PIPS,Digits);
    tp = price - pip * GRID_TAKEPROFIT;
-   double numLots = lots;
-   sellStop(numLots, price, sl, tp, magic, comment, "gridSell");
+   
+   int multiplier = getMultiplierForMicroLot(Symbol6());
+   if (multiplier>=1 && multiplier<=5) {
+      double numLots = 0.01*multiplier;
+      sellStop(numLots, price, sl, tp, magic, comment, "gridSell");
+   } else {
+      maldaLog("MULTIPLIER OUT OF RANGE!!!");
+   }
 }
 
 void tradeRenko() {
