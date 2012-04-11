@@ -42,7 +42,7 @@ void moveOrders_GRID(double d){
       int otype = OrderType();
       if ((otype!=OP_SELL) && (otype!=OP_BUY)) { 
          if (isMyOrder(magic)){
-            if (MathAbs(OrderOpenPrice() - getLine()) > (1+GRID_TRADING_PENDINGORDERS) * GRID_TRADING_STEP * pip){
+            if (MathAbs(OrderOpenPrice() - ((Bid+Ask)/2)) > (1+GRID_TRADING_PENDINGORDERS) * GRID_TRADING_STEP * pip){
                orderDeleteReliable(OrderTicket());
             }else{
                maldaLog("GRID: moving order "+OrderTicket()+" by "+DoubleToStr(d,Digits));
@@ -344,6 +344,4 @@ void maldaLog(string text, bool clear = False) {
    stringToAppendToInfo = output;
 }
 
-double getLine(){
-   return(ObjectGet("last_order", OBJPROP_PRICE1));
-}
+

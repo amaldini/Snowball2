@@ -1915,6 +1915,10 @@ void placeLine(double price){
    WindowRedraw();
 }
 
+double getLine(){
+   return(ObjectGet("last_order", OBJPROP_PRICE1));
+}
+
 void place_SL_Line(double price,string name,string description) {
    horizLine(name,price,LightSalmon, description);
 } 
