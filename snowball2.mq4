@@ -713,7 +713,7 @@ void tradeGrid_Slave() {
             // verifico di non avere gi� un ordine a questo livello
             bool found = false;
             for (int j=0;j<numOrders;j++) {
-               if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip) {
+               if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip*4/5) {
                   found=true;
                   nLevels++;
                }
@@ -780,7 +780,7 @@ void tradeGrid_Master() {
             // verifico di non avere gi� un ordine a questo livello
             bool found = false;
             for (int j=0;j<numOrders;j++) {
-               if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip) {
+               if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip*4/5) {
                   found=true;
                   nLevels++;
                }
