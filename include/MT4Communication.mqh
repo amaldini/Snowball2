@@ -39,19 +39,22 @@ void moveOrders_GRID(double d){
    int i;
    for(i=0; i<OrdersTotal(); i++){
       OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
-      if (isMyOrder(magic)){
-         if (MathAbs(OrderOpenPrice() - getLine()) > (1+GRID_TRADING_PENDINGORDERS) * GRID_TRADING_STEP * pip){
-            orderDeleteReliable(OrderTicket());
-         }else{
-            maldaLog("GRID: moving order "+OrderTicket()+" by "+DoubleToStr(d,Digits));
-            orderModifyReliable(
-               OrderTicket(),
-               NormalizeDouble(OrderOpenPrice() + d,Digits),
-               NormalizeDouble(OrderStopLoss() + d,Digits), //OK
-               NormalizeDouble(OrderTakeProfit() + d, Digits),
-               0,
-               CLR_NONE
-            );
+      int otype = OrderType();
+      if ((otype!=OP_SELL) && (otype!=OP_BUY)) { 
+         if (isMyOrder(magic)){
+            if (MathAbs(OrderOpenPrice() - getLine()) > (1+GRID_TRADING_PENDINGORDERS) * GRID_TRADING_STEP * pip){
+               orderDeleteReliable(OrderTicket());
+            }else{
+               maldaLog("GRID: moving order "+OrderTicket()+" by "+DoubleToStr(d,Digits));
+               orderModifyReliable(
+                  OrderTicket(),
+                  NormalizeDouble(OrderOpenPrice() + d,Digits),
+                  NormalizeDouble(OrderStopLoss() + d,Digits), //OK
+                  NormalizeDouble(OrderTakeProfit() + d, Digits),
+                  0,
+                  CLR_NONE
+               );
+            }
          }
       }
    }
