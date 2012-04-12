@@ -191,6 +191,7 @@ begin
 end;
 
 procedure TForm1.Timer1Timer(Sender: TObject);
+const myFormat:string='#.00';
 var Balance1,nav1,usedmargin1:double;
     Balance2,nav2,usedmargin2:double;
 begin
@@ -198,24 +199,24 @@ begin
      Balance2:=0; nav2:=0; usedMargin2:=0;
      if (getBalance_NAV_UsedMargin(1,Balance1,nav1,usedMargin1)) then
         lblStatsAccount1.caption :=
-                                 floatToStr(Balance1)+sLineBreak+
+                                 formatFloat(myFormat,Balance1)+sLineBreak+
                                  sLineBreak+
-                                 floatToStr(nav1)+sLineBreak+
+                                 formatFloat(myFormat,nav1)+sLineBreak+
                                  sLineBreak+
-                                 floatToStr(usedMargin1);
+                                 formatFloat(myFormat,usedMargin1);
      if (getBalance_NAV_UsedMargin(0,Balance2,nav2,usedMargin2)) then
         lblStatsAccount2.caption :=
-                                 floatToStr(Balance2)+sLineBreak+
+                                 formatFloat(myFormat,Balance2)+sLineBreak+
                                  sLineBreak+
-                                 floatToStr(nav2)+sLineBreak+
+                                 formatFloat(myFormat,nav2)+sLineBreak+
                                  sLineBreak+
-                                 floatToStr(usedMargin2);
+                                 formatFloat(myFormat,usedMargin2);
      lblTotals.caption :=
-                                 floatToStr(Balance1+Balance2)+sLineBreak+
+                                 formatFloat(myFormat,Balance1+Balance2)+sLineBreak+
                                  sLineBreak+
-                                 floatToStr(nav1+nav2)+sLineBreak+
+                                 formatFloat(myFormat,nav1+nav2)+sLineBreak+
                                  sLineBreak+
-                                 floatToStr(usedMargin1+usedMargin2);
+                                 formatFloat(myFormat,usedMargin1+usedMargin2);
 
 end;
 
