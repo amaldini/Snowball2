@@ -29,8 +29,10 @@ string stringToAppendToInfo;
 extern bool GRID_TRADING = true;
 extern double GRID_TRADING_STEP = 10; // pips
 extern int GRID_TRADING_PENDINGORDERS = 2;
-extern double GRID_TAKEPROFIT = 60; // pips
-extern double GRID_STOP_PIPS = 30; // pips
+extern double GRID_TAKEPROFIT = 10; // pips
+extern double GRID_STOP_PIPS = 200; // pips
+
+extern int maxDanglers = 10;
 
 /**
 * move all entry orders by the amount of d
@@ -61,12 +63,7 @@ void moveOrders_GRID(double d){
 }
 
 void tradeGrid_Slave() {
-   
-   double GRID_BreakEven = GRID_TRADING_STEP;
-   double GRID_LockGainPips = 2;
-   double GRID_BreakEven2 = GRID_TRADING_STEP /2 * 3;
-   double GRID_LockGainPips2 = GRID_TRADING_STEP;
-   GRID_TrailStops(pip,GRID_BreakEven, GRID_LockGainPips,GRID_BreakEven2,GRID_LockGainPips2);
+   GR_TrailStops();
    
    int tickets[],orderTypes[];
    double openPrices[];
@@ -98,7 +95,7 @@ void tradeGrid_Slave() {
    
    int addedOrders = 0;
    int nLevels=0;
-   if (danglers<1) {
+   if (danglers<maxDanglers) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
          double price = NormalizeDouble(gridStart-GRID_TRADING_STEP*i*pip,Digits);
          
@@ -128,11 +125,7 @@ void tradeGrid_Slave() {
 
 void tradeGrid_Master() {
 
-   double GRID_BreakEven = GRID_TRADING_STEP;
-   double GRID_LockGainPips = 2;
-   double GRID_BreakEven2 = GRID_TRADING_STEP /2 * 3;
-   double GRID_LockGainPips2 = GRID_TRADING_STEP;
-   GRID_TrailStops(pip,GRID_BreakEven, GRID_LockGainPips,GRID_BreakEven2,GRID_LockGainPips2);
+   GR_TrailStops();
 
    int tickets[],orderTypes[];
    double openPrices[];
@@ -165,7 +158,7 @@ void tradeGrid_Master() {
    
    int addedOrders = 0;
    int nLevels=0;
-   if (danglers<1) {
+   if (danglers<maxDanglers) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
          double price = NormalizeDouble(gridStart+GRID_TRADING_STEP*i*pip,Digits);
          
@@ -191,6 +184,14 @@ void tradeGrid_Master() {
    }
 
    maldaLog("tradeGrid_Master (" + danglers +") danglers");
+}
+
+void GR_TrailStops() {
+   double GRID_BreakEven = GRID_TRADING_STEP;
+   double GRID_LockGainPips = 2;
+   double GRID_BreakEven2 = GRID_TRADING_STEP /2 * 3;
+   double GRID_LockGainPips2 = GRID_TRADING_STEP;
+   GRID_TrailStops(pip,GRID_BreakEven, GRID_LockGainPips,GRID_BreakEven2,GRID_LockGainPips2);
 }
 
 // ---- Trailing Stops
