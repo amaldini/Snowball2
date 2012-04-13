@@ -17,6 +17,8 @@ int    getMultiplierForMicroLot(string symbolName);
 
 bool setBalance_NAV_UsedMargin(int isMaster,double balance, double NAV,double usedMargin);   
 
+bool setExposure(string symbolName,int isMaster,double exposureLots);
+double getExposure(string symbolName,int isMaster);  
 
 #include <common_functions.mqh>
 
