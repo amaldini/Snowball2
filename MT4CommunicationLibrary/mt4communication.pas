@@ -18,6 +18,9 @@ function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
 function getGridOptions(symbolName:PChar;isMaster:integer;var distant:tiPair):boolean;stdcall;
 function setGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer):boolean;stdcall;
 
+function setExposure(symbolName:PChar;isMaster:integer;exposureLots:double):boolean;stdcall;
+function getExposure(symbolName:PChar;isMaster:integer):double;stdcall;
+
 function getBalance_NAV_UsedMargin(isMaster:integer;var balance:double;var NAV:double;var usedMargin:double):boolean;stdcall;
 function setBalance_NAV_UsedMargin(isMaster:integer;balance:double;NAV:double;usedMargin:double):boolean;stdcall;
 
@@ -29,6 +32,41 @@ implementation
 uses
   Classes, SysUtils, Registry; // ,Dialogs;
 
+function appendMasterTagToSymbolName(isMaster:integer;symbolName:PChar):ansistring;
+begin
+     if (isMaster<>0) then result:=AnsiString(symbolName)+'_MASTER'
+     else result:=AnsiString(symbolName);
+end;
+
+function setExposure(symbolName:PChar;isMaster:integer;exposureLots:double):boolean;stdcall;
+var entry:ansistring;
+begin
+   With TRegistry.Create do
+   try
+      RootKey:=HKEY_CURRENT_USER;
+      entry:=appendMasterTagToSymbolName(isMaster,symbolName);
+      if OpenKey('Software\VB and VBA Program Settings\MT4Channel\Exposure',true) then
+         WriteFloat(entry,exposureLots);
+      finally
+         free;
+      end;
+   result:=true;
+end;
+
+function getExposure(symbolName:PChar;isMaster:integer):double;stdcall;
+var entry:ansistring;
+begin
+     result:=0; // default
+     With TRegistry.Create do
+       try
+         RootKey:=HKEY_CURRENT_USER;
+         entry:=appendMasterTagToSymbolName(isMaster,symbolName);
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\Exposure') then
+         If ValueExists(entry) then result:=ReadFloat(entry);
+       finally
+         free;
+       end;
+end;
 
 function setMultiplierForMicroLot(symbolName:PChar;multiplier:integer):boolean;stdcall;
 var entry:ansistring;
@@ -130,12 +168,6 @@ begin
          end;
 
     result := true;
-end;
-
-function appendMasterTagToSymbolName(isMaster:integer;symbolName:PChar):ansistring;
-begin
-     if (isMaster<>0) then result:=AnsiString(symbolName)+'_MASTER'
-     else result:=AnsiString(symbolName);
 end;
 
 function setGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer):boolean;stdcall;

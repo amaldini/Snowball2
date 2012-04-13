@@ -21,7 +21,9 @@ exports
   setBalance_NAV_UsedMargin,
   getGridOptions,
   getMultiplierForMicroLot,
-  setMultiplierForMicroLot;
+  setMultiplierForMicroLot,
+  setExposure,
+  getExposure;
 
 {$IFDEF TESTING}
 
