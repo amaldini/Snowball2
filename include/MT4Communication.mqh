@@ -64,6 +64,8 @@ void moveOrders_GRID(double d){
    }
 }
 
+double lastExposure=0;
+
 void tradeGrid_Slave() {
    GR_TrailStops();
    
@@ -74,10 +76,19 @@ void tradeGrid_Slave() {
    int i;
    int danglers=0;
    double max=0;
+   double exposure = 0;
    for (i=0;i<numOrders;i++) {
-      if (orderTypes[i]==OP_SELL && openPrices[i]<Ask) danglers++;
+      if (orderTypes[i]==OP_SELL && openPrices[i]<Ask) { 
+         danglers++;
+         exposure+=OrderLots();
+      }
       if (openPrices[i]>max) max=openPrices[i];
    }
+   if (lastExposure!=exposure) {
+      setExposure(Symbol6(),0,exposure);
+      lastExposure=exposure;
+   }
+   
    int distant[2];
    distant[0]=0;
    if (getGridOptions(Symbol6(),0,distant)) {
@@ -136,9 +147,17 @@ void tradeGrid_Master() {
    int i;
    int danglers=0;
    double min=10000000;
+   double exposure=0;
    for (i=0;i<numOrders;i++) {
-      if (orderTypes[i]==OP_BUY && openPrices[i]>Bid) danglers++;
+      if (orderTypes[i]==OP_BUY && openPrices[i]>Bid) {
+         danglers++;
+         exposure+=OrderLots();
+      }
       if (openPrices[i]<min) min=openPrices[i];
+   }
+   if (lastExposure!=exposure) {
+      setExposure(Symbol6(),1,exposure);
+      lastExposure = exposure;
    }
    
    int distant[2];
