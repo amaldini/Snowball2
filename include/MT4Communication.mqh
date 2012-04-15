@@ -152,7 +152,7 @@ void tradeGrid_Slave() {
             }
             if (!found) {
                nLevels++;
-               gridSell(price);
+               gridSell(price,adjustedLotSize);
                maldaLog("pending sell at:"+DoubleToStr(price,Digits));           
             }
          }
@@ -236,7 +236,7 @@ void tradeGrid_Master() {
             }
             if (!found) {
                nLevels++;
-               gridBuy(price);
+               gridBuy(price,adjustedLotSize);
                maldaLog("pending buy at:"+DoubleToStr(price,Digits));           
             }
          }
@@ -304,31 +304,18 @@ void GRID_TrailStops(double pip,double BreakEven, double LockGainPips,double Bre
 }
 
 
-void gridBuy(double price) {
+void gridBuy(double price,double numLots) {
    double sl=0,tp=0;
    sl = NormalizeDouble(price - pip * GRID_STOP_PIPS,Digits);
-   tp = price + pip * GRID_TAKEPROFIT;
-   int multiplier = getMultiplierForMicroLot(Symbol6());
-   if (multiplier>=1 && multiplier<=5) {
-      double numLots = 0.01*multiplier;
-      buyStop(numLots, price, sl, tp, magic, comment, "gridBuy");
-   } else {
-      maldaLog("MULTIPLIER OUT OF RANGE!!!");
-   }
+   tp = price + pip * GRID_TAKEPROFIT;  
+   buyStop(numLots, price, sl, tp, magic, comment, "gridBuy");
 }
 
-void gridSell(double price) {
+void gridSell(double price,double numLots) {
    double sl=0,tp=0;
    sl = NormalizeDouble(price + pip * GRID_STOP_PIPS,Digits);
    tp = price - pip * GRID_TAKEPROFIT;
-   
-   int multiplier = getMultiplierForMicroLot(Symbol6());
-   if (multiplier>=1 && multiplier<=5) {
-      double numLots = 0.01*multiplier;
-      sellStop(numLots, price, sl, tp, magic, comment, "gridSell");
-   } else {
-      maldaLog("MULTIPLIER OUT OF RANGE!!!");
-   }
+   sellStop(numLots, price, sl, tp, magic, comment, "gridSell");
 }
 
 int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTypes[]) {
