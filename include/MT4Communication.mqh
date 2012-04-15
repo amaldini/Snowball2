@@ -34,7 +34,7 @@ extern int GRID_TRADING_PENDINGORDERS = 2;
 extern double GRID_TAKEPROFIT = 10; // pips
 extern double GRID_STOP_PIPS = 200; // pips
 
-extern int maxExposureLots = 0.05;
+extern double maxExposureLots = 0.05;
 
 /**
 * move all entry orders by the amount of d
@@ -160,6 +160,8 @@ void tradeGrid_Slave() {
             }
          }
       }
+   } else {
+      maldaLog("exposure>maxExposureLots!");
    }
    
    maldaLog("tradeGrid_Slave("+ danglers +") danglers");
@@ -247,6 +249,8 @@ void tradeGrid_Master() {
             }
          }
       }
+   } else {
+      maldaLog("exposure>maxExposureLots!");
    }
 
    maldaLog("tradeGrid_Master (" + danglers +") danglers");
