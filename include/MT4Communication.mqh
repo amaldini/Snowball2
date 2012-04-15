@@ -64,6 +64,19 @@ void moveOrders_GRID(double d){
    }
 }
 
+double calcAdjustedLotSize(double exposureDelta) {
+   int i;
+   double numLots=0.01;
+   if (exposureDelta<=0) {
+      int multiplier = getMultiplierForMicroLot(Symbol6());
+      if (multiplier>=1 && multiplier<=5) {
+         numLots = 0.01*multiplier;
+      }
+   } else {
+      numLots = exposureDelta;
+   }
+}
+
 double lastExposure=0;
 
 void tradeGrid_Slave() {
@@ -77,16 +90,29 @@ void tradeGrid_Slave() {
    int danglers=0;
    double max=0;
    double exposure = 0;
+   
+   double pendingOrderLots = 0;
+   
    for (i=0;i<numOrders;i++) {
       if (orderTypes[i]==OP_SELL && openPrices[i]<Ask) { 
          danglers++;
          exposure+=OrderLots();
+      } else {
+         pendingOrderLots = OrderLots();
       }
       if (openPrices[i]>max) max=openPrices[i];
    }
    if (lastExposure!=exposure) {
       setExposure(Symbol6(),0,exposure);
       lastExposure=exposure;
+   }
+   
+   double exposureDelta = exposure-getExposure(Symbol6(),1);
+   
+   double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
+   
+   if (exposureDelta<0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0)) { // chiudo perché devo cambiare lotsize
+      closeOpenOrders(OP_SELLSTOP,magic,"tradeGrid_Slave");
    }
    
    int distant[2];
@@ -148,16 +174,29 @@ void tradeGrid_Master() {
    int danglers=0;
    double min=10000000;
    double exposure=0;
+   
+   double pendingOrderLots = 0;
+   
    for (i=0;i<numOrders;i++) {
       if (orderTypes[i]==OP_BUY && openPrices[i]>Bid) {
          danglers++;
          exposure+=OrderLots();
+      } else {
+         pendingOrderLots = OrderLots();
       }
       if (openPrices[i]<min) min=openPrices[i];
    }
    if (lastExposure!=exposure) {
       setExposure(Symbol6(),1,exposure);
       lastExposure = exposure;
+   }
+   
+   double exposureDelta = exposure-getExposure(Symbol6(),0);
+   
+   double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
+   
+   if (exposureDelta<0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0)) { // chiudo perché devo cambiare lotsize
+      closeOpenOrders(OP_BUYSTOP,magic,"tradeGrid_Master");
    }
    
    int distant[2];
