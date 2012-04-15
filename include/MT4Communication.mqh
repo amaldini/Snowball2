@@ -65,15 +65,15 @@ void moveOrders_GRID(double d){
 }
 
 double calcAdjustedLotSize(double exposureDelta) {
-   int i;
    double numLots=0.01;
-   if (exposureDelta<=0) {
+   
+   if (exposureDelta>0.0001) {
+      numLots = exposureDelta;
+   } else {
       int multiplier = getMultiplierForMicroLot(Symbol6());
       if (multiplier>=1 && multiplier<=5) {
          numLots = 0.01*multiplier;
       }
-   } else {
-      numLots = exposureDelta;
    }
    return (numLots);
 }
@@ -108,11 +108,11 @@ void tradeGrid_Slave() {
       lastExposure=exposure;
    }
    
-   double exposureDelta = exposure-getExposure(Symbol6(),1);
+   double exposureDelta = getExposure(Symbol6(),1)-exposure;
    
    double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
    
-   if (exposureDelta<0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0)) { // chiudo perché devo cambiare lotsize
+   if (exposureDelta>0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0)) { // chiudo perché devo cambiare lotsize
       closeOpenOrders(OP_SELLSTOP,magic,"tradeGrid_Slave");
    }
    
@@ -192,11 +192,11 @@ void tradeGrid_Master() {
       lastExposure = exposure;
    }
    
-   double exposureDelta = exposure-getExposure(Symbol6(),0);
+   double exposureDelta = getExposure(Symbol6(),0)-exposure;
    
    double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
    
-   if (exposureDelta<0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0)) { // chiudo perché devo cambiare lotsize
+   if (exposureDelta>0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0)) { // chiudo perché devo cambiare lotsize
       closeOpenOrders(OP_BUYSTOP,magic,"tradeGrid_Master");
    }
    
