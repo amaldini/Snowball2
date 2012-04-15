@@ -34,7 +34,7 @@ extern int GRID_TRADING_PENDINGORDERS = 2;
 extern double GRID_TAKEPROFIT = 10; // pips
 extern double GRID_STOP_PIPS = 200; // pips
 
-extern int maxDanglers = 10;
+extern int maxExposureLots = 0.05;
 
 /**
 * move all entry orders by the amount of d
@@ -112,7 +112,9 @@ void tradeGrid_Slave() {
    
    double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
    
-   if (exposureDelta>0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0)) { // chiudo perché devo cambiare lotsize
+   bool cond1 = (exposureDelta>0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0));
+   bool cond2 = (exposure>maxExposureLots);
+   if (cond1 || cond2) { // chiudo perché devo cambiare lotsize
       closeOpenOrders(OP_SELLSTOP,magic,"tradeGrid_Slave");
    }
    
@@ -135,7 +137,7 @@ void tradeGrid_Slave() {
    
    int addedOrders = 0;
    int nLevels=0;
-   if (danglers<maxDanglers) {
+   if (exposure<maxExposureLots) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
          double price = NormalizeDouble(gridStart-GRID_TRADING_STEP*i*pip,Digits);
          
@@ -196,7 +198,10 @@ void tradeGrid_Master() {
    
    double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
    
-   if (exposureDelta>0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0)) { // chiudo perché devo cambiare lotsize
+   
+   bool cond1 = (exposureDelta>0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0));
+   bool cond2 = (exposure>maxExposureLots);
+   if (cond1 || cond2) { // chiudo perché devo cambiare lotsize
       closeOpenOrders(OP_BUYSTOP,magic,"tradeGrid_Master");
    }
    
@@ -219,7 +224,7 @@ void tradeGrid_Master() {
    
    int addedOrders = 0;
    int nLevels=0;
-   if (danglers<maxDanglers) {
+   if (exposure<maxExposureLots) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
          double price = NormalizeDouble(gridStart+GRID_TRADING_STEP*i*pip,Digits);
          
