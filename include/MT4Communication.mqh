@@ -75,6 +75,7 @@ double calcAdjustedLotSize(double exposureDelta) {
    } else {
       numLots = exposureDelta;
    }
+   return (numLots);
 }
 
 double lastExposure=0;
