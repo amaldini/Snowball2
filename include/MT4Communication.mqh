@@ -67,6 +67,8 @@ void moveOrders_GRID(double d){
 double calcAdjustedLotSize(double exposureDelta) {
    double numLots=0.01;
    
+   maldaLog("exposureDelta="+DoubleToStr(exposureDelta,4));
+   
    if (exposureDelta>0.0001) {
       numLots = exposureDelta;
    } else {
@@ -85,7 +87,8 @@ void tradeGrid_Slave() {
    
    int tickets[],orderTypes[];
    double openPrices[];
-   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes);
+   double orderLots[];
+   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes,orderLots);
    
    int i;
    int danglers=0;
@@ -108,13 +111,15 @@ void tradeGrid_Slave() {
       lastExposure=exposure;
    }
    
+   maldaLog("exposure="+DoubleToStr(exposure,4));
    double exposureDelta = getExposure(Symbol6(),1)-exposure;
    
    double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
    
    bool cond1 = (exposureDelta>0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0));
-   bool cond2 = (exposure>maxExposureLots);
-   if (cond1 || cond2) { // chiudo perché devo cambiare lotsize
+   bool cond2 = (exposureDelta==0 && (adjustedLotSize<pendingOrderLots) && (pendingOrderLots>0));
+   bool cond3 = (exposure>maxExposureLots);
+   if (cond1 || cond2 || cond3) { // chiudo perché devo cambiare lotsize
       closeOpenOrders(OP_SELLSTOP,magic,"tradeGrid_Slave");
    }
    
@@ -173,7 +178,8 @@ void tradeGrid_Master() {
 
    int tickets[],orderTypes[];
    double openPrices[];
-   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes); 
+   double orderLots[];
+   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes,orderLots); 
    
    int i;
    int danglers=0;
@@ -185,9 +191,10 @@ void tradeGrid_Master() {
    for (i=0;i<numOrders;i++) {
       if (orderTypes[i]==OP_BUY && openPrices[i]>Bid) {
          danglers++;
-         exposure+=OrderLots();
+         exposure+=orderLots[i];
+         maldaLog("exposure component: "+OrderTicket()+" "+DoubleToStr(orderLots[i],4));
       } else {
-         pendingOrderLots = OrderLots();
+         pendingOrderLots = orderLots[i];
       }
       if (openPrices[i]<min) min=openPrices[i];
    }
@@ -196,14 +203,16 @@ void tradeGrid_Master() {
       lastExposure = exposure;
    }
    
+   maldaLog("exposure="+DoubleToStr(exposure,4));
    double exposureDelta = getExposure(Symbol6(),0)-exposure;
    
    double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
    
    
    bool cond1 = (exposureDelta>0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0));
-   bool cond2 = (exposure>maxExposureLots);
-   if (cond1 || cond2) { // chiudo perché devo cambiare lotsize
+   bool cond2 = (exposureDelta==0 && (adjustedLotSize<pendingOrderLots) && (pendingOrderLots>0));
+   bool cond3 = (exposure>maxExposureLots);
+   if (cond1 || cond2 || cond3) { // chiudo perché devo cambiare lotsize
       closeOpenOrders(OP_BUYSTOP,magic,"tradeGrid_Master");
    }
    
@@ -328,7 +337,7 @@ void gridSell(double price,double numLots) {
    sellStop(numLots, price, sl, tp, magic, comment, "gridSell");
 }
 
-int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTypes[]) {
+int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTypes[],double& orderLots[]) {
    
    // int numOpenOrders = getNumOpenOrders(-1,magic);
    // if (numOpenOrders<=0) return(0);
@@ -343,6 +352,7 @@ int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTyp
    ArrayResize(tickets, total);
    ArrayResize(prices, total);
    ArrayResize(orderTypes,total);
+   ArrayResize(orderLots,total);
    
    // collect order tickets and prices
    int idx=0;
@@ -352,6 +362,7 @@ int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTyp
          orderTypes[idx] = OrderType();
          tickets[idx] = OrderTicket();
          prices[idx] = OrderOpenPrice();
+         orderLots[idx] = OrderLots();
          idx++;
       }
    }
