@@ -82,7 +82,7 @@ double calcAdjustedLotSize(double exposureDelta) {
 
 double lastExposure=0;
 
-void tradeGrid_Slave() {
+void tradeGrid(int isMaster) {
    GR_TrailStops();
    
    int tickets[],orderTypes[];
@@ -92,27 +92,30 @@ void tradeGrid_Slave() {
    
    int i;
    int danglers=0;
+   double min=1000000;
    double max=0;
    double exposure = 0;
    
    double pendingOrderLots = 0;
    
    for (i=0;i<numOrders;i++) {
-      if (orderTypes[i]==OP_SELL && openPrices[i]<Ask) { 
+      if ((orderTypes[i]==OP_SELL && openPrices[i]<Ask) ||
+          (orderTypes[i]==OP_BUY  && openPrices[i]>Bid)) { 
          danglers++;
          exposure+=orderLots[i];
       } else {
          pendingOrderLots = orderLots[i];
       }
       if (openPrices[i]>max) max=openPrices[i];
+      if (openPrices[i]<min) min=openPrices[i];
    }
    if (lastExposure!=exposure) {
-      setExposure(Symbol6(),0,exposure);
+      setExposure(Symbol6(),isMaster,exposure);
       lastExposure=exposure;
    }
    
    maldaLog("exposure="+DoubleToStr(exposure,4));
-   double exposureDelta = getExposure(Symbol6(),1)-exposure;
+   double exposureDelta = getExposure(Symbol6(),1-isMaster)-exposure;
    
    double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
    
@@ -120,16 +123,28 @@ void tradeGrid_Slave() {
    bool cond2 = (exposureDelta==0 && (adjustedLotSize<pendingOrderLots) && (pendingOrderLots>0));
    bool cond3 = (exposure>maxExposureLots);
    if (cond1 || cond2 || cond3) { // chiudo perché devo cambiare lotsize
-      closeOpenOrders(OP_SELLSTOP,magic,"tradeGrid_Slave");
+      if (isMaster==0) {
+         closeOpenOrders(OP_SELLSTOP,magic,"tradeGrid");
+      } else {
+         closeOpenOrders(OP_BUYSTOP,magic,"tradeGrid");
+      }
    }
    
    int distant[2];
    distant[0]=0;
-   if (getGridOptions(Symbol6(),0,distant)) {
-      if (distant[0]!=0 && numOrders>0 && danglers==0 && (max<Bid-GRID_TRADING_STEP*pip)) {
-          double delta = (Bid-GRID_TRADING_STEP*pip)-max;
-          moveOrders_GRID(delta); 
-          for (i=0;i<numOrders;i++) openPrices[i]+=delta;
+   if (getGridOptions(Symbol6(),isMaster,distant)) {
+      if (distant[0]!=0 && numOrders>0 && danglers==0) {
+          double delta;
+          if (isMaster==0 && (max<Bid-GRID_TRADING_STEP*pip)) {
+            delta = (Bid-GRID_TRADING_STEP*pip)-max;
+            moveOrders_GRID(delta); 
+            for (i=0;i<numOrders;i++) openPrices[i]+=delta;
+          }
+          if (isMaster==1 && (min>Ask+GRID_TRADING_STEP*pip)) {
+            delta = -(min-(Ask+GRID_TRADING_STEP*pip));
+            moveOrders_GRID(delta);   
+            for (i=0;i<numOrders;i++) openPrices[i]+=delta;
+          }   
       }
    }  
    
@@ -144,10 +159,19 @@ void tradeGrid_Slave() {
    int nLevels=0;
    if (exposure<maxExposureLots) {
       for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
-         double price = NormalizeDouble(gridStart-GRID_TRADING_STEP*i*pip,Digits);
+         double price;
+         bool condition1;
+         bool condition2;
          
-         bool condition1 = (price<Bid && distant[0]==0); 
-         bool condition2 = (price<(Bid-GRID_TRADING_STEP*pip/2) && distant[0]!=0);
+         if (isMaster==0) {
+            price = NormalizeDouble(gridStart-GRID_TRADING_STEP*i*pip,Digits);
+            condition1 = (price<Bid && distant[0]==0); 
+            condition2 = (price<(Bid-GRID_TRADING_STEP*pip/2) && distant[0]!=0);
+         } else {
+            price = NormalizeDouble(gridStart+GRID_TRADING_STEP*i*pip,Digits);
+            condition1 = (price>Ask && distant[0]==0); 
+            condition2 = (price>(Ask+GRID_TRADING_STEP*pip/2) && distant[0]!=0);
+         }
          
          if (condition1 || condition2) {
             // verifico di non avere giï¿½ un ordine a questo livello
@@ -160,8 +184,13 @@ void tradeGrid_Slave() {
             }
             if (!found) {
                nLevels++;
-               gridSell(price,adjustedLotSize);
-               maldaLog("pending sell at:"+DoubleToStr(price,Digits));           
+               if (isMaster==0) {
+                  gridSell(price,adjustedLotSize);
+                  maldaLog("pending sell at:"+DoubleToStr(price,Digits));  
+               } else {
+                  gridBuy(price,adjustedLotSize);
+                  maldaLog("pending buy at:"+DoubleToStr(price,Digits));   
+               }         
             }
          }
       }
@@ -169,100 +198,15 @@ void tradeGrid_Slave() {
       maldaLog("exposure>maxExposureLots!");
    }
    
-   maldaLog("tradeGrid_Slave("+ danglers +") danglers");
+   maldaLog("tradeGrid("+ danglers +") danglers");
+}
+
+void tradeGrid_Slave() {
+   tradeGrid(0);
 }
 
 void tradeGrid_Master() {
-
-   GR_TrailStops();
-
-   int tickets[],orderTypes[];
-   double openPrices[];
-   double orderLots[];
-   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes,orderLots); 
-   
-   int i;
-   int danglers=0;
-   double min=10000000;
-   double exposure=0;
-   
-   double pendingOrderLots = 0;
-   
-   for (i=0;i<numOrders;i++) {
-      if (orderTypes[i]==OP_BUY && openPrices[i]>Bid) {
-         danglers++;
-         exposure+=orderLots[i];
-         maldaLog("exposure component: "+OrderTicket()+" "+DoubleToStr(orderLots[i],4));
-      } else {
-         pendingOrderLots = orderLots[i];
-      }
-      if (openPrices[i]<min) min=openPrices[i];
-   }
-   if (lastExposure!=exposure) {
-      setExposure(Symbol6(),1,exposure);
-      lastExposure = exposure;
-   }
-   
-   maldaLog("exposure="+DoubleToStr(exposure,4));
-   double exposureDelta = getExposure(Symbol6(),0)-exposure;
-   
-   double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
-   
-   
-   bool cond1 = (exposureDelta>0 && (adjustedLotSize>pendingOrderLots) && (pendingOrderLots>0));
-   bool cond2 = (exposureDelta==0 && (adjustedLotSize<pendingOrderLots) && (pendingOrderLots>0));
-   bool cond3 = (exposure>maxExposureLots);
-   if (cond1 || cond2 || cond3) { // chiudo perché devo cambiare lotsize
-      closeOpenOrders(OP_BUYSTOP,magic,"tradeGrid_Master");
-   }
-   
-   int distant[2];
-   distant[0]=0;
-   if (getGridOptions(Symbol6(),1,distant)) {
-      if (distant[0]!=0 && numOrders>0 && danglers==0 && (min>Ask+GRID_TRADING_STEP*pip)) {
-         double delta = -(min-(Ask+GRID_TRADING_STEP*pip));
-         moveOrders_GRID(delta);   
-         for (i=0;i<numOrders;i++) openPrices[i]+=delta;
-      }   
-   } 
-   
-   double gridStart;
-   if (numOrders == 0) {
-      gridStart = NormalizeDouble((Ask+Bid)/2,Digits);
-   } else {
-      gridStart = openPrices[0];
-   }
-   
-   int addedOrders = 0;
-   int nLevels=0;
-   if (exposure<maxExposureLots) {
-      for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
-         double price = NormalizeDouble(gridStart+GRID_TRADING_STEP*i*pip,Digits);
-         
-         bool condition1 = (price>Ask && distant[0]==0); 
-         bool condition2 = (price>(Ask+GRID_TRADING_STEP*pip/2) && distant[0]!=0);
-         
-         if (condition1 || condition2) {
-            // verifico di non avere giï¿½ un ordine a questo livello
-            bool found = false;
-            for (int j=0;j<numOrders;j++) {
-               if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip*4/5) {
-                  found=true;
-                  nLevels++;
-               }
-            }
-            if (!found) {
-               nLevels++;
-               gridBuy(price,adjustedLotSize);
-               maldaLog("pending buy at:"+DoubleToStr(price,Digits));           
-            }
-         }
-      }
-   } else {
-      maldaLog("exposure>maxExposureLots!");
-   }
-
-   maldaLog("tradeGrid_Master (" + danglers +") danglers");
+   tradeGrid(1);
 }
 
 void GR_TrailStops() {
