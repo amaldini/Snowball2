@@ -100,9 +100,9 @@ void tradeGrid_Slave() {
    for (i=0;i<numOrders;i++) {
       if (orderTypes[i]==OP_SELL && openPrices[i]<Ask) { 
          danglers++;
-         exposure+=OrderLots();
+         exposure+=orderLots[i];
       } else {
-         pendingOrderLots = OrderLots();
+         pendingOrderLots = orderLots[i];
       }
       if (openPrices[i]>max) max=openPrices[i];
    }
