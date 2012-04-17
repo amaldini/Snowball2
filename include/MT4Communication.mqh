@@ -156,11 +156,11 @@ void tradeGrid(int isMaster) {
       if (isMaster==0) {
          price = NormalizeDouble(gridStart-GRID_TRADING_STEP*i*pip,Digits);
          condition1 = (price<Bid && distant[0]==0); 
-         condition2 = (price<(Bid-GRID_TRADING_STEP*pip/2) && distant[0]!=0);
+         condition2 = (price<(Bid-GRID_TRADING_STEP*pip) && distant[0]!=0);
       } else {
          price = NormalizeDouble(gridStart+GRID_TRADING_STEP*i*pip,Digits);
          condition1 = (price>Ask && distant[0]==0); 
-         condition2 = (price>(Ask+GRID_TRADING_STEP*pip/2) && distant[0]!=0);
+         condition2 = (price>(Ask+GRID_TRADING_STEP*pip) && distant[0]!=0);
       }
       
       if (condition1 || condition2) {
