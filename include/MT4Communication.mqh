@@ -34,7 +34,7 @@ extern int GRID_TRADING_PENDINGORDERS = 2;
 extern double GRID_TAKEPROFIT = 10; // pips
 extern double GRID_STOP_PIPS = 200; // pips
 
-extern double maxExposureLots = 0.05;
+extern double maxExposureLots = 0.08;
 
 /**
 * move all entry orders by the amount of d
@@ -142,50 +142,53 @@ void tradeGrid(int isMaster) {
    
    int addedOrders = 0;
    int nLevels=0;
-   if (exposure<maxExposureLots) {
-      for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
-         double price;
-         bool condition1;
-         bool condition2;
-         
-         if (isMaster==0) {
-            price = NormalizeDouble(gridStart-GRID_TRADING_STEP*i*pip,Digits);
-            condition1 = (price<Bid && distant[0]==0); 
-            condition2 = (price<(Bid-GRID_TRADING_STEP*pip/2) && distant[0]!=0);
-         } else {
-            price = NormalizeDouble(gridStart+GRID_TRADING_STEP*i*pip,Digits);
-            condition1 = (price>Ask && distant[0]==0); 
-            condition2 = (price>(Ask+GRID_TRADING_STEP*pip/2) && distant[0]!=0);
-         }
-         
-         if (condition1 || condition2) {
-            // verifico di non avere già un ordine a questo livello
-            double currentLots = 0;
-            for (int j=0;j<numOrders;j++) {
-               if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip*4/5) {
-                  if ((currentLots+orderLots[j])>adjustedLotSize && (orderTypes[j]==OP_BUYSTOP || orderTypes[j]==OP_SELLSTOP)) {
-                     orderDeleteReliable(tickets[j]);
-                     orderLots[j]=0;
-                  } else {
-                     currentLots+=orderLots[j]; 
-                  }
-               }
-            }
-            if (currentLots<adjustedLotSize) {
-               if (isMaster==0) {
-                  gridSell(price,adjustedLotSize-currentLots);
-                  maldaLog("pending sell at:"+DoubleToStr(price,Digits));  
-               } else {
-                  gridBuy(price,adjustedLotSize-currentLots);
-                  maldaLog("pending buy at:"+DoubleToStr(price,Digits));   
-               }         
-            }
-            nLevels++; // o c'era già o l'ho creato
-         }
-      }
-   } else {
+   
+   if (exposure>=maxExposureLots) {
+      adjustedLotSize = 0;
       maldaLog("exposure>maxExposureLots!");
    }
+   
+   for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
+      double price;
+      bool condition1;
+      bool condition2;
+      
+      if (isMaster==0) {
+         price = NormalizeDouble(gridStart-GRID_TRADING_STEP*i*pip,Digits);
+         condition1 = (price<Bid && distant[0]==0); 
+         condition2 = (price<(Bid-GRID_TRADING_STEP*pip/2) && distant[0]!=0);
+      } else {
+         price = NormalizeDouble(gridStart+GRID_TRADING_STEP*i*pip,Digits);
+         condition1 = (price>Ask && distant[0]==0); 
+         condition2 = (price>(Ask+GRID_TRADING_STEP*pip/2) && distant[0]!=0);
+      }
+      
+      if (condition1 || condition2) {
+         // verifico di non avere già un ordine a questo livello
+         double currentLots = 0;
+         for (int j=0;j<numOrders;j++) {
+            if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip*4/5) {
+               if ((currentLots+orderLots[j])>adjustedLotSize && (orderTypes[j]==OP_BUYSTOP || orderTypes[j]==OP_SELLSTOP)) {
+                  orderDeleteReliable(tickets[j]);
+                  orderLots[j]=0;
+               } else {
+                  currentLots+=orderLots[j]; 
+               }
+            }
+         }
+         if (currentLots<adjustedLotSize) {
+            if (isMaster==0) {
+               gridSell(price,adjustedLotSize-currentLots);
+               maldaLog("pending sell at:"+DoubleToStr(price,Digits));  
+            } else {
+               gridBuy(price,adjustedLotSize-currentLots);
+               maldaLog("pending buy at:"+DoubleToStr(price,Digits));   
+            }         
+         }
+         nLevels++; // o c'era già o l'ho creato
+      }
+   }
+   
    
    maldaLog("tradeGrid("+ danglers +") danglers");
 }
