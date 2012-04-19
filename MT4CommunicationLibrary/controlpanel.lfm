@@ -1,11 +1,11 @@
 object Form1: TForm1
-  Left = 627
-  Height = 268
-  Top = 406
-  Width = 371
+  Left = 364
+  Height = 272
+  Top = 235
+  Width = 456
   Caption = 'SnowBall ControlPanel'
-  ClientHeight = 248
-  ClientWidth = 371
+  ClientHeight = 252
+  ClientWidth = 456
   FormStyle = fsSystemStayOnTop
   Menu = MainMenu1
   OnCreate = FormCreate
@@ -130,8 +130,8 @@ object Form1: TForm1
   object StatusBar1: TStatusBar
     Left = 0
     Height = 23
-    Top = 225
-    Width = 371
+    Top = 229
+    Width = 456
     Panels = <>
   end
   object Label1: TLabel
@@ -175,6 +175,14 @@ object Form1: TForm1
     Caption = 'Close All'
     OnClick = ButtonCloseAllClick
     TabOrder = 5
+  end
+  object lblProfits: TLabel
+    Left = 368
+    Height = 131
+    Top = 8
+    Width = 32
+    Caption = 'Profits'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'
+    ParentColor = False
   end
   object Timer1: TTimer
     OnTimer = Timer1Timer

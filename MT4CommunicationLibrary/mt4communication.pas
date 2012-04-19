@@ -27,6 +27,9 @@ function setBalance_NAV_UsedMargin(isMaster:integer;balance:double;NAV:double;us
 function getMultiplierForMicroLot(symbolName:PChar):integer;stdcall;
 function setMultiplierForMicroLot(symbolName:PChar;multiplier:integer):boolean;stdcall;
 
+function setProfits(symbolName:PChar;isMaster:integer;profits:double):boolean;stdcall;
+function getProfits(symbolName:PChar;isMaster:integer):double;stdcall;
+
 implementation
 
 uses
@@ -36,6 +39,36 @@ function appendMasterTagToSymbolName(isMaster:integer;symbolName:PChar):ansistri
 begin
      if (isMaster<>0) then result:=AnsiString(symbolName)+'_MASTER'
      else result:=AnsiString(symbolName);
+end;
+
+function setProfits(symbolName:PChar;isMaster:integer;profits:double):boolean;stdcall;
+var entry:ansistring;
+begin
+   With TRegistry.Create do
+   try
+      RootKey:=HKEY_CURRENT_USER;
+      entry:=appendMasterTagToSymbolName(isMaster,symbolName);
+      if OpenKey('Software\VB and VBA Program Settings\MT4Channel\Profits',true) then
+         WriteFloat(entry,profits);
+      finally
+         free;
+      end;
+   result:=true;
+end;
+
+function getProfits(symbolName:PChar;isMaster:integer):double;stdcall;
+var entry:ansistring;
+begin
+     result:=0; // default
+     With TRegistry.Create do
+       try
+         RootKey:=HKEY_CURRENT_USER;
+         entry:=appendMasterTagToSymbolName(isMaster,symbolName);
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\Profits') then
+         If ValueExists(entry) then result:=ReadFloat(entry);
+       finally
+         free;
+       end;
 end;
 
 function setExposure(symbolName:PChar;isMaster:integer;exposureLots:double):boolean;stdcall;

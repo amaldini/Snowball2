@@ -23,7 +23,8 @@ exports
   getMultiplierForMicroLot,
   setMultiplierForMicroLot,
   setExposure,
-  getExposure;
+  getExposure,
+  setProfits;
 
 {$IFDEF TESTING}
 

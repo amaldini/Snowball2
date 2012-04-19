@@ -17,6 +17,7 @@ type
     btnCloseLong: TButton;
     btnCloseShort: TButton;
     ButtonCloseAll: TButton;
+    lblProfits: TLabel;
     MainMenu1: TMainMenu;
     GridDistance: TMenuItem;
     GroupBox1: TGroupBox;
@@ -190,6 +191,25 @@ begin
      end;
 end;
 
+procedure checkProfits();
+const myFormat:string='0.00';
+var i:integer;
+    symbol:string;
+    text:string;
+    profits1:double;
+    profits2:double;
+begin
+     text:='Profits:'+sLineBreak;
+     for i := 0 to (Form1.listbox1.count-1) do
+     begin
+          symbol:=Form1.listbox1.items[i];
+          profits1:= getProfits(PChar(symbol),0);
+          profits2:= getProfits(PChar(symbol),1);
+          text+=symbol+' '+FormatFloat(myFormat,profits1+profits2)+sLineBreak;
+     end;
+     Form1.lblProfits.caption := text;
+end;
+
 procedure TForm1.Timer1Timer(Sender: TObject);
 const myFormat:string='#.00';
 var Balance1,nav1,usedmargin1:double;
@@ -217,6 +237,8 @@ begin
                                  formatFloat(myFormat,nav1+nav2)+sLineBreak+
                                  sLineBreak+
                                  formatFloat(myFormat,usedMargin1+usedMargin2);
+
+     checkProfits();
 
 end;
 

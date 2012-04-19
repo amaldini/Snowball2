@@ -15,6 +15,8 @@ bool   setGridMode(string symbolName,int isMaster,string gridMode);
 bool   getGridOptions(string symbolName,int isMaster,int& distant[]); 
 int    getMultiplierForMicroLot(string symbolName);
 
+bool   setProfits(string symbolName,int isMaster,double profits);
+
 bool setBalance_NAV_UsedMargin(int isMaster,double balance, double NAV,double usedMargin);   
 
 bool setExposure(string symbolName,int isMaster,double exposureLots);
@@ -31,7 +33,7 @@ string stringToAppendToInfo;
 extern bool GRID_TRADING = true;
 extern double GRID_TRADING_STEP = 10; // pips
 extern int GRID_TRADING_PENDINGORDERS = 2;
-extern double GRID_TAKEPROFIT = 10; // pips
+extern double GRID_TAKEPROFIT = 200; // pips
 extern double GRID_STOP_PIPS = 200; // pips
 
 extern double maxExposureLots = 0.08;
@@ -69,6 +71,9 @@ double calcAdjustedLotSize(double exposureDelta) {
    
    maldaLog("exposureDelta="+DoubleToStr(exposureDelta,4));
    
+   exposureDelta = 0; // disabilito hedging perche voglio provare 
+                      //a sfruttare lo sbilanciamento a mio favore
+   
    if (exposureDelta>0.0001) {
       numLots = exposureDelta;
    } else {
@@ -88,7 +93,8 @@ void tradeGrid(int isMaster) {
    int tickets[],orderTypes[];
    double openPrices[];
    double orderLots[];
-   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes,orderLots);
+   double orderProfits[];
+   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes,orderLots,orderProfits);
    
    int i;
    int danglers=0;
@@ -96,12 +102,19 @@ void tradeGrid(int isMaster) {
    double max=0;
    double exposure = 0;
    
+   double profit = 0;
+   
    for (i=0;i<numOrders;i++) {
       if ((orderTypes[i]==OP_SELL && openPrices[i]<Ask) ||
           (orderTypes[i]==OP_BUY  && openPrices[i]>Bid)) { 
          danglers++;
          exposure+=orderLots[i];
       }
+      
+      if (orderTypes[i]==OP_SELL || orderTypes[i]==OP_BUY) {
+         profit += orderProfits[i];
+      }
+      
       if (openPrices[i]>max) max=openPrices[i];
       if (openPrices[i]<min) min=openPrices[i];
    }
@@ -109,6 +122,8 @@ void tradeGrid(int isMaster) {
       setExposure(Symbol6(),isMaster,exposure);
       lastExposure=exposure;
    }
+   
+   setProfits(Symbol6(),isMaster,profit);
    
    maldaLog("exposure="+DoubleToStr(exposure,4));
    double exposureDelta = getExposure(Symbol6(),1-isMaster)-exposure;
@@ -202,11 +217,13 @@ void tradeGrid_Master() {
 }
 
 void GR_TrailStops() {
-   double GRID_BreakEven = GRID_TRADING_STEP;
-   double GRID_LockGainPips = 2;
-   double GRID_BreakEven2 = GRID_TRADING_STEP /2 * 3;
-   double GRID_LockGainPips2 = GRID_TRADING_STEP;
+   /*
+   double GRID_BreakEven = GRID_TRADING_STEP*3;
+   double GRID_LockGainPips = GRID_TRADING_STEP;
+   double GRID_BreakEven2 = GRID_TRADING_STEP * 6;
+   double GRID_LockGainPips2 = GRID_TRADING_STEP * 3;
    GRID_TrailStops(pip,GRID_BreakEven, GRID_LockGainPips,GRID_BreakEven2,GRID_LockGainPips2);
+   */
 }
 
 // ---- Trailing Stops
@@ -273,7 +290,7 @@ void gridSell(double price,double numLots) {
    sellStop(numLots, price, sl, tp, magic, comment, "gridSell");
 }
 
-int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTypes[],double& orderLots[]) {
+int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTypes[],double& orderLots[],double& orderProfits[]) {
    
    // int numOpenOrders = getNumOpenOrders(-1,magic);
    // if (numOpenOrders<=0) return(0);
@@ -289,6 +306,7 @@ int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTyp
    ArrayResize(prices, total);
    ArrayResize(orderTypes,total);
    ArrayResize(orderLots,total);
+   ArrayResize(orderProfits,total);
    
    // collect order tickets and prices
    int idx=0;
@@ -299,6 +317,7 @@ int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTyp
          tickets[idx] = OrderTicket();
          prices[idx] = OrderOpenPrice();
          orderLots[idx] = OrderLots();
+         if (orderTypes[idx]==OP_BUY || orderTypes[idx]==OP_SELL) orderProfits[idx]=OrderProfit();
          idx++;
       }
    }
