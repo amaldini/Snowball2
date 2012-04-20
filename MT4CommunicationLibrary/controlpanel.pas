@@ -203,9 +203,15 @@ begin
      for i := 0 to (Form1.listbox1.count-1) do
      begin
           symbol:=Form1.listbox1.items[i];
-          profits1:= getProfits(PChar(symbol),0);
-          profits2:= getProfits(PChar(symbol),1);
-          text+=symbol+' '+FormatFloat(myFormat,profits1+profits2)+sLineBreak;
+          profits1:= getProfits(PChar(symbol),1);
+          profits2:= getProfits(PChar(symbol),0);
+          if ((profits1+profits2)<>0) then
+          begin
+             text+=symbol+' '+
+                            FormatFloat(myFormat,profits1)+' '+
+                            FormatFloat(myFormat,profits2)+' '+
+                            FormatFloat(myFormat,profits1+profits2)+' '+sLineBreak;
+          end;
      end;
      Form1.lblProfits.caption := text;
 end;
