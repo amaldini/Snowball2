@@ -32,7 +32,7 @@ string stringToAppendToInfo;
 
 extern bool GRID_TRADING = true;
 extern double GRID_TRADING_STEP = 10; // pips
-extern int GRID_TRADING_PENDINGORDERS = 2;
+extern int GRID_TRADING_PENDINGORDERS = 3;
 extern double GRID_TAKEPROFIT = 200; // pips
 extern double GRID_STOP_PIPS = 200; // pips
 
