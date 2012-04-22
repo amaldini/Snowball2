@@ -103,6 +103,7 @@ void tradeGrid(int isMaster) {
    double exposure = 0;
    
    double profit = 0;
+   double gridStart = -1;
    
    for (i=0;i<numOrders;i++) {
       if ((orderTypes[i]==OP_SELL && openPrices[i]<Ask) ||
@@ -117,6 +118,9 @@ void tradeGrid(int isMaster) {
       
       if (openPrices[i]>max) max=openPrices[i];
       if (openPrices[i]<min) min=openPrices[i];
+      
+      if (gridStart<0 || (MathAbs(openPrices[i]-Bid)<MathAbs(Bid-gridStart))) gridStart = openPrices[i];
+      
    }
    if (lastExposure!=exposure) {
       setExposure(Symbol6(),isMaster,exposure);
@@ -148,11 +152,8 @@ void tradeGrid(int isMaster) {
       }
    }  
    
-   double gridStart;
    if (numOrders == 0) {
       gridStart = NormalizeDouble((Ask+Bid)/2,Digits);
-   } else {
-      gridStart = openPrices[0];
    } 
    
    int addedOrders = 0;
