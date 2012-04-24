@@ -136,16 +136,18 @@ void tradeGrid(int isMaster) {
    
    int distant[2];
    distant[0]=0;
+   int allowReenter = 0;
    if (getGridOptions(Symbol6(),isMaster,distant)) {
+      allowReenter = distant[1];
       if (distant[0]!=0 && numOrders>0 && danglers==0) {
           double delta;
-          if (isMaster==0 && (max<Bid-GRID_TRADING_STEP*pip)) {
-            delta = (Bid-GRID_TRADING_STEP*pip)-max;
+          if (isMaster==0 && (max<Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)) {
+            delta = (Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)-max;
             moveOrders_GRID(delta); 
             for (i=0;i<numOrders;i++) openPrices[i]+=delta;
           }
-          if (isMaster==1 && (min>Ask+GRID_TRADING_STEP*pip)) {
-            delta = -(min-(Ask+GRID_TRADING_STEP*pip));
+          if (isMaster==1 && (min>Ask+GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)) {
+            delta = -(min-(Ask+GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS));
             moveOrders_GRID(delta);   
             for (i=0;i<numOrders;i++) openPrices[i]+=delta;
           }   
@@ -182,22 +184,29 @@ void tradeGrid(int isMaster) {
       if (condition1 || condition2) {
          // verifico di non avere già un ordine a questo livello
          double currentLots = 0;
+         double pendingLots = 0;
          for (int j=0;j<numOrders;j++) {
             if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip*4/5) {
-               if ((currentLots+orderLots[j])>adjustedLotSize && (orderTypes[j]==OP_BUYSTOP || orderTypes[j]==OP_SELLSTOP)) {
+               bool isPendingOrder = (orderTypes[j]==OP_BUYSTOP || orderTypes[j]==OP_SELLSTOP);
+               if ((currentLots+orderLots[j])>adjustedLotSize && isPendingOrder) {
                   orderDeleteReliable(tickets[j]);
                   orderLots[j]=0;
                } else {
-                  currentLots+=orderLots[j]; 
+                  currentLots+=orderLots[j];
+                  if (isPendingOrder) {
+                     pendingLots+=orderLots[j];
+                  }
                }
             }
          }
-         if (currentLots<adjustedLotSize) {
+         double lotsForOrder = adjustedLotSize-currentLots;
+         if (allowReenter!=0 && (pendingLots<0.0001)) lotsForOrder = 0.01;
+         if (lotsForOrder>0.0001) {
             if (isMaster==0) {
-               gridSell(price,adjustedLotSize-currentLots);
+               gridSell(price,lotsForOrder);
                maldaLog("pending sell at:"+DoubleToStr(price,Digits));  
             } else {
-               gridBuy(price,adjustedLotSize-currentLots);
+               gridBuy(price,lotsForOrder);
                maldaLog("pending buy at:"+DoubleToStr(price,Digits));   
             }         
          }

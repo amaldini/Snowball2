@@ -16,7 +16,7 @@ function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;s
 function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
 
 function getGridOptions(symbolName:PChar;isMaster:integer;var distant:tiPair):boolean;stdcall;
-function setGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer):boolean;stdcall;
+function setGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer;allowReenter:integer):boolean;stdcall;
 
 function setExposure(symbolName:PChar;isMaster:integer;exposureLots:double):boolean;stdcall;
 function getExposure(symbolName:PChar;isMaster:integer):double;stdcall;
@@ -203,15 +203,23 @@ begin
     result := true;
 end;
 
-function setGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer):boolean;stdcall;
+function setGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer;allowReenter:integer):boolean;stdcall;
 var entry:ansistring;
 begin
+   entry:=appendMasterTagToSymbolName(isMaster,symbolName);
    With TRegistry.Create do
    try
       RootKey:=HKEY_CURRENT_USER;
-      entry:=appendMasterTagToSymbolName(isMaster,symbolName);
       if OpenKey('Software\VB and VBA Program Settings\MT4Channel\GridOption_Distant',true) then
          WriteInteger(entry,isDistant);
+      finally
+         free;
+      end;
+   With TRegistry.Create do
+   try
+      RootKey:=HKEY_CURRENT_USER;
+      if OpenKey('Software\VB and VBA Program Settings\MT4Channel\GridOption_AllowReenter',true) then
+         WriteInteger(entry,allowReenter)
       finally
          free;
       end;
@@ -222,15 +230,31 @@ function getGridOptions(symbolName:PChar;isMaster:integer;var distant:tiPair):bo
 var entry:ansistring;
 begin
      result:=false;
+     distant[0]:=1;
+     distant[1]:=0;
+     entry:=appendMasterTagToSymbolName(isMaster,symbolName);
      With TRegistry.Create do
        try
          RootKey:=HKEY_CURRENT_USER;
-         entry:=appendMasterTagToSymbolName(isMaster,symbolName);
          If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\GridOption_Distant') then
          If ValueExists(entry) then
          begin
             distant[0] := ReadInteger(entry);
             result:=true; // Or whatever it is. ReadInteger/ReadBool
+         end;
+       finally
+         free;
+       end;
+
+
+     With TRegistry.Create do
+       try
+         RootKey:=HKEY_CURRENT_USER;
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\GridOption_AllowReenter') then
+         If ValueExists(entry) then
+         begin
+              distant[1] := ReadInteger(entry);
+              result:=true; // Or whatever it is. ReadInteger/ReadBool
          end;
        finally
          free;

@@ -210,6 +210,14 @@ object Form1: TForm1
         Caption = 'Short distant'
         OnClick = ShortDistantClick
       end
+      object LongReenter: TMenuItem
+        Caption = 'Long Reenter'
+        OnClick = LongReenterClick
+      end
+      object ShortReenter: TMenuItem
+        Caption = 'Short Reenter'
+        OnClick = ShortReenterClick
+      end
       object MenuItem1: TMenuItem
         Caption = '-'
       end

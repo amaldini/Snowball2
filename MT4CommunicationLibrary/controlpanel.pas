@@ -37,6 +37,8 @@ type
     Lots003: TMenuItem;
     Lots004: TMenuItem;
     Lots005: TMenuItem;
+    LongReenter: TMenuItem;
+    ShortReenter: TMenuItem;
     ShortDistant: TMenuItem;
     ShortWait: TRadioButton;
     ShortGrid: TRadioButton;
@@ -55,7 +57,9 @@ type
     procedure Lots003Click(Sender: TObject);
     procedure Lots004Click(Sender: TObject);
     procedure Lots005Click(Sender: TObject);
+    procedure LongReenterClick(Sender: TObject);
     procedure ShortDistantClick(Sender: TObject);
+    procedure ShortReenterClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
 
   private
@@ -80,6 +84,7 @@ var symbol:PChar;
     mode:PChar;
     distant:TIPair;
     boolValue:boolean;
+    boolValue2:boolean;
     multiplierForMicroLot:integer;
 begin
   GroupBox1.Enabled:=true;
@@ -100,18 +105,24 @@ begin
   if (mode='A') then shortAntiGrid.Checked:=true;
 
   boolValue:=false;
+  boolValue2:=false;
   if (getGridOptions(symbol,1,distant)) then
   begin
        if (distant[0]<>0) then boolValue:=true;
+       if (distant[1]<>0) then boolValue2:=true;
   end;
   longDistant.checked:=boolValue;
+  LongReenter.Checked:=boolValue2;
 
   boolValue:=false;
+  boolValue2:=false;
   if (getGridOptions(symbol,0,distant)) then
   begin
        if (distant[0]<>0) then boolValue:=true;
+       if (distant[1]<>0) then boolValue2:=true;
   end;
   shortDistant.checked:=boolValue;
+  ShortReenter.Checked:= boolValue2;
 
   multiplierForMicroLot:=getMultiplierForMicroLot(symbol);
   case multiplierForMicroLot of
@@ -128,19 +139,60 @@ begin
      result:=PChar(form1.listbox1.getSelectedText);
 end;
 
-procedure TForm1.LongDistantClick(Sender: TObject);
+procedure updateGridLongOptions();
 var symbol:pchar;
     isDistant:integer;
+    allowReenter:integer;
 begin
-     if (form1.ListBox1.ItemIndex>=0) then
-     begin
+  if (form1.listbox1.itemindex>=0) then
+  begin
+       isDistant:=0; allowReenter:=0;
        symbol:=getSelectedSymbol();
-       LongDistant.Checked:=not longDistant.Checked;
-       isDistant:=0;
-       if (longDistant.checked) then isDistant:=1;
-       setGridOptions(symbol,1,isDistant);
+       if (form1.longDistant.checked) then isDistant:=1;
+       if (form1.longReenter.checked) then allowReenter:=1;
+       setGridOptions(symbol,1,isDistant,allowReenter);
+  end;
+end;
+
+procedure updateGridShortOptions();
+var symbol:pchar;
+    isDistant:integer;
+    allowReenter:integer;
+begin
+     if (form1.listbox1.itemindex>=0) then
+     begin
+        isDistant:=0; allowReenter:=0;
+        symbol:=getSelectedSymbol();
+        if (form1.shortDistant.checked) then isDistant:=1;
+        if (form1.ShortReenter.checked) then allowReenter:=1;
+        setGridOptions(symbol,0,isDistant,allowReenter);
      end;
 end;
+
+procedure TForm1.LongDistantClick(Sender: TObject);
+begin
+       LongDistant.Checked:=not longDistant.Checked;
+       updateGridLongOptions();
+end;
+
+procedure TForm1.LongReenterClick(Sender: TObject);
+begin
+     LongReenter.Checked:=not LongReenter.Checked;
+     updateGridLongOptions();
+end;
+
+procedure TForm1.ShortDistantClick(Sender: TObject);
+begin
+     ShortDistant.checked := not shortDistant.checked;
+     updateGridShortOptions();
+end;
+
+procedure TForm1.ShortReenterClick(Sender: TObject);
+begin
+     ShortReenter.Checked:= not ShortReenter.checked;
+     updateGridShortOptions();
+end;
+
 
 procedure _setLotMultiplierForMicrolot(multiplier:integer);
 var symbol:pchar;
@@ -177,19 +229,7 @@ begin
      _setLotMultiplierForMicrolot(5);
 end;
 
-procedure TForm1.ShortDistantClick(Sender: TObject);
-var symbol:pchar;
-    isDistant:integer;
-begin
-     if (form1.listbox1.itemindex>=0) then
-     begin
-       symbol:=getSelectedSymbol();
-       ShortDistant.checked := not shortDistant.checked;
-       isDistant:=0;
-       if (shortDistant.checked) then isDistant:=1;
-       setGridOptions(symbol,0,isDistant);
-     end;
-end;
+
 
 procedure checkProfits();
 const myFormat:string='0.00';
