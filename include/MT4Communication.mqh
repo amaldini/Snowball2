@@ -188,7 +188,7 @@ void tradeGrid(int isMaster) {
          for (int j=0;j<numOrders;j++) {
             if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip*4/5) {
                bool isPendingOrder = (orderTypes[j]==OP_BUYSTOP || orderTypes[j]==OP_SELLSTOP);
-               if ((currentLots+orderLots[j])>adjustedLotSize && isPendingOrder) {
+               if ((currentLots+orderLots[j])>adjustedLotSize && isPendingOrder && (allowReenter==0)) {
                   orderDeleteReliable(tickets[j]);
                   orderLots[j]=0;
                } else {
