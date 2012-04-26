@@ -94,7 +94,8 @@ void tradeGrid(int isMaster) {
    double openPrices[];
    double orderLots[];
    double orderProfits[];
-   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes,orderLots,orderProfits);
+   double orderTP[];
+   int numOrders = getOpenOrderPrices(magic,tickets,openPrices,orderTypes,orderLots,orderProfits,orderTP);
    
    int i;
    int danglers=0;
@@ -300,7 +301,7 @@ void gridSell(double price,double numLots) {
    sellStop(numLots, price, sl, tp, magic, comment, "gridSell");
 }
 
-int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTypes[],double& orderLots[],double& orderProfits[]) {
+int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTypes[],double& orderLots[],double& orderProfits[],double& orderTP[]) {
    
    // int numOpenOrders = getNumOpenOrders(-1,magic);
    // if (numOpenOrders<=0) return(0);
@@ -317,6 +318,7 @@ int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTyp
    ArrayResize(orderTypes,total);
    ArrayResize(orderLots,total);
    ArrayResize(orderProfits,total);
+   ArrayResize(orderTP,total);
    
    // collect order tickets and prices
    int idx=0;
@@ -327,6 +329,7 @@ int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTyp
          tickets[idx] = OrderTicket();
          prices[idx] = OrderOpenPrice();
          orderLots[idx] = OrderLots();
+         orderTP[idx] = OrderTakeProfit();
          if (orderTypes[idx]==OP_BUY || orderTypes[idx]==OP_SELL) orderProfits[idx]=OrderProfit();
          idx++;
       }
