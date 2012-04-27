@@ -15,8 +15,8 @@ extern int stop_distance = 5;
 extern int min_stop_distance = 10;
 extern bool dynamicStopDistance = false;
 ////////////////////////////////////////
-extern double profit_target = 20;
-extern int auto_tp = 2; // auto-takeprofit this many levels (roughly) above the BE point
+// extern double profit_target = 20;
+// extern int auto_tp = 2; // auto-takeprofit this many levels (roughly) above the BE point
 extern bool stopWhenAutoTP=true;
 ////////////////////////////////////////
 extern bool useBreakEven=false;
@@ -72,7 +72,7 @@ extern double RISK_STOPDISTANCE_DIVISOR = 1;
 extern bool NO_STOPS = false;
 extern double MAX_SPREAD_PIPS = 2.5;
 
-extern double ACCOUNT_PROFIT_TARGET = 30;
+// extern double ACCOUNT_PROFIT_TARGET = 30;
 
 extern bool is_ecn_broker = false; // different market order procedure when resuming after pause
 
@@ -100,8 +100,6 @@ int level; // current level, signed, minus=short, calculated in trade()
 double realized; // total realized (all time) (calculated in info())
 double cycle_total_profit; // total profit since cycle started (calculated in info())
 double stop_value; // dollars (account) per single level (calculated in info())
-double auto_tp_price; // the price where auto_tp should trigger, calculated during break even calc.
-double auto_tp_profit; // rough estimation of auto_tp profit, calculated during break even calc.
 
 bool start_immediately;
 bool stopAlreadyReduced;
@@ -1155,10 +1153,10 @@ void onTick(){
    trade();
    tradeRenko();
    info(); // calcola lastFloating
-   checkAutoTP();
+   // checkAutoTP();
    checkStopToBreakEven();
    checkBreakEven2();
-   checkProfitTarget(); // usa lastFloating
+   // checkProfitTarget(); // usa lastFloating
    checkExitBars();
    checkMA();
    
@@ -1820,6 +1818,7 @@ void toggleBreakOut() {
    ObjectDelete("toggle_breakout2");
 }
 
+/*
 void checkAutoTP(){
    if (auto_tp > 0 && auto_tp_price > 0){
       if (level > 0 && Close[0] >= auto_tp_price){
@@ -1840,6 +1839,7 @@ void checkAutoTP(){
       }
    }
 }
+*/
 
 void checkStopToBreakEven() {
    static int maxLevel = 0;
@@ -1900,6 +1900,7 @@ void checkStopToBreakEven() {
    }
 }
 
+/*
 void checkProfitTarget() {
    if (profit_target>0 && lastFloating>profit_target) {
       closeTrades("checkProfitTarget",magic);
@@ -1908,6 +1909,7 @@ void checkProfitTarget() {
       closeTrades("checkProfitTarget(AccountProfit)",-1);
    } 
 }
+*/
 
 void placeLine(double price){
    horizLine("last_order", price, clr_gridline, SP + "grid position");
@@ -2009,7 +2011,7 @@ void trade(){
             }
             placeLine(Ask);
             start = Ask;
-            plotBreakEven();
+            // plotBreakEven();
             if (sound_grid_trail != ""){
                PlaySound(sound_grid_trail);
             }
@@ -2025,7 +2027,7 @@ void trade(){
             }
             placeLine(Bid);
             start = Bid;
-            plotBreakEven();
+            // plotBreakEven();
             if (sound_grid_trail != ""){
                PlaySound(sound_grid_trail);
             }
@@ -2374,7 +2376,7 @@ void info(){
    double floating;
    double pb, lp, tp;
    static int last_ticket;
-   static datetime last_be_plot = 0; 
+    
    int ticket;
    string dir;
    
@@ -2386,8 +2388,6 @@ void info(){
       realized = getProfitRealized(magic);
       last_ticket = ticket;
       
-      // enforce a new break-even arrow plot immediately
-      last_be_plot = 0;
    } else {
       // Print("Last ticket:",ticket,"GetProfitRealized:",getProfitRealized(magic),"getGlobal(realized)",getGlobal("realized"),"Realized:",realized);
    }
@@ -2438,8 +2438,6 @@ void info(){
            "\n" + SP + "every stop equals " + DoubleToStr(stop_value, 2) + " " + AccountCurrency() +
            "\n" + SP + "realized: " + DoubleToStr(realized - getGlobal("realized"), 2) + "  floating: " + DoubleToStr(floating, 2) +
            "\n" + SP + "profit: " + DoubleToStr(cycle_total_profit, 2) + " " + AccountCurrency() + "  current level: " + level_abs +
-           "\n" + SP + "auto-tp: " + auto_tp + " levels (" + DoubleToStr(auto_tp_price, Digits) + ", " + DoubleToStr(auto_tp_profit, 2) + " " + AccountCurrency() + ")" +
-           "\n" + SP + "profit target: "+ DoubleToStr(profit_target,2) + " AccountProfit target: "+DoubleToStr(ACCOUNT_PROFIT_TARGET,2) +
            "\n" + SP + "Trading enabled from " + START_HOUR + ":" + START_MINUTES + " to " + END_HOUR + ":" + END_MINUTES + " local time"+stoppedInfo+
            "\n" + SP + "Stop for 1 percent risk: " + DoubleToStr(STOP_FOR_1_PERCENT_RISK(),3) + " / "+ DoubleToStr(RISK_STOPDISTANCE_DIVISOR,1) + 
            "\n" + SP + "IS RENKO CHART: " + IS_RENKO_CHART + " AUTOTRADE:" + RENKO_AUTO_TRADE +  " USE_TAKEPROFIT:"+RENKO_USE_TAKEPROFIT+
@@ -2449,10 +2447,6 @@ void info(){
                        " Master or Slave:"+masterOrSlave+
            "\n" + stringToAppendToInfo);
 
-   if (last_be_plot == 0 || TimeCurrent() - last_be_plot > 300){ // every 5 minutes
-      plotBreakEven();
-      last_be_plot = TimeCurrent();
-   }
 
    // If you put a text object (not a label!) with the name "profit",  
    // anywhere on the chart then this can be used as a profit calculator.
@@ -2544,6 +2538,7 @@ void plotBreakEvenArrow(string arrow_name, double price){
 * FIXME: This whole break even calculation sucks comets through drinking straws!
 * FIXME: Isn't there a more elegant way to calculate break even?
 */
+/*
 void plotBreakEven(){
 
    double base = getPyramidBase();
@@ -2620,6 +2615,7 @@ void plotBreakEven(){
       auto_tp_profit = 0;
    }
 }
+*/
 
 /**
 * return the entry price of the first order of the pyramid.
