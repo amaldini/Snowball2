@@ -22,6 +22,9 @@ bool setBalance_NAV_UsedMargin(int isMaster,double balance, double NAV,double us
 bool setExposure(string symbolName,int isMaster,double exposureLots);
 double getExposure(string symbolName,int isMaster);  
 
+bool setCloseOpenTrades(string symbolName,int isMaster,int isClose);
+bool getCloseOpenTrades(string symbolName,int isMaster);  
+
 #include <common_functions.mqh>
 
 double pip;
@@ -37,6 +40,19 @@ extern double GRID_TAKEPROFIT = 200; // pips
 extern double GRID_STOP_PIPS = 200; // pips
 
 extern double maxExposureLots = 0.08;
+
+extern double ANTIGRID_TRADING_STEP = 10; // pips
+extern double ANTIGRID_TRADING_PENDINGORDERS = 3;
+extern double ANTIGRID_TAKEPROFIT = 200; // pips
+extern double ANTIGRID_STOP_PIPS = 200; // pips
+
+bool isAntiGridTrade(double openPrice, double TP) {
+   if (MathAbs(TP-openPrice)>pip*120) {
+      return(true);
+   } else { 
+      return(false);
+   }
+}
 
 /**
 * move all entry orders by the amount of d
@@ -215,6 +231,11 @@ void tradeGrid(int isMaster) {
       }
    }
    
+   if (getCloseOpenTrades(Symbol6(),isMaster)) {
+      closeOpenOrders(OP_BUY,magic,"command issued by controlpanel");
+      closeOpenOrders(OP_SELL,magic,"command issued by controlpanel");
+      setCloseOpenTrades(Symbol6(),isMaster,0);
+   }
    
    maldaLog("tradeGrid("+ danglers +") danglers");
 }
@@ -224,7 +245,7 @@ void tradeGrid_Slave() {
 }
 
 void tradeGrid_Master() {
-   tradeGrid(1);
+   tradeGrid(1);   
 }
 
 void GR_TrailStops() {

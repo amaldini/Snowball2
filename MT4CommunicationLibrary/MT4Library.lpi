@@ -38,11 +38,10 @@
         <Filename Value="MT4Library.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="MT4Library"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
-        <CursorPos X="13" Y="27"/>
+        <CursorPos X="3" Y="29"/>
         <UsageCount Value="57"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -85,6 +84,7 @@
         <Filename Value="mt4communication.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="MT4Communication"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
         <TopLine Value="36"/>

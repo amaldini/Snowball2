@@ -16,7 +16,11 @@ type
     Button1: TButton;
     btnCloseLong: TButton;
     btnCloseShort: TButton;
+    ButtonCalcTargetNAV: TButton;
     ButtonCloseAll: TButton;
+    txtProfitTarget: TEdit;
+    Label2: TLabel;
+    lblTargetNAV: TLabel;
     lblProfits: TLabel;
     MainMenu1: TMainMenu;
     GridDistance: TMenuItem;
@@ -48,8 +52,10 @@ type
     procedure Button1Click(Sender: TObject);
     procedure btnCloseLongClick(Sender: TObject);
     procedure btnCloseShortClick(Sender: TObject);
+    procedure ButtonCalcTargetNAVClick(Sender: TObject);
     procedure ButtonCloseAllClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure Label2Click(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure LongDistantClick(Sender: TObject);
     procedure Lots001Click(Sender: TObject);
@@ -69,7 +75,9 @@ type
   end; 
 
 var
-  Form1: TForm1; 
+  Form1: TForm1;
+  currentNav:double;
+  targetNav:double;
 
 implementation
 
@@ -256,6 +264,25 @@ begin
      Form1.lblProfits.caption := text;
 end;
 
+procedure calcNewTargetNAV();
+begin
+     targetNav := currentNav+StrToFloat(Form1.txtProfitTarget.text);
+     Form1.lblTargetNav.Caption:='Target NAV: '+FormatFloat('0.00',targetNav);
+end;
+
+procedure closeOpenTrades();
+var i:integer;
+    symbol:ansistring;
+begin
+     for i := 0 to form1.listbox1.count-1 do
+     begin
+          symbol:=form1.listbox1.items[i];
+          setCloseOpenTrades(PChar(symbol),0,1);
+          setCloseOpenTrades(PChar(symbol),1,1);
+     end;
+     form1.statusbar1.SimpleText:='Closing open trades.';
+end;
+
 procedure TForm1.Timer1Timer(Sender: TObject);
 const myFormat:string='#.00';
 var Balance1,nav1,usedmargin1:double;
@@ -277,14 +304,26 @@ begin
                                  formatFloat(myFormat,nav2)+sLineBreak+
                                  sLineBreak+
                                  formatFloat(myFormat,usedMargin2);
+     currentNav := nav1+nav2;
      lblTotals.caption :=
                                  formatFloat(myFormat,Balance1+Balance2)+sLineBreak+
                                  sLineBreak+
-                                 formatFloat(myFormat,nav1+nav2)+sLineBreak+
+                                 formatFloat(myFormat,currentNav)+sLineBreak+
                                  sLineBreak+
                                  formatFloat(myFormat,usedMargin1+usedMargin2);
 
      checkProfits();
+
+     if (nav1>0) and (nav2>0) and (targetNAV=0) then
+     begin
+          calcNewTargetNAV();
+     end;
+
+     if (currentNav>targetNAV) then
+     begin
+          closeOpenTrades();
+          calcNewTargetNAV();
+     end;
 
 end;
 
@@ -337,6 +376,11 @@ begin
   statusbar1.SimpleText :='Close command issued for '+symbol+' SLAVE';
 end;
 
+procedure TForm1.ButtonCalcTargetNAVClick(Sender: TObject);
+begin
+     calcNewTargetNAV();
+end;
+
 procedure TForm1.ButtonCloseAllClick(Sender: TObject);
 var i:integer;
     symbol:ansistring;
@@ -354,8 +398,14 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
+     targetNav:=0;
      setBalance_NAV_UsedMargin(0,-1,-1,-1);
      setBalance_NAV_UsedMargin(1,-1,-1,-1);
+end;
+
+procedure TForm1.Label2Click(Sender: TObject);
+begin
+
 end;
 
 end.

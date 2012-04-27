@@ -30,6 +30,9 @@ function setMultiplierForMicroLot(symbolName:PChar;multiplier:integer):boolean;s
 function setProfits(symbolName:PChar;isMaster:integer;profits:double):boolean;stdcall;
 function getProfits(symbolName:PChar;isMaster:integer):double;stdcall;
 
+function setCloseOpenTrades(symbolName:PChar;isMaster:integer;isClose:integer):boolean;stdcall;
+function getCloseOpenTrades(symbolName:PChar;isMaster:integer):boolean;stdcall;
+
 implementation
 
 uses
@@ -39,6 +42,41 @@ function appendMasterTagToSymbolName(isMaster:integer;symbolName:PChar):ansistri
 begin
      if (isMaster<>0) then result:=AnsiString(symbolName)+'_MASTER'
      else result:=AnsiString(symbolName);
+end;
+
+function setCloseOpenTrades(symbolName:PChar;isMaster:integer;isClose:integer):boolean;stdcall;
+var entry:ansistring;
+begin
+   With TRegistry.Create do
+   try
+      RootKey:=HKEY_CURRENT_USER;
+      entry:=appendMasterTagToSymbolName(isMaster,symbolName);
+      if OpenKey('Software\VB and VBA Program Settings\MT4Channel\CloseOpenTrades',true) then
+         WriteInteger(entry,isClose);
+      finally
+         free;
+      end;
+   result:=true;
+end;
+
+function getCloseOpenTrades(symbolName:PChar;isMaster:integer):boolean;stdcall;
+var entry:ansistring;
+    resInteger:integer;
+begin
+     result:=false; // default
+     With TRegistry.Create do
+       try
+         RootKey:=HKEY_CURRENT_USER;
+         entry:=appendMasterTagToSymbolName(isMaster,symbolName);
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\CloseOpenTrades') then
+         If ValueExists(entry) then
+         begin
+            resInteger:=ReadInteger(entry);
+            if (resInteger<>0) then result:=true;
+         end;
+       finally
+         free;
+       end;
 end;
 
 function setProfits(symbolName:PChar;isMaster:integer;profits:double):boolean;stdcall;

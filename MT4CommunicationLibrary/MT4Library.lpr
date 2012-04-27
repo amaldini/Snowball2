@@ -24,7 +24,9 @@ exports
   setMultiplierForMicroLot,
   setExposure,
   getExposure,
-  setProfits;
+  setProfits,
+  setCloseOpenTrades,
+  getCloseOpenTrades;
 
 {$IFDEF TESTING}
 

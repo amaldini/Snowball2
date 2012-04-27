@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 364
+  Left = 325
   Height = 272
-  Top = 235
+  Top = 321
   Width = 582
   Caption = 'SnowBall ControlPanel'
   ClientHeight = 252
@@ -178,10 +178,10 @@ object Form1: TForm1
   end
   object lblProfits: TLabel
     Left = 368
-    Height = 191
+    Height = 153
     Top = 8
     Width = 51
-    Caption = 'Profits'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'
+    Caption = 'Profits'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'#13#10'-'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
     Font.Height = -16
@@ -192,14 +192,55 @@ object Form1: TForm1
     ParentColor = False
     ParentFont = False
   end
+  object Label2: TLabel
+    Left = 373
+    Height = 14
+    Top = 181
+    Width = 66
+    Caption = 'Profit Target:'
+    ParentColor = False
+    OnClick = Label2Click
+  end
+  object txtProfitTarget: TEdit
+    Left = 448
+    Height = 32
+    Top = 168
+    Width = 64
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -21
+    Font.Name = 'Arial'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentFont = False
+    TabOrder = 6
+    Text = '20'
+  end
+  object ButtonCalcTargetNAV: TButton
+    Left = 520
+    Height = 21
+    Top = 174
+    Width = 51
+    Caption = 'Calc'
+    OnClick = ButtonCalcTargetNAVClick
+    TabOrder = 7
+  end
+  object lblTargetNAV: TLabel
+    Left = 373
+    Height = 14
+    Top = 208
+    Width = 135
+    Caption = 'Target NAV: ____________'
+    ParentColor = False
+  end
   object Timer1: TTimer
     OnTimer = Timer1Timer
     left = 72
     top = 104
   end
   object MainMenu1: TMainMenu
-    left = 298
-    top = 48
+    left = 288
+    top = 40
     object GridDistance: TMenuItem
       Caption = 'Grid Distance'
       object LongDistant: TMenuItem
