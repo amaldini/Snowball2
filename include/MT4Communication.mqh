@@ -63,12 +63,18 @@ bool isAntiGridTrade(double openPrice, double TP) {
 */
 void moveOrders_GRID(double d){
    int i;
+   
+   double maxOffset = (1+GRID_TRADING_PENDINGORDERS) * GRID_TRADING_STEP * pip;
+   
+   if (distant) maxOffset += GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS;
+   
    for(i=0; i<OrdersTotal(); i++){
       OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
       int otype = OrderType();
       if ((otype!=OP_SELL) && (otype!=OP_BUY)) { 
          if (isMyOrder(magic)){
-            if (MathAbs(OrderOpenPrice() - ((Bid+Ask)/2)) > (1+GRID_TRADING_PENDINGORDERS) * GRID_TRADING_STEP * pip){
+            if (MathAbs(OrderOpenPrice() - ((Bid+Ask)/2)) > maxOffset){
+               maldaLog("Deleting too distant order");
                orderDeleteReliable(OrderTicket());
             }else{
                maldaLog("GRID: moving order "+OrderTicket()+" by "+DoubleToStr(d,Digits));
