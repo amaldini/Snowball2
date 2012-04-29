@@ -162,7 +162,7 @@ void tradeGrid(int isMaster) {
    double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
    
    
-   if (distant && (numOrders>0) && (danglers==0)) {
+   if (distant && (numOrders>0) && (exposure<0.0001)) {
        double delta;
        if (isMaster==0 && (max<Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)) {
          delta = (Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)-max;
