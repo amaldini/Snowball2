@@ -33,6 +33,10 @@ string comment;
 int magic;
 string stringToAppendToInfo;
 
+
+bool distant=true;
+bool allowReenter=false;
+
 extern bool GRID_TRADING = true;
 extern double GRID_TRADING_STEP = 10; // pips
 extern int GRID_TRADING_PENDINGORDERS = 3;
@@ -151,25 +155,21 @@ void tradeGrid(int isMaster) {
    
    double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
    
-   int distant[2];
-   distant[0]=0;
-   int allowReenter = 0;
-   if (getGridOptions(Symbol6(),isMaster,distant)) {
-      allowReenter = distant[1];
-      if (distant[0]!=0 && numOrders>0 && danglers==0) {
-          double delta;
-          if (isMaster==0 && (max<Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)) {
-            delta = (Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)-max;
-            moveOrders_GRID(delta); 
-            for (i=0;i<numOrders;i++) openPrices[i]+=delta;
-          }
-          if (isMaster==1 && (min>Ask+GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)) {
-            delta = -(min-(Ask+GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS));
-            moveOrders_GRID(delta);   
-            for (i=0;i<numOrders;i++) openPrices[i]+=delta;
-          }   
-      }
-   }  
+   
+   if (distant && (numOrders>0) && (danglers==0)) {
+       double delta;
+       if (isMaster==0 && (max<Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)) {
+         delta = (Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)-max;
+         moveOrders_GRID(delta); 
+         for (i=0;i<numOrders;i++) openPrices[i]+=delta;
+       }
+       if (isMaster==1 && (min>Ask+GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)) {
+         delta = -(min-(Ask+GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS));
+         moveOrders_GRID(delta);   
+         for (i=0;i<numOrders;i++) openPrices[i]+=delta;
+       }   
+   }
+
    
    if (numOrders == 0) {
       gridStart = NormalizeDouble((Ask+Bid)/2,Digits);
@@ -190,12 +190,12 @@ void tradeGrid(int isMaster) {
       
       if (isMaster==0) {
          price = NormalizeDouble(gridStart-GRID_TRADING_STEP*i*pip,Digits);
-         condition1 = (price<Bid && distant[0]==0); 
-         condition2 = (price<(Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS) && distant[0]!=0);
+         condition1 = (price<Bid && !distant); 
+         condition2 = (price<(Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS) && distant);
       } else {
          price = NormalizeDouble(gridStart+GRID_TRADING_STEP*i*pip,Digits);
-         condition1 = (price>Ask && distant[0]==0); 
-         condition2 = (price>(Ask+GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS) && distant[0]!=0);
+         condition1 = (price>Ask && !distant); 
+         condition2 = (price>(Ask+GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS) && distant);
       }
       
       if (condition1 || condition2) {
@@ -205,7 +205,7 @@ void tradeGrid(int isMaster) {
          for (int j=0;j<numOrders;j++) {
             if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip*4/5) {
                bool isPendingOrder = (orderTypes[j]==OP_BUYSTOP || orderTypes[j]==OP_SELLSTOP);
-               if ((currentLots+orderLots[j])>adjustedLotSize && isPendingOrder && (allowReenter==0)) {
+               if ((currentLots+orderLots[j])>adjustedLotSize && isPendingOrder && (!allowReenter)) {
                   orderDeleteReliable(tickets[j]);
                   orderLots[j]=0;
                } else {
@@ -217,7 +217,7 @@ void tradeGrid(int isMaster) {
             }
          }
          double lotsForOrder = adjustedLotSize-currentLots;
-         if (allowReenter!=0 && (pendingLots<0.0001)) lotsForOrder = 0.01;
+         if (allowReenter && (pendingLots<0.0001)) lotsForOrder = 0.01;
          if (lotsForOrder>0.0001) {
             if (isMaster==0) {
                gridSell(price,lotsForOrder);
@@ -240,11 +240,25 @@ void tradeGrid(int isMaster) {
    maldaLog("tradeGrid("+ danglers +") danglers");
 }
 
+
+void readDistantAndAllowReenter(int isMaster) {
+   int i[2];
+   i[0]=0;
+   allowReenter = false;
+   distant = true;
+   if (getGridOptions(Symbol6(),isMaster,i)) {
+      if (i[0]==0) distant = false;
+      if (i[1]!=0) allowReenter = true;
+   }
+}
+
 void tradeGrid_Slave() {
+   readDistantAndAllowReenter(0);
    tradeGrid(0);
 }
 
 void tradeGrid_Master() {
+   readDistantAndAllowReenter(1);
    tradeGrid(1);   
 }
 
