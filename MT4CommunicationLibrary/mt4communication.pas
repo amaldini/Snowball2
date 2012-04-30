@@ -18,6 +18,9 @@ function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
 function getAntiGridOptions(symbolName:PChar;isMaster:integer;var distant:tiPair):boolean;stdcall;
 function setAntiGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer;allowReenter:integer):boolean;stdcall;
 
+function setGridOptions(symbolName:PChar;enable:integer;gridBottom:double;gridTop:double):boolean;stdcall;
+function getGridOptions(symbolName:PChar;var enable:tiPair;var bottomAndTop:TD_Terna):boolean;stdcall;
+
 function setExposure(symbolName:PChar;isMaster:integer;exposureLots:double):boolean;stdcall;
 function getExposure(symbolName:PChar;isMaster:integer):double;stdcall;
 
@@ -419,6 +422,14 @@ begin
 
   list.free;
 
+end;
+
+function setGridOptions(symbolName:PChar;enable:integer;gridBottom:double;gridTop:double):boolean;stdcall;
+begin
+end;
+
+function getGridOptions(symbolName:PChar;var enable:tiPair;var bottomAndTop:TD_Terna):boolean;stdcall;
+begin
 end;
 
 end.

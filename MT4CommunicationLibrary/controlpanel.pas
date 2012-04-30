@@ -86,6 +86,9 @@ var
   currentNav:double;
   targetNav:double;
 
+  gridBottom:double;
+  gridTop:double;
+
 implementation
 
 {$R *.lfm}
@@ -154,7 +157,7 @@ begin
      result:=PChar(form1.listbox1.getSelectedText);
 end;
 
-procedure updateGridLongOptions();
+procedure updateAntiGridLongOptions();
 var symbol:pchar;
     isDistant:integer;
     allowReenter:integer;
@@ -169,7 +172,7 @@ begin
   end;
 end;
 
-procedure updateGridShortOptions();
+procedure updateAntiGridShortOptions();
 var symbol:pchar;
     isDistant:integer;
     allowReenter:integer;
@@ -184,25 +187,39 @@ begin
      end;
 end;
 
+procedure updateGridOptions();
+var symbol:pchar;
+    enable:integer;
+begin
+     if (form1.listbox1.itemindex>=0) then
+     begin
+        enable:=0;
+        symbol:=getSelectedSymbol();
+        if (form1.GridEnable.Checked) then enable:=1;
+        setGridOptions(symbol,enable,gridBottom,gridTop);
+     end;
+end;
+
 procedure TForm1.LongDistantClick(Sender: TObject);
 begin
        LongDistant.Checked:=not longDistant.Checked;
-       updateGridLongOptions();
+       updateAntiGridLongOptions();
 end;
 
 procedure TForm1.LongReenterClick(Sender: TObject);
 begin
      LongReenter.Checked:=not LongReenter.Checked;
-     updateGridLongOptions();
+     updateAntiGridLongOptions();
 end;
 
 procedure TForm1.GridSetTopPriceClick(Sender: TObject);
 var responseStr : string;
     price:double;
 begin
-     responseStr := inputbox('Grid ', 'Top price', '');
+     if (inputQuery('Grid ', 'Top price', responseStr)) then
      try
-        price:=StrToFloat(responseStr);
+        gridTop:=StrToFloat(responseStr);
+        updateGridOptions();
      except
        on E:Exception do
           ShowMessage(E.Message);
@@ -213,9 +230,10 @@ procedure TForm1.GridSetBottomPriceClick(Sender: TObject);
 var responseStr : string;
     price:double;
 begin
-     responseStr := inputbox('Grid ', 'Bottom price', '');
+     if (inputQuery('Grid ', 'Bottom price', responseStr)) then
      try
-        price:=StrToFloat(responseStr);
+        gridBottom:=StrToFloat(responseStr);
+        updateGridOptions();
      except
        on E:Exception do
           ShowMessage(E.Message);
@@ -230,13 +248,13 @@ end;
 procedure TForm1.ShortDistantClick(Sender: TObject);
 begin
      ShortDistant.checked := not shortDistant.checked;
-     updateGridShortOptions();
+     updateAntiGridShortOptions();
 end;
 
 procedure TForm1.ShortReenterClick(Sender: TObject);
 begin
      ShortReenter.Checked:= not ShortReenter.checked;
-     updateGridShortOptions();
+     updateAntiGridShortOptions();
 end;
 
 
