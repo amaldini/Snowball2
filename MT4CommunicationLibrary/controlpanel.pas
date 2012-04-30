@@ -18,12 +18,16 @@ type
     btnCloseShort: TButton;
     ButtonCalcTargetNAV: TButton;
     ButtonCloseAll: TButton;
+    MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
+    MenuItem5: TMenuItem;
     txtProfitTarget: TEdit;
     Label2: TLabel;
     lblTargetNAV: TLabel;
     lblProfits: TLabel;
     MainMenu1: TMainMenu;
-    GridDistance: TMenuItem;
+    AntiGridOptions: TMenuItem;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     Label1: TLabel;

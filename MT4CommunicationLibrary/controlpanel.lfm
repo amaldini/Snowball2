@@ -241,8 +241,8 @@ object Form1: TForm1
   object MainMenu1: TMainMenu
     left = 288
     top = 40
-    object GridDistance: TMenuItem
-      Caption = 'Grid Distance'
+    object AntiGridOptions: TMenuItem
+      Caption = 'AntiGrid'
       object LongDistant: TMenuItem
         Caption = 'Long distant'
         OnClick = LongDistantClick
@@ -297,6 +297,18 @@ object Form1: TForm1
         GroupIndex = 1
         RadioItem = True
         OnClick = Lots005Click
+      end
+    end
+    object MenuItem2: TMenuItem
+      Caption = 'Grid'
+      object MenuItem3: TMenuItem
+        Caption = 'Set Top Price'
+      end
+      object MenuItem4: TMenuItem
+        Caption = 'Set Bottom Price'
+      end
+      object MenuItem5: TMenuItem
+        Caption = 'Enable'
       end
     end
   end
