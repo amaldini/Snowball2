@@ -603,7 +603,7 @@ void tradeRenko() {
    if (isSlaveAccount()) {
    
       if (GRID_TRADING) {
-         tradeGrid_Slave();
+         tradeGridAndAntiGrid(0); // slave
          return;
       }
    
@@ -612,7 +612,7 @@ void tradeRenko() {
    }
    
    if (GRID_TRADING) {
-      tradeGrid_Master();
+      tradeGridAndAntiGrid(1); // master
       return;
    }
 

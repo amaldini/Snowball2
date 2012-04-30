@@ -38,6 +38,18 @@ bool distant=true;
 bool allowReenter=false;
 
 extern bool GRID_TRADING = true;
+
+
+double GRID_STEP;
+int GRID_PENDINGORDERS;
+double GRID_TP;
+double GRID_STOP;
+
+double GRID_CENTER;
+double GRID_HEIGHT_PIPS;
+
+bool isGrid;
+
 extern double GRID_TRADING_STEP = 10; // pips
 extern int GRID_TRADING_PENDINGORDERS = 3;
 extern double GRID_TAKEPROFIT = 200; // pips
@@ -64,9 +76,9 @@ bool isAntiGridTrade(double openPrice, double TP) {
 void moveOrders_GRID(double d){
    int i;
    
-   double maxOffset = (1+GRID_TRADING_PENDINGORDERS) * GRID_TRADING_STEP * pip;
+   double maxOffset = (1+GRID_PENDINGORDERS) * GRID_STEP * pip;
    
-   if (distant) maxOffset += GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS;
+   if (distant) maxOffset += GRID_STEP*pip*GRID_PENDINGORDERS;
    
    for(i=0; i<OrdersTotal(); i++){
       OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
@@ -164,13 +176,13 @@ void tradeGrid(int isMaster) {
    
    if (distant && (numOrders>0) && (exposure<0.0001)) {
        double delta;
-       if (isMaster==0 && (max<Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)) {
-         delta = (Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)-max;
+       if (isMaster==0 && (max<Bid-GRID_STEP*pip*GRID_PENDINGORDERS)) {
+         delta = (Bid-GRID_STEP*pip*GRID_PENDINGORDERS)-max;
          moveOrders_GRID(delta); 
          for (i=0;i<numOrders;i++) openPrices[i]+=delta;
        }
-       if (isMaster==1 && (min>Ask+GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS)) {
-         delta = -(min-(Ask+GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS));
+       if (isMaster==1 && (min>Ask+GRID_STEP*pip*GRID_PENDINGORDERS)) {
+         delta = -(min-(Ask+GRID_STEP*pip*GRID_PENDINGORDERS));
          moveOrders_GRID(delta);   
          for (i=0;i<numOrders;i++) openPrices[i]+=delta;
        }   
@@ -189,19 +201,19 @@ void tradeGrid(int isMaster) {
       maldaLog("exposure>maxExposureLots!");
    }
    
-   for (i = -20;i<20 && nLevels<GRID_TRADING_PENDINGORDERS;i++) {
+   for (i = -20;i<20 && nLevels<GRID_PENDINGORDERS;i++) {
       double price;
       bool condition1;
       bool condition2;
       
-      if (isMaster==0) {
-         price = NormalizeDouble(gridStart-GRID_TRADING_STEP*i*pip,Digits);
+      if (isMaster==0) { // SHORT
+         price = NormalizeDouble(gridStart-GRID_STEP*i*pip,Digits);
          condition1 = (price<Bid && !distant); 
-         condition2 = (price<(Bid-GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS) && distant);
-      } else {
-         price = NormalizeDouble(gridStart+GRID_TRADING_STEP*i*pip,Digits);
+         condition2 = (price<(Bid-GRID_STEP*pip*GRID_PENDINGORDERS) && distant);
+      } else {           // LONG
+         price = NormalizeDouble(gridStart+GRID_STEP*i*pip,Digits);
          condition1 = (price>Ask && !distant); 
-         condition2 = (price>(Ask+GRID_TRADING_STEP*pip*GRID_TRADING_PENDINGORDERS) && distant);
+         condition2 = (price>(Ask+GRID_STEP*pip*GRID_PENDINGORDERS) && distant);
       }
       
       if (condition1 || condition2) {
@@ -209,7 +221,7 @@ void tradeGrid(int isMaster) {
          double currentLots = 0;
          double pendingLots = 0;
          for (int j=0;j<numOrders;j++) {
-            if (MathAbs(openPrices[j]-price)<GRID_TRADING_STEP*pip*4/5) {
+            if (MathAbs(openPrices[j]-price)<GRID_STEP*pip*4/5) {
                bool isPendingOrder = (orderTypes[j]==OP_BUYSTOP || orderTypes[j]==OP_SELLSTOP);
                if ((currentLots+orderLots[j])>adjustedLotSize && isPendingOrder && (!allowReenter)) {
                   orderDeleteReliable(tickets[j]);
@@ -258,22 +270,35 @@ void readDistantAndAllowReenter(int isMaster) {
    }
 }
 
-void tradeGrid_Slave() {
-   readDistantAndAllowReenter(0);
-   tradeGrid(0);
-}
-
-void tradeGrid_Master() {
-   readDistantAndAllowReenter(1);
-   tradeGrid(1);   
+void tradeGridAndAntiGrid(int isMaster) {
+   readDistantAndAllowReenter(isMaster);
+   
+   GRID_STEP = ANTIGRID_TRADING_STEP;
+   GRID_PENDINGORDERS = ANTIGRID_TRADING_PENDINGORDERS;
+   GRID_TP = ANTIGRID_TAKEPROFIT;
+   GRID_STOP = ANTIGRID_STOP_PIPS;
+   
+   isGrid = false; // ANTIGRID
+   tradeGrid(isMaster);
+   
+   distant = false;
+   allowReenter = false; 
+   
+   GRID_STEP = GRID_TRADING_STEP;
+   GRID_PENDINGORDERS = GRID_TRADING_PENDINGORDERS;
+   GRID_TP = GRID_TAKEPROFIT;
+   GRID_STOP = GRID_STOP_PIPS;
+   
+   isGrid = true; // GRID
+   // tradeGrid(isMaster);
 }
 
 void GR_TrailStops() {
    /*
-   double GRID_BreakEven = GRID_TRADING_STEP*3;
-   double GRID_LockGainPips = GRID_TRADING_STEP;
-   double GRID_BreakEven2 = GRID_TRADING_STEP * 6;
-   double GRID_LockGainPips2 = GRID_TRADING_STEP * 3;
+   double GRID_BreakEven = GRID_STEP*3;
+   double GRID_LockGainPips = GRID_STEP;
+   double GRID_BreakEven2 = GRID_STEP * 6;
+   double GRID_LockGainPips2 = GRID_STEP * 3;
    GRID_TrailStops(pip,GRID_BreakEven, GRID_LockGainPips,GRID_BreakEven2,GRID_LockGainPips2);
    */
 }
@@ -330,15 +355,15 @@ void GRID_TrailStops(double pip,double BreakEven, double LockGainPips,double Bre
 
 void gridBuy(double price,double numLots) {
    double sl=0,tp=0;
-   sl = NormalizeDouble(price - pip * GRID_STOP_PIPS,Digits);
-   tp = price + pip * GRID_TAKEPROFIT;  
+   sl = NormalizeDouble(price - pip * GRID_STOP,Digits);
+   tp = price + pip * GRID_TP;  
    buyStop(numLots, price, sl, tp, magic, comment, "gridBuy");
 }
 
 void gridSell(double price,double numLots) {
    double sl=0,tp=0;
-   sl = NormalizeDouble(price + pip * GRID_STOP_PIPS,Digits);
-   tp = price - pip * GRID_TAKEPROFIT;
+   sl = NormalizeDouble(price + pip * GRID_STOP,Digits);
+   tp = price - pip * GRID_TP;
    sellStop(numLots, price, sl, tp, magic, comment, "gridSell");
 }
 
