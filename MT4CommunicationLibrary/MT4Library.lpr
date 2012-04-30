@@ -19,7 +19,7 @@ exports
   setGridMode,
   getBalance_NAV_UsedMargin,
   setBalance_NAV_UsedMargin,
-  getGridOptions,
+  getAntiGridOptions,
   getMultiplierForMicroLot,
   setMultiplierForMicroLot,
   setExposure,

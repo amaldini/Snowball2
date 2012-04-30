@@ -299,16 +299,19 @@ object Form1: TForm1
         OnClick = Lots005Click
       end
     end
-    object MenuItem2: TMenuItem
+    object GridMenuItem: TMenuItem
       Caption = 'Grid'
-      object MenuItem3: TMenuItem
+      object GridSetTopPrice: TMenuItem
         Caption = 'Set Top Price'
+        OnClick = GridSetTopPriceClick
       end
-      object MenuItem4: TMenuItem
+      object GridSetBottomPrice: TMenuItem
         Caption = 'Set Bottom Price'
+        OnClick = GridSetBottomPriceClick
       end
-      object MenuItem5: TMenuItem
+      object GridEnable: TMenuItem
         Caption = 'Enable'
+        OnClick = GridEnableClick
       end
     end
   end

@@ -12,7 +12,7 @@ bool GetSymbolStatus(string symbolName,int& longOrShort[],double& lotsPyramidBas
 string getGridMode(string symbolName,int isMaster); 
 bool   setGridMode(string symbolName,int isMaster,string gridMode);
 
-bool   getGridOptions(string symbolName,int isMaster,int& distant[]); 
+bool   getAntiGridOptions(string symbolName,int isMaster,int& distant[]); 
 int    getMultiplierForMicroLot(string symbolName);
 
 bool   setProfits(string symbolName,int isMaster,double profits);
@@ -273,7 +273,7 @@ void readDistantAndAllowReenter(int isMaster) {
    i[0]=0;
    allowReenter = false;
    distant = true;
-   if (getGridOptions(Symbol6(),isMaster,i)) {
+   if (getAntiGridOptions(Symbol6(),isMaster,i)) {
       if (i[0]==0) distant = false;
       if (i[1]!=0) allowReenter = true;
    }

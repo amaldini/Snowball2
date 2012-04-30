@@ -41,7 +41,7 @@
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
-        <CursorPos X="3" Y="29"/>
+        <CursorPos X="10" Y="22"/>
         <UsageCount Value="57"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -87,7 +87,7 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="36"/>
+        <TopLine Value="1"/>
         <CursorPos X="20" Y="44"/>
         <UsageCount Value="38"/>
         <Loaded Value="True"/>

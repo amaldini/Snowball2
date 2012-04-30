@@ -18,10 +18,10 @@ type
     btnCloseShort: TButton;
     ButtonCalcTargetNAV: TButton;
     ButtonCloseAll: TButton;
-    MenuItem2: TMenuItem;
-    MenuItem3: TMenuItem;
-    MenuItem4: TMenuItem;
-    MenuItem5: TMenuItem;
+    GridMenuItem: TMenuItem;
+    GridSetTopPrice: TMenuItem;
+    GridSetBottomPrice: TMenuItem;
+    GridEnable: TMenuItem;
     txtProfitTarget: TEdit;
     Label2: TLabel;
     lblTargetNAV: TLabel;
@@ -59,6 +59,8 @@ type
     procedure ButtonCalcTargetNAVClick(Sender: TObject);
     procedure ButtonCloseAllClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure GridEnableClick(Sender: TObject);
+    procedure GridSetBottomPriceClick(Sender: TObject);
     procedure Label2Click(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure LongDistantClick(Sender: TObject);
@@ -68,6 +70,7 @@ type
     procedure Lots004Click(Sender: TObject);
     procedure Lots005Click(Sender: TObject);
     procedure LongReenterClick(Sender: TObject);
+    procedure GridSetTopPriceClick(Sender: TObject);
     procedure ShortDistantClick(Sender: TObject);
     procedure ShortReenterClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
@@ -118,7 +121,7 @@ begin
 
   boolValue:=false;
   boolValue2:=false;
-  if (getGridOptions(symbol,1,distant)) then
+  if (getAntiGridOptions(symbol,1,distant)) then
   begin
        if (distant[0]<>0) then boolValue:=true;
        if (distant[1]<>0) then boolValue2:=true;
@@ -128,7 +131,7 @@ begin
 
   boolValue:=false;
   boolValue2:=false;
-  if (getGridOptions(symbol,0,distant)) then
+  if (getAntiGridOptions(symbol,0,distant)) then
   begin
        if (distant[0]<>0) then boolValue:=true;
        if (distant[1]<>0) then boolValue2:=true;
@@ -162,7 +165,7 @@ begin
        symbol:=getSelectedSymbol();
        if (form1.longDistant.checked) then isDistant:=1;
        if (form1.longReenter.checked) then allowReenter:=1;
-       setGridOptions(symbol,1,isDistant,allowReenter);
+       setAntiGridOptions(symbol,1,isDistant,allowReenter);
   end;
 end;
 
@@ -177,7 +180,7 @@ begin
         symbol:=getSelectedSymbol();
         if (form1.shortDistant.checked) then isDistant:=1;
         if (form1.ShortReenter.checked) then allowReenter:=1;
-        setGridOptions(symbol,0,isDistant,allowReenter);
+        setAntiGridOptions(symbol,0,isDistant,allowReenter);
      end;
 end;
 
@@ -191,6 +194,37 @@ procedure TForm1.LongReenterClick(Sender: TObject);
 begin
      LongReenter.Checked:=not LongReenter.Checked;
      updateGridLongOptions();
+end;
+
+procedure TForm1.GridSetTopPriceClick(Sender: TObject);
+var responseStr : string;
+    price:double;
+begin
+     responseStr := inputbox('Grid ', 'Top price', '');
+     try
+        price:=StrToFloat(responseStr);
+     except
+       on E:Exception do
+          ShowMessage(E.Message);
+     end;
+end;
+
+procedure TForm1.GridSetBottomPriceClick(Sender: TObject);
+var responseStr : string;
+    price:double;
+begin
+     responseStr := inputbox('Grid ', 'Bottom price', '');
+     try
+        price:=StrToFloat(responseStr);
+     except
+       on E:Exception do
+          ShowMessage(E.Message);
+     end;
+end;
+
+procedure TForm1.GridEnableClick(Sender: TObject);
+begin
+  GridEnable.Checked:=not GridEnable.Checked;
 end;
 
 procedure TForm1.ShortDistantClick(Sender: TObject);
@@ -318,15 +352,17 @@ begin
 
      checkProfits();
 
-     if (nav1>0) and (nav2>0) and (targetNAV=0) then
+     if (nav1>0) and (nav2>0) then
      begin
-          calcNewTargetNAV();
-     end;
-
-     if (currentNav>targetNAV) then
-     begin
-          closeOpenTrades();
-          calcNewTargetNAV();
+          if (targetNAV=0) then
+          begin
+               calcNewTargetNAV();
+          end;
+          if (currentNav>targetNAV) then
+          begin
+               closeOpenTrades();
+               calcNewTargetNAV();
+          end;
      end;
 
 end;

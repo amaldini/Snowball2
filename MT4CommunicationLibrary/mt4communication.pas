@@ -15,8 +15,8 @@ function GetSymbolStatus(symbolName:PChar; var longOrShort:TIPair;var lotsPyrami
 function setGridMode(symbolName:PChar;isMaster:integer;gridMode:PChar):boolean;stdcall;
 function getGridMode(symbolName:PChar;isMaster:integer):PChar;stdcall;
 
-function getGridOptions(symbolName:PChar;isMaster:integer;var distant:tiPair):boolean;stdcall;
-function setGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer;allowReenter:integer):boolean;stdcall;
+function getAntiGridOptions(symbolName:PChar;isMaster:integer;var distant:tiPair):boolean;stdcall;
+function setAntiGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer;allowReenter:integer):boolean;stdcall;
 
 function setExposure(symbolName:PChar;isMaster:integer;exposureLots:double):boolean;stdcall;
 function getExposure(symbolName:PChar;isMaster:integer):double;stdcall;
@@ -241,14 +241,14 @@ begin
     result := true;
 end;
 
-function setGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer;allowReenter:integer):boolean;stdcall;
+function setAntiGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer;allowReenter:integer):boolean;stdcall;
 var entry:ansistring;
 begin
    entry:=appendMasterTagToSymbolName(isMaster,symbolName);
    With TRegistry.Create do
    try
       RootKey:=HKEY_CURRENT_USER;
-      if OpenKey('Software\VB and VBA Program Settings\MT4Channel\GridOption_Distant',true) then
+      if OpenKey('Software\VB and VBA Program Settings\MT4Channel\AntiGridOption_Distant',true) then
          WriteInteger(entry,isDistant);
       finally
          free;
@@ -256,7 +256,7 @@ begin
    With TRegistry.Create do
    try
       RootKey:=HKEY_CURRENT_USER;
-      if OpenKey('Software\VB and VBA Program Settings\MT4Channel\GridOption_AllowReenter',true) then
+      if OpenKey('Software\VB and VBA Program Settings\MT4Channel\AntiGridOption_AllowReenter',true) then
          WriteInteger(entry,allowReenter)
       finally
          free;
@@ -264,7 +264,7 @@ begin
    result:=true;
 end;
 
-function getGridOptions(symbolName:PChar;isMaster:integer;var distant:tiPair):boolean;stdcall;
+function getAntiGridOptions(symbolName:PChar;isMaster:integer;var distant:tiPair):boolean;stdcall;
 var entry:ansistring;
 begin
      result:=false;
@@ -274,7 +274,7 @@ begin
      With TRegistry.Create do
        try
          RootKey:=HKEY_CURRENT_USER;
-         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\GridOption_Distant') then
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\AntiGridOption_Distant') then
          If ValueExists(entry) then
          begin
             distant[0] := ReadInteger(entry);
@@ -288,7 +288,7 @@ begin
      With TRegistry.Create do
        try
          RootKey:=HKEY_CURRENT_USER;
-         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\GridOption_AllowReenter') then
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\AntiGridOption_AllowReenter') then
          If ValueExists(entry) then
          begin
               distant[1] := ReadInteger(entry);
