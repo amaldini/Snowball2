@@ -62,12 +62,21 @@ extern double ANTIGRID_TRADING_PENDINGORDERS = 3;
 extern double ANTIGRID_TAKEPROFIT = 200; // pips
 extern double ANTIGRID_STOP_PIPS = 200; // pips
 
-bool isAntiGridTrade(double openPrice, double TP) {
-   if (MathAbs(TP-openPrice)>pip*120) {
+bool isAntiGridTrade() {
+   if (MathAbs(OrderOpenPrice()-OrderTakeProfit())>pip*120) {
       return(true);
    } else { 
       return(false);
    }
+}
+
+bool isMyOrderGrid(int magic) {
+   if (!isMyOrder(magic)) return (false);
+   
+   if ((!isGrid) && isAntiGridTrade()) return (true);
+   if (isGrid && (!isAntiGridTrade())) return (true);
+   
+   return (false);
 }
 
 /**
@@ -84,7 +93,7 @@ void moveOrders_GRID(double d){
       OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
       int otype = OrderType();
       if ((otype!=OP_SELL) && (otype!=OP_BUY)) { 
-         if (isMyOrder(magic)){
+         if (isMyOrderGrid(magic)){
             if (MathAbs(OrderOpenPrice() - ((Bid+Ask)/2)) > maxOffset){
                maldaLog("Deleting too distant order");
                orderDeleteReliable(OrderTicket());
@@ -390,7 +399,7 @@ int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTyp
    int idx=0;
    for (int cnt = 0; cnt < total; cnt++) {
       OrderSelect(cnt, SELECT_BY_POS, MODE_TRADES);
-      if (isMyOrder(magic)) {
+      if (isMyOrderGrid(magic)) {
          orderTypes[idx] = OrderType();
          tickets[idx] = OrderTicket();
          prices[idx] = OrderOpenPrice();
