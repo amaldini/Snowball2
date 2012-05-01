@@ -205,6 +205,8 @@ void tradeGrid(int isMaster) {
       gridStart = NormalizeDouble((Ask+Bid)/2,Digits);
    } 
    
+   if (isGrid) gridStart = GRID_CENTER;
+   
    int addedOrders = 0;
    int nLevels=0;
    
@@ -228,7 +230,7 @@ void tradeGrid(int isMaster) {
          condition2 = (price>(Ask+GRID_STEP*pip*GRID_PENDINGORDERS) && distant);
       }
       if (isGrid) {
-         condition1 = condition1 && (MathAbs(price-GRID_CENTER)<(GRID_HEIGHT_PIPS/2));
+         condition1 = condition1 && (MathAbs(price-GRID_CENTER)<=((GRID_HEIGHT_PIPS+GRID_STEP)/2));
       }
       
       if (condition1 || condition2) {
