@@ -294,6 +294,9 @@ void readGridOptions(int isMaster) {
       GRID_ENABLE = (enable[0]!=0);
       GRID_CENTER = (bottomAndTop[0]+bottomAndTop[1])/2;
       GRID_HEIGHT_PIPS = MathAbs(bottomAndTop[0]-bottomAndTop[1])/pip;
+      
+      place_SL_Line(bottomAndTop[1],"GridTop","Grid TOP");
+      place_SL_Line(bottomAndTop[0],"GridBottom","Grid BOTTOM");
    } 
 }
 
@@ -322,6 +325,8 @@ void tradeGridAndAntiGrid(int isMaster) {
    
    isGrid = true; // GRID
    tradeGrid(isMaster);
+   
+   
 }
 
 void GR_TrailStops() {
