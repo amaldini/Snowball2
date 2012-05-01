@@ -227,6 +227,9 @@ void tradeGrid(int isMaster) {
          condition1 = (price>Ask && !distant); 
          condition2 = (price>(Ask+GRID_STEP*pip*GRID_PENDINGORDERS) && distant);
       }
+      if (isGrid) {
+         condition1 = condition1 && (MathAbs(price-GRID_CENTER)<(GRID_HEIGHT_PIPS/2));
+      }
       
       if (condition1 || condition2) {
          // verifico di non avere già un ordine a questo livello
@@ -310,9 +313,9 @@ void tradeGridAndAntiGrid(int isMaster) {
    
    if (!GRID_ENABLE) return;
    
-   GRID_STEP = GRID_TRADING_STEP;
+   GRID_STEP = GRID_HEIGHT_PIPS/4;
    GRID_PENDINGORDERS = GRID_TRADING_PENDINGORDERS;
-   GRID_TP = GRID_TAKEPROFIT;
+   GRID_TP = GRID_STEP;
    GRID_STOP = GRID_STOP_PIPS;
    
    isGrid = true; // GRID
