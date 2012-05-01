@@ -95,6 +95,35 @@ implementation
 
 { TForm1 }
 
+function getSelectedSymbol():PChar;
+begin
+     result:=PChar(form1.listbox1.getSelectedText);
+end;
+
+procedure updateGridTopAndBottom();
+begin
+     form1.GridSetBottomPrice.caption:='Set bottom price ('+FormatFloat('0.00000',gridBottom)+')';
+     form1.GridSetTopPrice.caption:='Set top price ('+FormatFloat('0.00000',gridTop)+')';
+end;
+
+procedure loadGridOptions();
+var
+   enable:tiPair;
+   bottomAndTop:TD_Terna;
+   bEnable:boolean;
+begin
+     bEnable:=false;
+     gridBottom:=0;
+     gridTop:=0;
+     if (getGridOptions(getSelectedSymbol(),enable,bottomAndTop)) then
+     begin
+          bEnable:=(enable[0]<>0);
+          gridBottom:=bottomAndTop[0];
+          gridTop:=bottomAndTop[1];
+     end;
+     Form1.gridEnable.checked:=bEnable;
+     updateGridTopAndBottom();
+end;
 
 procedure TForm1.ListBox1Click(Sender: TObject);
 var symbol:PChar;
@@ -150,11 +179,8 @@ begin
   4:Lots004.checked:=true;
   5:Lots005.checked:=true;
   end;
-end;
 
-function getSelectedSymbol():PChar;
-begin
-     result:=PChar(form1.listbox1.getSelectedText);
+  loadGridOptions();
 end;
 
 procedure updateAntiGridLongOptions();
@@ -197,6 +223,7 @@ begin
         symbol:=getSelectedSymbol();
         if (form1.GridEnable.Checked) then enable:=1;
         setGridOptions(symbol,enable,gridBottom,gridTop);
+        updateGridTopAndBottom();
      end;
 end;
 
@@ -243,6 +270,7 @@ end;
 procedure TForm1.GridEnableClick(Sender: TObject);
 begin
   GridEnable.Checked:=not GridEnable.Checked;
+  updateGridOptions();
 end;
 
 procedure TForm1.ShortDistantClick(Sender: TObject);

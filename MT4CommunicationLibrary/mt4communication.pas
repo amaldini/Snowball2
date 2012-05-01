@@ -425,11 +425,73 @@ begin
 end;
 
 function setGridOptions(symbolName:PChar;enable:integer;gridBottom:double;gridTop:double):boolean;stdcall;
+var
+   entry:ansistring;
+   s :ansistring; // reference counted and memory managed strings.
 begin
+    entry:=appendMasterTagToSymbolName(0,symbolName);
+
+    s := IntToStr(enable)+';'+
+         FloatToStr(gridBottom)+';'+
+         FloatToStr(gridTop);
+
+    With TRegistry.Create do
+         try
+            RootKey:=HKEY_CURRENT_USER;
+            if OpenKey('Software\VB and VBA Program Settings\MT4Channel\GridOptions',true) then
+            WriteString(entry,s);
+         finally
+            free;
+         end;
+
+    result := true;
 end;
 
 function getGridOptions(symbolName:PChar;var enable:tiPair;var bottomAndTop:TD_Terna):boolean;stdcall;
+var
+   entry:ansistring;
+   list:TStringList;
+   i:integer;
+   s:string;
 begin
+   entry:=appendMasterTagToSymbolName(0,symbolName);
+
+   With TRegistry.Create do
+       try
+         RootKey:=HKEY_CURRENT_USER;
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\GridOptions') then
+         If ValueExists(entry) then
+            s:=ReadString(entry); // Or whatever it is. ReadInteger/ReadBool
+       finally
+         free;
+       end;
+
+  // ShowMessage(s);
+
+  list := TStringList.Create;
+  list.Delimiter := ';';
+  list.StrictDelimiter:=true;
+  list.DelimitedText:=s;
+
+  result:=false;
+  if (list.Count=3) then
+  begin
+         for i:=0 to list.Count-1 do
+         begin
+              case i of
+              0: enable[0] := strToInt(list.valueFromIndex[i]);
+              1: bottomAndTop[0] := strToFloat(list.ValueFromIndex[i]);          // gridBottom
+              2: bottomAndTop[1] := strToFloat(list.ValueFromIndex[i]);          // gridTop
+              end;
+              // Writeln(list.ValueFromIndex[i]);
+         end;
+         result:=true;
+  end;
+
+
+  // Writeln(list.Count);
+
+  list.free;
 end;
 
 end.
