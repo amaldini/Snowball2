@@ -47,7 +47,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="1" Y="19"/>
-        <UsageCount Value="80"/>
+        <UsageCount Value="81"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -56,22 +56,22 @@
         <ComponentName Value="Form1"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="ControlPanel"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="80"/>
-        <CursorPos X="22" Y="106"/>
-        <UsageCount Value="80"/>
+        <TopLine Value="91"/>
+        <CursorPos X="24" Y="92"/>
+        <UsageCount Value="81"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="mt4communication.pas"/>
         <UnitName Value="MT4Communication"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="453"/>
-        <CursorPos X="6" Y="469"/>
+        <TopLine Value="13"/>
+        <CursorPos X="1" Y="22"/>
         <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit2>

@@ -15,6 +15,8 @@ bool   setGridMode(string symbolName,int isMaster,string gridMode);
 bool   getAntiGridOptions(string symbolName,int isMaster,int& distant[]); 
 int    getMultiplierForMicroLot(string symbolName);
 
+bool getGridOptions(string symbolName,int& enable[],double& bottomAndTop[]);  
+
 bool   setProfits(string symbolName,int isMaster,double profits);
 
 bool setBalance_NAV_UsedMargin(int isMaster,double balance, double NAV,double usedMargin);   
@@ -47,6 +49,7 @@ double GRID_STOP;
 
 double GRID_CENTER;
 double GRID_HEIGHT_PIPS;
+bool GRID_ENABLE=false;
 
 bool isGrid;
 
@@ -279,6 +282,16 @@ void readDistantAndAllowReenter(int isMaster) {
    }
 }
 
+void readGridOptions(int isMaster) {
+   int enable[2];
+   double bottomAndTop[3];
+   if (getGridOptions(Symbol6(),enable,bottomAndTop)) {
+      GRID_ENABLE = (enable[0]!=0);
+      GRID_CENTER = (bottomAndTop[0]+bottomAndTop[1])/2;
+      GRID_HEIGHT_PIPS = MathAbs(bottomAndTop[0]-bottomAndTop[1])/pip;
+   } 
+}
+
 void tradeGridAndAntiGrid(int isMaster) {
    readDistantAndAllowReenter(isMaster);
    
@@ -292,6 +305,10 @@ void tradeGridAndAntiGrid(int isMaster) {
    
    distant = false;
    allowReenter = false; 
+   
+   readGridOptions(isMaster);
+   
+   if (!GRID_ENABLE) return;
    
    GRID_STEP = GRID_TRADING_STEP;
    GRID_PENDINGORDERS = GRID_TRADING_PENDINGORDERS;
