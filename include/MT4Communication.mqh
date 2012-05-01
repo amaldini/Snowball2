@@ -319,7 +319,7 @@ void tradeGridAndAntiGrid(int isMaster) {
    GRID_STOP = GRID_STOP_PIPS;
    
    isGrid = true; // GRID
-   // tradeGrid(isMaster);
+   tradeGrid(isMaster);
 }
 
 void GR_TrailStops() {
