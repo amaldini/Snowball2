@@ -178,8 +178,6 @@ void tradeGrid(int isMaster) {
       lastExposure=exposure;
    }
    
-   setProfits(Symbol6(),isMaster,profit);
-   
    maldaLog("exposure="+DoubleToStr(exposure,4));
    double exposureDelta = getExposure(Symbol6(),1-isMaster)-exposure;
    
@@ -316,17 +314,17 @@ void tradeGridAndAntiGrid(int isMaster) {
    
    readGridOptions(isMaster);
    
-   if (!GRID_ENABLE) return;
+   if (GRID_ENABLE) {
+      GRID_STEP = GRID_HEIGHT_PIPS/4;
+      GRID_PENDINGORDERS = GRID_TRADING_PENDINGORDERS;
+      GRID_TP = GRID_STEP;
+      GRID_STOP = GRID_STOP_PIPS;
    
-   GRID_STEP = GRID_HEIGHT_PIPS/4;
-   GRID_PENDINGORDERS = GRID_TRADING_PENDINGORDERS;
-   GRID_TP = GRID_STEP;
-   GRID_STOP = GRID_STOP_PIPS;
+      isGrid = true; // GRID
+      tradeGrid(isMaster);
+   }
    
-   isGrid = true; // GRID
-   tradeGrid(isMaster);
-   
-   
+   setProfits(Symbol6(),isMaster,getCurrentProfit());
 }
 
 void GR_TrailStops() {
@@ -439,6 +437,22 @@ int getOpenOrderPrices(int magic, int &tickets[], double& prices[],int &orderTyp
    
    return (idx);
 }
+
+double getCurrentProfit() {
+   double profit=0;
+   int total = OrdersTotal();
+   for (int i=0;i<total;i++) {
+      OrderSelect(i,SELECT_BY_POS,MODE_TRADES);
+      if (isMyOrder(magic)) {
+         if (OrderType()==OP_BUY || OrderType()==OP_SELL) {
+            profit+=OrderProfit();
+         }
+      }
+   }
+   return (profit);
+} 
+
+
 
 /**
 * Replacement for the built-in Print(), output to the chart window.
