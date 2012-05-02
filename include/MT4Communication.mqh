@@ -228,7 +228,7 @@ void tradeGrid(int isMaster) {
          condition2 = (price>(Ask+GRID_STEP*pip*GRID_PENDINGORDERS) && distant);
       }
       if (isGrid) {
-         condition1 = condition1 && (MathAbs(price-GRID_CENTER)<=((GRID_HEIGHT_PIPS+GRID_STEP)/2));
+         condition1 = condition1 && (MathAbs(price-GRID_CENTER)<=(pip*(GRID_HEIGHT_PIPS+GRID_STEP)/2));
       }
       
       if (condition1 || condition2) {
