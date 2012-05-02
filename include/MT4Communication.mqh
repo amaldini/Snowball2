@@ -314,14 +314,17 @@ void tradeGridAndAntiGrid(int isMaster) {
    
    readGridOptions(isMaster);
    
+   isGrid = true; // GRID
+   
    if (GRID_ENABLE) {
       GRID_STEP = GRID_HEIGHT_PIPS/4;
       GRID_PENDINGORDERS = GRID_TRADING_PENDINGORDERS;
       GRID_TP = GRID_STEP;
       GRID_STOP = GRID_STOP_PIPS;
-   
-      isGrid = true; // GRID
+      
       tradeGrid(isMaster);
+   } else {
+      deleteGridPendingOrders();
    }
    
    setProfits(Symbol6(),isMaster,getCurrentProfit());
@@ -451,6 +454,18 @@ double getCurrentProfit() {
    }
    return (profit);
 } 
+
+void deleteGridPendingOrders() {
+   int total = OrdersTotal();
+   for (int i=0;i<total;i++) {
+      OrderSelect(i,SELECT_BY_POS,MODE_TRADES);
+      if (isMyOrderGrid(magic)) {
+         if (OrderType()==OP_BUYSTOP || OrderType()==OP_SELLSTOP) {
+            orderDeleteReliable(OrderTicket());
+         }
+      }
+   }
+}
 
 
 
