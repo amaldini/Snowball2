@@ -319,7 +319,8 @@ void tradeGridAndAntiGrid(int isMaster) {
    if (GRID_ENABLE) {
       GRID_STEP = GRID_HEIGHT_PIPS/4;
       GRID_PENDINGORDERS = GRID_TRADING_PENDINGORDERS;
-      GRID_TP = GRID_STEP;
+      GRID_TP = GRID_STEP-2;
+      if (GRID_TP<6) GRID_TP=6;
       GRID_STOP = GRID_STOP_PIPS;
       
       tradeGrid(isMaster);
