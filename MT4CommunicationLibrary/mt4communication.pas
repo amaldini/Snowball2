@@ -21,8 +21,8 @@ function setAntiGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer;
 function setGridOptions(symbolName:PChar;enable:integer;gridBottom:double;gridTop:double):boolean;stdcall;
 function getGridOptions(symbolName:PChar;var enable:tiPair;var bottomAndTop:TD_Terna):boolean;stdcall;
 
-function setExposure(symbolName:PChar;isMaster:integer;exposureLots:double):boolean;stdcall;
-function getExposure(symbolName:PChar;isMaster:integer):double;stdcall;
+function setExposure(symbolName:PChar;isMaster:integer;isGrid:integer;exposureLots:double):boolean;stdcall;
+function getExposure(symbolName:PChar;isMaster:integer;isGrid:integer):double;stdcall;
 
 function getBalance_NAV_UsedMargin(isMaster:integer;var balance:double;var NAV:double;var usedMargin:double):boolean;stdcall;
 function setBalance_NAV_UsedMargin(isMaster:integer;balance:double;NAV:double;usedMargin:double):boolean;stdcall;
@@ -112,13 +112,14 @@ begin
        end;
 end;
 
-function setExposure(symbolName:PChar;isMaster:integer;exposureLots:double):boolean;stdcall;
+function setExposure(symbolName:PChar;isMaster:integer;isGrid:integer;exposureLots:double):boolean;stdcall;
 var entry:ansistring;
 begin
    With TRegistry.Create do
    try
       RootKey:=HKEY_CURRENT_USER;
       entry:=appendMasterTagToSymbolName(isMaster,symbolName);
+      if (isGrid<>0) then entry:=entry+'Grid';
       if OpenKey('Software\VB and VBA Program Settings\MT4Channel\Exposure',true) then
          WriteFloat(entry,exposureLots);
       finally
@@ -127,7 +128,7 @@ begin
    result:=true;
 end;
 
-function getExposure(symbolName:PChar;isMaster:integer):double;stdcall;
+function getExposure(symbolName:PChar;isMaster:integer;isGrid:integer):double;stdcall;
 var entry:ansistring;
 begin
      result:=0; // default
@@ -135,6 +136,7 @@ begin
        try
          RootKey:=HKEY_CURRENT_USER;
          entry:=appendMasterTagToSymbolName(isMaster,symbolName);
+         if (isGrid<>0) then entry:=entry+'Grid';
          If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\Exposure') then
          If ValueExists(entry) then result:=ReadFloat(entry);
        finally

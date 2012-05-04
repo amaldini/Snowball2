@@ -88,7 +88,9 @@ void tradeGridAndAntiGrid(int isMaster) {
       double exposureDelta = getExposure(Symbol6(),isMaster,1)-getExposure(Symbol6(),1-isMaster,1);
    
       GRID_STEP = 8; // 8 pips   
-      GRID_STEP = GRID_STEP*(1+Max(0,exposureDelta/0.01)   
+      GRID_STEP = GRID_STEP*(1+MathMax(0,exposureDelta/0.01));
+      
+      maldaLog("GRID_STEP="+GRID_STEP);
       
       GRID_PENDINGORDERS = GRID_TRADING_PENDINGORDERS;
       GRID_TP = GRID_STEP-2;
@@ -212,13 +214,21 @@ void tradeGrid(int isMaster) {
       
    }
    if (lastExposure!=exposure) {
-      setExposure(Symbol6(),isMaster,exposure);
+      if (isGrid) {
+         setExposure(Symbol6(),isMaster,1,exposure);
+      } else {
+         setExposure(Symbol6(),isMaster,0,exposure);
+      }
       lastExposure=exposure;
    }
    
    maldaLog("exposure="+DoubleToStr(exposure,4));
-   double exposureDelta = getExposure(Symbol6(),1-isMaster)-exposure;
-   
+   double exposureDelta;
+   if (isGrid) {
+      exposureDelta = getExposure(Symbol6(),1-isMaster,1)-exposure;
+   } else {
+      exposureDelta = getExposure(Symbol6(),1-isMaster,0)-exposure;
+   }
    double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
    
    
