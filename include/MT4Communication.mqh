@@ -65,6 +65,8 @@ extern double ANTIGRID_TRADING_PENDINGORDERS = 3;
 extern double ANTIGRID_TAKEPROFIT = 200; // pips
 extern double ANTIGRID_STOP_PIPS = 200; // pips
 
+double prevGridStep = 0;
+
 void tradeGridAndAntiGrid(int isMaster) {
    readDistantAndAllowReenter(isMaster);
    
@@ -89,6 +91,13 @@ void tradeGridAndAntiGrid(int isMaster) {
    
       GRID_STEP = 8; // 8 pips   
       GRID_STEP = GRID_STEP*(1+MathMax(0,exposureDelta/0.01));
+   
+      if (MathAbs(GRID_STEP-prevGridStep)>0.0001) {
+         maldaLog("deleting grid pending orders because grid step changed");
+         deleteGridPendingOrders();
+      };
+   
+      prevGridStep = GRID_STEP;
       
       maldaLog("GRID_STEP="+GRID_STEP);
       
