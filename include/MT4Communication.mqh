@@ -21,8 +21,8 @@ bool   setProfits(string symbolName,int isMaster,double profits);
 
 bool setBalance_NAV_UsedMargin(int isMaster,double balance, double NAV,double usedMargin);   
 
-bool setExposure(string symbolName,int isMaster,double exposureLots);
-double getExposure(string symbolName,int isMaster);  
+bool setExposure(string symbolName,int isMaster,int isGrid,double exposureLots);
+double getExposure(string symbolName,int isMaster,int isGrid);  
 
 bool setCloseOpenTrades(string symbolName,int isMaster,int isClose);
 bool getCloseOpenTrades(string symbolName,int isMaster);  
@@ -64,6 +64,44 @@ extern double ANTIGRID_TRADING_STEP = 10; // pips
 extern double ANTIGRID_TRADING_PENDINGORDERS = 3;
 extern double ANTIGRID_TAKEPROFIT = 200; // pips
 extern double ANTIGRID_STOP_PIPS = 200; // pips
+
+void tradeGridAndAntiGrid(int isMaster) {
+   readDistantAndAllowReenter(isMaster);
+   
+   GRID_STEP = ANTIGRID_TRADING_STEP;
+   GRID_PENDINGORDERS = ANTIGRID_TRADING_PENDINGORDERS;
+   GRID_TP = ANTIGRID_TAKEPROFIT;
+   GRID_STOP = ANTIGRID_STOP_PIPS;
+   
+   isGrid = false; // ANTIGRID
+   tradeGrid(isMaster);
+   
+   distant = false;
+   allowReenter = false; 
+   
+   readGridOptions(isMaster);
+   
+   isGrid = true; // GRID
+   
+   if (GRID_ENABLE) {
+   
+      double exposureDelta = getExposure(Symbol6(),isMaster,1)-getExposure(Symbol6(),1-isMaster,1);
+   
+      GRID_STEP = 8; // 8 pips   
+      GRID_STEP = GRID_STEP*(1+Max(0,exposureDelta/0.01)   
+      
+      GRID_PENDINGORDERS = GRID_TRADING_PENDINGORDERS;
+      GRID_TP = GRID_STEP-2;
+      if (GRID_TP<6) GRID_TP=6;
+      GRID_STOP = GRID_STOP_PIPS;
+      
+      tradeGrid(isMaster);
+   } else {
+      deleteGridPendingOrders();
+   }
+   
+   setProfits(Symbol6(),isMaster,getCurrentProfit());
+}
 
 bool isAntiGridTrade() {
    if (MathAbs(OrderOpenPrice()-OrderTakeProfit())>pip*120) {
@@ -296,39 +334,6 @@ void readGridOptions(int isMaster) {
       place_SL_Line(bottomAndTop[1],"GridTop","Grid TOP");
       place_SL_Line(bottomAndTop[0],"GridBottom","Grid BOTTOM");
    } 
-}
-
-void tradeGridAndAntiGrid(int isMaster) {
-   readDistantAndAllowReenter(isMaster);
-   
-   GRID_STEP = ANTIGRID_TRADING_STEP;
-   GRID_PENDINGORDERS = ANTIGRID_TRADING_PENDINGORDERS;
-   GRID_TP = ANTIGRID_TAKEPROFIT;
-   GRID_STOP = ANTIGRID_STOP_PIPS;
-   
-   isGrid = false; // ANTIGRID
-   tradeGrid(isMaster);
-   
-   distant = false;
-   allowReenter = false; 
-   
-   readGridOptions(isMaster);
-   
-   isGrid = true; // GRID
-   
-   if (GRID_ENABLE) {
-      GRID_STEP = GRID_HEIGHT_PIPS/4;
-      GRID_PENDINGORDERS = GRID_TRADING_PENDINGORDERS;
-      GRID_TP = GRID_STEP-2;
-      if (GRID_TP<6) GRID_TP=6;
-      GRID_STOP = GRID_STOP_PIPS;
-      
-      tradeGrid(isMaster);
-   } else {
-      deleteGridPendingOrders();
-   }
-   
-   setProfits(Symbol6(),isMaster,getCurrentProfit());
 }
 
 void GR_TrailStops() {
