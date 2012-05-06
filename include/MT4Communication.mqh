@@ -53,7 +53,7 @@ bool GRID_ENABLE=false;
 
 bool isGrid;
 
-extern double GRID_TRADING_STEP = 10; // pips
+extern double GRID_TRADING_STEP = 8; // pips
 extern int GRID_TRADING_PENDINGORDERS = 3;
 extern double GRID_TAKEPROFIT = 200; // pips
 extern double GRID_STOP_PIPS = 200; // pips
@@ -89,13 +89,13 @@ void tradeGridAndAntiGrid(int isMaster) {
    
       double exposureDelta = getExposure(Symbol6(),isMaster,1)-getExposure(Symbol6(),1-isMaster,1);
    
-      GRID_STEP = 8; // 8 pips   
+      GRID_STEP = GRID_TRADING_STEP;   
       GRID_STEP = GRID_STEP*(1+MathMax(0,exposureDelta/0.01));
    
       if (MathAbs(GRID_STEP-prevGridStep)>0.0001) {
          maldaLog("deleting grid pending orders because grid step changed");
          deleteGridPendingOrders();
-      };
+      }
    
       prevGridStep = GRID_STEP;
       
@@ -165,22 +165,14 @@ void moveOrders_GRID(double d){
    }
 }
 
-double calcAdjustedLotSize(double exposureDelta) {
+double getLotSize() {
    double numLots=0.01;
-   
-   maldaLog("exposureDelta="+DoubleToStr(exposureDelta,4));
-   
-   exposureDelta = 0; // disabilito hedging perche voglio provare 
-                      //a sfruttare lo sbilanciamento a mio favore
-   
-   if (exposureDelta>0.0001) {
-      numLots = exposureDelta;
-   } else {
-      int multiplier = getMultiplierForMicroLot(Symbol6());
-      if (multiplier>=1 && multiplier<=5) {
-         numLots = 0.01*multiplier;
-      }
+ 
+   int multiplier = getMultiplierForMicroLot(Symbol6());
+   if (multiplier>=1 && multiplier<=5) {
+      numLots = 0.01*multiplier;
    }
+   
    return (numLots);
 }
 
@@ -232,14 +224,6 @@ void tradeGrid(int isMaster) {
    }
    
    maldaLog("exposure="+DoubleToStr(exposure,4));
-   double exposureDelta;
-   if (isGrid) {
-      exposureDelta = getExposure(Symbol6(),1-isMaster,1)-exposure;
-   } else {
-      exposureDelta = getExposure(Symbol6(),1-isMaster,0)-exposure;
-   }
-   double adjustedLotSize = calcAdjustedLotSize(exposureDelta);
-   
    
    if (distant && (numOrders>0) && (exposure<0.0001)) {
        double delta;
@@ -264,6 +248,8 @@ void tradeGrid(int isMaster) {
    
    int addedOrders = 0;
    int nLevels=0;
+   
+   double adjustedLotSize = getLotSize();
    
    if (exposure>=maxExposureLots) {
       adjustedLotSize = 0;
