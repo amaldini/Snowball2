@@ -65,17 +65,44 @@ extern double ANTIGRID_TRADING_PENDINGORDERS = 3;
 extern double ANTIGRID_TAKEPROFIT = 200; // pips
 extern double ANTIGRID_STOP_PIPS = 200; // pips
 
-double prevGridStep = 0;
+double prevGridStep_Grid = 0;
+double prevGridStep_AntiGrid = 0;
+
+double adjustGridStepByExposure(int isMaster,double baseGridStep) {
+   int isGridInt = 0;
+   double pgs;
+   if (isGrid) {
+      isGridInt = 1;
+      pgs = prevGridStep_Grid;
+   } else {
+      pgs = prevGridStep_AntiGrid;
+   }
+   
+   double exposureDelta = getExposure(Symbol6(),isMaster,isGridInt)-getExposure(Symbol6(),1-isMaster,isGridInt);
+   GRID_STEP = baseGridStep*(1+MathMax(0,exposureDelta/0.01));
+   
+   if (MathAbs(GRID_STEP-pgs)>0.0001) {
+      maldaLog("deleting grid pending orders because grid step changed");
+      deleteGridPendingOrders();
+   }
+   
+   if (isGrid) {
+      prevGridStep_Grid = pgs;
+   } else {
+      prevGridStep_AntiGrid = pgs;
+   }
+}
 
 void tradeGridAndAntiGrid(int isMaster) {
    readDistantAndAllowReenter(isMaster);
    
-   GRID_STEP = ANTIGRID_TRADING_STEP;
+   isGrid = false; // ANTIGRID
+   
+   GRID_STEP = adjustGridStepByExposure(isMaster,ANTIGRID_TRADING_STEP);
    GRID_PENDINGORDERS = ANTIGRID_TRADING_PENDINGORDERS;
    GRID_TP = ANTIGRID_TAKEPROFIT;
    GRID_STOP = ANTIGRID_STOP_PIPS;
    
-   isGrid = false; // ANTIGRID
    tradeGrid(isMaster);
    
    distant = false;
@@ -86,18 +113,8 @@ void tradeGridAndAntiGrid(int isMaster) {
    isGrid = true; // GRID
    
    if (GRID_ENABLE) {
-   
-      double exposureDelta = getExposure(Symbol6(),isMaster,1)-getExposure(Symbol6(),1-isMaster,1);
-   
-      GRID_STEP = GRID_TRADING_STEP;   
-      GRID_STEP = GRID_STEP*(1+MathMax(0,exposureDelta/0.01));
-   
-      if (MathAbs(GRID_STEP-prevGridStep)>0.0001) {
-         maldaLog("deleting grid pending orders because grid step changed");
-         deleteGridPendingOrders();
-      }
-   
-      prevGridStep = GRID_STEP;
+      
+      GRID_STEP = adjustGridStepByExposure(isMaster,GRID_TRADING_STEP);
       
       maldaLog("GRID_STEP="+GRID_STEP);
       
@@ -201,7 +218,7 @@ void tradeGrid(int isMaster) {
       if ((orderTypes[i]==OP_SELL && openPrices[i]<Ask) ||
           (orderTypes[i]==OP_BUY  && openPrices[i]>Bid)) { 
          danglers++;
-         exposure+=orderLots[i];
+         exposure+=orderLots[i]; // considero exposure solo se sono in perdita, importante per bilanciamento di adjustGridStepByExposure
       }
       
       if (orderTypes[i]==OP_SELL || orderTypes[i]==OP_BUY) {
