@@ -79,7 +79,7 @@ double adjustGridStepByExposure(int isMaster,double baseGridStep) {
    }
    
    double exposureDelta = getExposure(Symbol6(),isMaster,isGridInt)-getExposure(Symbol6(),1-isMaster,isGridInt);
-   GRID_STEP = baseGridStep*(1+MathMax(0,exposureDelta/0.01));
+   double GRID_STEP = baseGridStep*(1+MathMax(0,exposureDelta/0.01));
    
    if (MathAbs(GRID_STEP-pgs)>0.0001) {
       maldaLog("deleting grid pending orders because grid step changed");
@@ -87,10 +87,12 @@ double adjustGridStepByExposure(int isMaster,double baseGridStep) {
    }
    
    if (isGrid) {
-      prevGridStep_Grid = pgs;
+      prevGridStep_Grid = GRID_STEP;
    } else {
-      prevGridStep_AntiGrid = pgs;
+      prevGridStep_AntiGrid = GRID_STEP;
    }
+   
+   return (GRID_STEP);
 }
 
 void tradeGridAndAntiGrid(int isMaster) {
@@ -102,6 +104,7 @@ void tradeGridAndAntiGrid(int isMaster) {
    GRID_PENDINGORDERS = ANTIGRID_TRADING_PENDINGORDERS;
    GRID_TP = ANTIGRID_TAKEPROFIT;
    GRID_STOP = ANTIGRID_STOP_PIPS;
+   maldaLog("ANTIGRID_STEP="+GRID_STEP);
    
    tradeGrid(isMaster);
    
