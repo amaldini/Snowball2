@@ -58,7 +58,7 @@ extern int GRID_TRADING_PENDINGORDERS = 3;
 // extern double GRID_TAKEPROFIT = 200; // pips
 extern double GRID_STOP_PIPS = 200; // pips
 
-extern double maxExposureLots = 0.08;
+extern double maxExposureLots = 0.16;
 
 extern double ANTIGRID_TRADING_STEP = 10; // pips
 extern double ANTIGRID_TRADING_PENDINGORDERS = 3;
@@ -136,7 +136,7 @@ void tradeGridAndAntiGrid(int isMaster) {
 }
 
 bool isAntiGridTrade() {
-   if (MathAbs(OrderOpenPrice()-OrderTakeProfit())>pip*120) {
+   if (MathAbs(OrderOpenPrice()-OrderTakeProfit())>pip*170) {
       return(true);
    } else { 
       return(false);
