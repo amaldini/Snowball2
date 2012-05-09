@@ -276,7 +276,12 @@ void tradeGrid(int isMaster) {
       maldaLog("exposure>maxExposureLots!");
    }
    
-   for (i = -20;i<20 && nLevels<GRID_PENDINGORDERS;i++) {
+   for (i = -20;
+      (i<20) && 
+      (nLevels<GRID_PENDINGORDERS) && 
+      (GRID_STEP>2); 
+      i++) {
+      
       double price;
       bool condition1;
       bool condition2;
@@ -292,6 +297,8 @@ void tradeGrid(int isMaster) {
       }
       if (isGrid) {
          condition1 = condition1 && (MathAbs(price-GRID_CENTER)<=(pip*(GRID_HEIGHT_PIPS+GRID_STEP)/2));
+         if (isMaster==0) condition1=condition1 && (price>=GRID_CENTER);
+         if (isMaster!=0) condition1=condition1 && (price<=GRID_CENTER);
       }
       
       if (condition1 || condition2) {
