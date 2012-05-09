@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                             MT4Communication.mqh |
-//|                      Copyright © 2012, Andrea Maldini            |
+//|                      Copyright ï¿½ 2012, Andrea Maldini            |
 //|                                                                  |
 //+------------------------------------------------------------------+
 #import "MT4Library.dll"
@@ -55,7 +55,7 @@ bool isGrid;
 
 extern double GRID_TRADING_STEP = 8; // pips
 extern int GRID_TRADING_PENDINGORDERS = 3;
-extern double GRID_TAKEPROFIT = 200; // pips
+// extern double GRID_TAKEPROFIT = 200; // pips
 extern double GRID_STOP_PIPS = 200; // pips
 
 extern double maxExposureLots = 0.08;
@@ -122,7 +122,8 @@ void tradeGridAndAntiGrid(int isMaster) {
       maldaLog("GRID_STEP="+GRID_STEP);
       
       GRID_PENDINGORDERS = GRID_TRADING_PENDINGORDERS;
-      GRID_TP = GRID_STEP-2;
+      // GRID_TP = GRID_STEP-2;
+      GRID_TP = GRID_HEIGHT_PIPS * 0.40;
       if (GRID_TP<6) GRID_TP=6;
       GRID_STOP = GRID_STOP_PIPS;
       
@@ -302,7 +303,7 @@ void tradeGrid(int isMaster) {
       }
       
       if (condition1 || condition2) {
-         // verifico di non avere già un ordine a questo livello
+         // verifico di non avere giï¿½ un ordine a questo livello
          double currentLots = 0;
          double pendingLots = 0;
          for (int j=0;j<numOrders;j++) {
@@ -330,7 +331,7 @@ void tradeGrid(int isMaster) {
                maldaLog("pending buy at:"+DoubleToStr(price,Digits));   
             }         
          }
-         nLevels++; // o c'era già o l'ho creato
+         nLevels++; // o c'era giï¿½ o l'ho creato
       }
    }
    
