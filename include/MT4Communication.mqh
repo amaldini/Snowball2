@@ -277,6 +277,12 @@ void tradeGrid(int isMaster) {
       maldaLog("exposure>maxExposureLots!");
    }
    
+   double ATR = iATR(NULL, PERIOD_D1,14,1);
+   maldaLog("ATR="+
+      DoubleToStr(ATR,Digits)+" ATR/3="+
+      DoubleToStr((ATR/3)/pip,2)+" pips"
+   );
+   double ATRdiv3 = ATR / 3;
    for (i = -20;
       (i<20) && 
       (nLevels<GRID_PENDINGORDERS) && 
@@ -285,16 +291,19 @@ void tradeGrid(int isMaster) {
       
       double price;
       bool condition1;
-      bool condition2;
       
       if (isMaster==0) { // SHORT
          price = NormalizeDouble(gridStart-GRID_STEP*i*pip,Digits);
-         condition1 = (price<Bid && !distant); 
-         condition2 = (price<(Bid-GRID_STEP*pip*GRID_PENDINGORDERS) && distant);
+         condition1 = (price<(Bid-ATRdiv3)); 
+         if (distant) {
+            condition1 = condition1 && (price<(Bid-GRID_STEP*pip*GRID_PENDINGORDERS));
+         }
       } else {           // LONG
          price = NormalizeDouble(gridStart+GRID_STEP*i*pip,Digits);
-         condition1 = (price>Ask && !distant); 
-         condition2 = (price>(Ask+GRID_STEP*pip*GRID_PENDINGORDERS) && distant);
+         condition1 = (price>(Ask+ATRdiv3)); 
+         if (distant) {
+            condition1 = condition1 && (price>(Ask+GRID_STEP*pip*GRID_PENDINGORDERS));
+         }
       }
       if (isGrid) {
          condition1 = condition1 && (MathAbs(price-GRID_CENTER)<=(pip*(GRID_HEIGHT_PIPS+GRID_STEP)/2));
@@ -302,7 +311,7 @@ void tradeGrid(int isMaster) {
          if (isMaster!=0) condition1=condition1 && (price<=GRID_CENTER);
       }
       
-      if (condition1 || condition2) {
+      if (condition1) {
          // verifico di non avere gi� un ordine a questo livello
          double currentLots = 0;
          double pendingLots = 0;
