@@ -55,7 +55,7 @@ bool isGrid;
 
 extern double GRID_TRADING_STEP = 8; // pips
 extern int GRID_TRADING_PENDINGORDERS = 3;
-// extern double GRID_TAKEPROFIT = 200; // pips
+extern double GRID_TAKEPROFIT = 64; // pips
 extern double GRID_STOP_PIPS = 200; // pips
 
 extern double maxExposureLots = 0.16;
@@ -125,7 +125,7 @@ void tradeGridAndAntiGrid(int isMaster) {
       
       GRID_PENDINGORDERS = GRID_TRADING_PENDINGORDERS;
       // GRID_TP = GRID_STEP-2;
-      GRID_TP = GRID_HEIGHT_PIPS * 0.40;
+      GRID_TP = GRID_TAKEPROFIT;
       if (GRID_TP<6) GRID_TP=6;
       GRID_STOP = GRID_STOP_PIPS;
       
@@ -163,6 +163,13 @@ void moveOrders_GRID(double d){
    double maxOffset = (1+GRID_PENDINGORDERS) * GRID_STEP * pip + ATRdiv3;
    
    if (distant) maxOffset += GRID_STEP*pip*GRID_PENDINGORDERS;
+  
+   string GRIDDESCR;
+   if (isGrid) {
+      GRIDDESCR = "GRID";
+   } else {
+      GRIDDESCR = "ANTIGRID";
+   }
    
    for(i=0; i<OrdersTotal(); i++){
       OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
@@ -170,10 +177,10 @@ void moveOrders_GRID(double d){
       if ((otype!=OP_SELL) && (otype!=OP_BUY)) { 
          if (isMyOrderGrid(magic)){
             if (MathAbs(OrderOpenPrice() - ((Bid+Ask)/2)) > maxOffset){
-               maldaLog("Deleting too distant order");
+               maldaLog(GRIDDESCR+": Deleting too distant order");
                orderDeleteReliable(OrderTicket());
             }else{
-               maldaLog("GRID: moving order "+OrderTicket()+" by "+DoubleToStr(d,Digits));
+               maldaLog(GRIDDESCR+": moving order "+OrderTicket()+" by "+DoubleToStr(d,Digits));
                orderModifyReliable(
                   OrderTicket(),
                   NormalizeDouble(OrderOpenPrice() + d,Digits),
