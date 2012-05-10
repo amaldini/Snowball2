@@ -334,10 +334,18 @@ void tradeGrid(int isMaster) {
          if (lotsForOrder>0.0001) {
             if (isMaster==0) {
                gridSell(price,lotsForOrder);
-               maldaLog("pending sell at:"+DoubleToStr(price,Digits));  
+               if (isGrid!=0) {
+                  maldaLog("GRID pending sell at:"+DoubleToStr(price,Digits));  
+               } else {
+                  maldaLog("ANTIGRID pending sell at:"+DoubleToStr(price,Digits));    
+               }
             } else {
                gridBuy(price,lotsForOrder);
-               maldaLog("pending buy at:"+DoubleToStr(price,Digits));   
+               if (isGrid!=0) {
+                  maldaLog("GRID pending buy at:"+DoubleToStr(price,Digits)); 
+               } else {
+                  maldaLog("ANTIGRID pending buy at:"+DoubleToStr(price,Digits));
+               }  
             }         
          }
          nLevels++; // o c'era gi� o l'ho creato
