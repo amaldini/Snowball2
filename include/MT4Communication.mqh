@@ -68,6 +68,8 @@ extern double ANTIGRID_STOP_PIPS = 200; // pips
 double prevGridStep_Grid = 0;
 double prevGridStep_AntiGrid = 0;
 
+double ATRdiv3 = 0;
+
 double adjustGridStepByExposure(int isMaster,double baseGridStep) {
    int isGridInt = 0;
    double pgs;
@@ -158,7 +160,7 @@ bool isMyOrderGrid(int magic) {
 void moveOrders_GRID(double d){
    int i;
    
-   double maxOffset = (1+GRID_PENDINGORDERS) * GRID_STEP * pip;
+   double maxOffset = (1+GRID_PENDINGORDERS) * GRID_STEP * pip + ATRdiv3;
    
    if (distant) maxOffset += GRID_STEP*pip*GRID_PENDINGORDERS;
    
@@ -286,7 +288,7 @@ void tradeGrid(int isMaster) {
       DoubleToStr(ATR,Digits)+" ATR/3="+
       DoubleToStr((ATR/3)/pip,2)+" pips"
    );
-   double ATRdiv3 = ATR / 3;
+   ATRdiv3 = ATR / 3;
    for (i = -20;
       (i<20) && 
       (nLevels<GRID_PENDINGORDERS) && 
