@@ -197,7 +197,8 @@ double getLotSize() {
    return (numLots);
 }
 
-double lastExposure=0;
+double lastExposureGrid=-1; // perché se metto 0 non si aggiorna in caso sia realmente 0
+double lastExposureAntiGrid=-1;
 
 void tradeGrid(int isMaster) {
    GR_TrailStops();
@@ -235,14 +236,17 @@ void tradeGrid(int isMaster) {
       if (gridStart<0 || (MathAbs(openPrices[i]-Bid)<MathAbs(Bid-gridStart))) gridStart = openPrices[i];
       
    }
-   if (lastExposure!=exposure) {
-      if (isGrid) {
-         setExposure(Symbol6(),isMaster,1,exposure);
-      } else {
-         setExposure(Symbol6(),isMaster,0,exposure);
-      }
-      lastExposure=exposure;
+   
+   if (isGrid && (lastExposureGrid!=exposure)) {
+      setExposure(Symbol6(),isMaster,1,exposure);
+      lastExposureGrid = exposure;
    }
+   if ((!isGrid) && (lastExposureAntiGrid!=exposure)) {
+      setExposure(Symbol6(),isMaster,0,exposure);
+      lastExposureAntiGrid = exposure;
+   }
+     
+   
    
    maldaLog("exposure="+DoubleToStr(exposure,4));
    
