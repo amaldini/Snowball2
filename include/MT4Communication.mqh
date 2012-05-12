@@ -323,7 +323,9 @@ void tradeGrid(int isMaster) {
          if (isMaster==0) condition1=condition1 && (price>=GRID_CENTER);
          if (isMaster!=0) condition1=condition1 && (price<=GRID_CENTER);
       } else {
-         condition1 = condition1 && (MathAbs(price-GRID_CENTER)>(pip*GRID_HEIGHT_PIPS/2)); 
+         if (GRID_ENABLE) {
+            condition1 = condition1 && (MathAbs(price-GRID_CENTER)>(pip*GRID_HEIGHT_PIPS/2)); 
+         }
       }
       
       if (condition1) {
