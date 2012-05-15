@@ -27,7 +27,8 @@ exports
   getExposure,
   setProfits,
   setCloseOpenTrades,
-  getCloseOpenTrades;
+  getCloseOpenTrades,
+  setCmd,getCmd;
 
 {$IFDEF TESTING}
 
