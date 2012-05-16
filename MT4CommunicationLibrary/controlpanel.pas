@@ -16,12 +16,14 @@ type
     Button1: TButton;
     btnCloseLong: TButton;
     btnCloseShort: TButton;
+    Button2: TButton;
     ButtonCalcTargetNAV: TButton;
     ButtonCloseAll: TButton;
     GridMenuItem: TMenuItem;
     GridSetTopPrice: TMenuItem;
     GridSetBottomPrice: TMenuItem;
     GridEnable: TMenuItem;
+    MenuItem2: TMenuItem;
     txtProfitTarget: TEdit;
     Label2: TLabel;
     lblTargetNAV: TLabel;
@@ -71,6 +73,7 @@ type
     procedure Lots005Click(Sender: TObject);
     procedure LongReenterClick(Sender: TObject);
     procedure GridSetTopPriceClick(Sender: TObject);
+    procedure mnuRebalanceClick(Sender: TObject);
     procedure ShortDistantClick(Sender: TObject);
     procedure ShortReenterClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
@@ -251,6 +254,13 @@ begin
        on E:Exception do
           ShowMessage(E.Message);
      end;
+end;
+
+procedure TForm1.mnuRebalanceClick(Sender: TObject);
+begin
+     setCmd(getSelectedSymbol(),1,'rebalance');
+     setCmd(getSelectedSymbol(),0,'rebalance');
+     statusbar1.SimpleText:='Rebalance command issued to '+getSelectedSymbol();
 end;
 
 procedure TForm1.GridSetBottomPriceClick(Sender: TObject);

@@ -27,6 +27,9 @@ double getExposure(string symbolName,int isMaster,int isGrid);
 bool setCloseOpenTrades(string symbolName,int isMaster,int isClose);
 bool getCloseOpenTrades(string symbolName,int isMaster);  
 
+bool setCmd(string symbolName,int isMaster,string cmd);
+string getCmd(string symbolName,int isMaster);  
+
 #include <common_functions.mqh>
 
 double pip;
@@ -135,6 +138,16 @@ void tradeGridAndAntiGrid(int isMaster) {
    }
    
    setProfits(Symbol6(),isMaster,getCurrentProfit());
+   
+   
+   if (getCmd(Symbol6(),isMaster)=="rebalance") {
+      setCmd(Symbol6(),isMaster,"");
+      doRebalance(isMaster);
+   }
+}
+
+void doRebalance(int isMaster) {
+   
 }
 
 bool isAntiGridTrade() {
