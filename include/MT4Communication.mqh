@@ -425,12 +425,46 @@ void GR_TrailStops() {
    double GRID_LockGainPips2 = GRID_STEP * 3;
    GRID_TrailStops(pip,GRID_BreakEven, GRID_LockGainPips,GRID_BreakEven2,GRID_LockGainPips2);
    */
-   if ((ATRdiv2/pip)<10) return;
+   
    
    GRID_TrailStopsATRdiv2();
 }
 
-void GRID_TrailStopsATRdiv2()
+void GRID_TrailStopsATRdiv2() {
+   if ((ATRdiv2/pip)<10) return;
+   
+   int total=OrdersTotal();
+   for (int cnt=0;cnt<total;cnt++)
+    { 
+     OrderSelect(cnt, SELECT_BY_POS);   
+     int mode=OrderType();    
+        if ( OrderSymbol()==Symbol() ) 
+        {
+            if ( mode==OP_BUY )
+            {  
+               double BuyStop = Bid - ATRdiv2;
+               
+               if (OrderStopLoss()<BuyStop) {
+                  OrderModify(OrderTicket(),OrderOpenPrice(),
+                              NormalizeDouble(BuyStop, Digits),
+                              OrderTakeProfit(),0,LightGreen);
+               }
+			      
+			   }
+            if ( mode==OP_SELL )
+            {
+               double SellStop = Ask + ATRdiv2;
+               
+               if (OrderStopLoss()>SellStop || (OrderStopLoss()<pip)) {
+                  OrderModify(OrderTicket(),OrderOpenPrice(),
+   		                  NormalizeDouble(SellStop, Digits),
+   		                  OrderTakeProfit(),0,Yellow);	 
+   		      }   
+                 
+            }
+         }   
+      } 
+}
 
 // ---- Trailing Stops
 void GRID_TrailStops(double pip,double BreakEven, double LockGainPips,double BreakEven2,double LockGainPips2)
