@@ -68,7 +68,7 @@ extern double ANTIGRID_STOP_PIPS = 200; // pips
 double prevGridStep_Grid = 0;
 double prevGridStep_AntiGrid = 0;
 
-double ATRdiv3 = 0;
+double ATRdiv3 = 0,ATRdiv2 = 0;
 
 double adjustGridStepByExposure(int isMaster,double baseGridStep) {
    int isGridInt = 0;
@@ -296,6 +296,7 @@ void tradeGrid(int isMaster) {
       DoubleToStr((ATR/3)/pip,2)+" pips"
    );
    ATRdiv3 = ATR / 3;
+   ATRdiv2 = ATR / 2;
    for (i = -20;
       (i<20) && 
       (nLevels<GRID_PENDINGORDERS) && 
@@ -411,7 +412,12 @@ void GR_TrailStops() {
    double GRID_LockGainPips2 = GRID_STEP * 3;
    GRID_TrailStops(pip,GRID_BreakEven, GRID_LockGainPips,GRID_BreakEven2,GRID_LockGainPips2);
    */
+   if ((ATRdiv2/pip)<10) return;
+   
+   GRID_TrailStopsATRdiv2();
 }
+
+void GRID_TrailStopsATRdiv2()
 
 // ---- Trailing Stops
 void GRID_TrailStops(double pip,double BreakEven, double LockGainPips,double BreakEven2,double LockGainPips2)
