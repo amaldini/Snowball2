@@ -427,7 +427,7 @@ void GR_TrailStops() {
    */
    
    
-   GRID_TrailStopsATRdiv2();
+   // GRID_TrailStopsATRdiv2();
 }
 
 void GRID_TrailStopsATRdiv2() {
