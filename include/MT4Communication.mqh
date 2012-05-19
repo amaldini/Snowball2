@@ -56,17 +56,17 @@ bool GRID_ENABLE=false;
 
 bool isGrid;
 
-extern double GRID_TRADING_STEP = 8; // pips
-extern int GRID_TRADING_PENDINGORDERS = 3;
-extern double GRID_TAKEPROFIT = 64; // pips
-extern double GRID_STOP_PIPS = 200; // pips
+double GRID_TRADING_STEP = 10; // pips
+int GRID_TRADING_PENDINGORDERS = 3;
+double GRID_TAKEPROFIT = 8; // pips
+double GRID_STOP_PIPS = 200; // pips
 
 extern double maxExposureLots = 0.16;
 
-extern double ANTIGRID_TRADING_STEP = 10; // pips
-extern double ANTIGRID_TRADING_PENDINGORDERS = 3;
-extern double ANTIGRID_TAKEPROFIT = 200; // pips
-extern double ANTIGRID_STOP_PIPS = 200; // pips
+double ANTIGRID_TRADING_STEP = 10; // pips
+double ANTIGRID_TRADING_PENDINGORDERS = 3;
+double ANTIGRID_TAKEPROFIT = 200; // pips
+double ANTIGRID_STOP_PIPS = 200; // pips
 
 double prevGridStep_Grid = 0;
 double prevGridStep_AntiGrid = 0;
@@ -270,6 +270,12 @@ void tradeGrid(int isMaster) {
       
    }
    
+   if (isGrid) {
+      maldaLog("GRID ORDERS: "+numOrders);
+   } else {
+      maldaLog("ANTIGRID ORDERS: "+numOrders);
+   }
+   
    if (isGrid && (lastExposureGrid!=exposure)) {
       setExposure(Symbol6(),isMaster,1,exposure);
       lastExposureGrid = exposure;
@@ -309,17 +315,28 @@ void tradeGrid(int isMaster) {
    
    double adjustedLotSize = getLotSize();
    
+   /*
    if (exposure>=maxExposureLots) {
       adjustedLotSize = 0;
       maldaLog("exposure>maxExposureLots!");
    }
+   */
    
    double ATR = iATR(NULL, PERIOD_D1,14,1);
-   maldaLog("ATR="+
-      DoubleToStr(ATR,Digits)+" ATR/3="+
-      DoubleToStr((ATR/3)/pip,2)+" pips"
-   );
-   ATRdiv3 = ATR / 3;
+   if (isGrid) {
+      ATRdiv3 = ATR / 3;
+      maldaLog("ATR="+
+         DoubleToStr(ATR,Digits)+" ATR/3="+
+         DoubleToStr((ATR/3)/pip,2)+" pips"
+      );
+   } else {
+      ATRdiv3 = ATR / 3 * (1+danglers);
+      maldaLog("ATR="+
+         DoubleToStr(ATR,Digits)+" ATR/3="+
+         DoubleToStr((ATR/3)/pip,2)+" pips"+
+         " ATR/3*(1+"+danglers+")="+DoubleToStr(ATRdiv3/pip,2)+" pips"
+      );
+   }
    ATRdiv2 = ATR / 2;
    for (i = -20;
       (i<20) && 
