@@ -82,14 +82,25 @@ double adjustGridStepByExposure(int isMaster,double baseGridStep) {
    } else {
       pgs = prevGridStep_AntiGrid;
    }
+   double myExposure = getExposure(Symbol6(),isMaster,isGridInt);
    
-   double exposureDelta = getExposure(Symbol6(),isMaster,isGridInt)-getExposure(Symbol6(),1-isMaster,isGridInt);
-   double GRID_STEP = baseGridStep*(1+MathMax(0,exposureDelta/0.01));
    
+   double GRID_STEP = baseGridStep;
+   /*
+   if (myExposure / 0.01 <= 1.001) {
+      GRID_STEP = baseGridStep;
+   } else {
+      double exposureDelta = myExposure -getExposure(Symbol6(),1-isMaster,isGridInt);
+      GRID_STEP = baseGridStep*(1+MathMax(0,exposureDelta/0.01));
+   }
+   */
+   
+   /*
    if (MathAbs(GRID_STEP-pgs)>0.0001) {
       maldaLog("deleting grid pending orders because grid step changed");
       deleteGridPendingOrders();
    }
+   */
    
    if (isGrid) {
       prevGridStep_Grid = GRID_STEP;
