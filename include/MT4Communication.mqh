@@ -341,7 +341,7 @@ void tradeGrid(int isMaster) {
    for (i = -20;
       (i<20) && 
       (nLevels<GRID_PENDINGORDERS) && 
-      (GRID_STEP>2); 
+      (GRID_STEP>=2); 
       i++) {
       
       double price;
