@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 292
+  Left = 477
   Height = 272
-  Top = 431
+  Top = 645
   Width = 582
   Caption = 'SnowBall ControlPanel'
   ClientHeight = 252
@@ -232,14 +232,6 @@ object Form1: TForm1
     Width = 135
     Caption = 'Target NAV: ____________'
     ParentColor = False
-  end
-  object Button2: TButton
-    Left = 300
-    Height = 25
-    Top = 52
-    Width = 75
-    Caption = 'Button2'
-    TabOrder = 8
   end
   object Timer1: TTimer
     OnTimer = Timer1Timer

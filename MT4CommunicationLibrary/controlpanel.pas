@@ -16,7 +16,6 @@ type
     Button1: TButton;
     btnCloseLong: TButton;
     btnCloseShort: TButton;
-    Button2: TButton;
     ButtonCalcTargetNAV: TButton;
     ButtonCloseAll: TButton;
     GridMenuItem: TMenuItem;
