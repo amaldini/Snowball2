@@ -64,7 +64,7 @@ double GRID_STOP_PIPS = 200; // pips
 extern double maxExposureLots = 0.16;
 
 double ANTIGRID_TRADING_STEP = 1; // pips
-double ANTIGRID_TRADING_PENDINGORDERS = 3;
+double ANTIGRID_TRADING_PENDINGORDERS = 10;
 double ANTIGRID_TAKEPROFIT = 200; // pips
 double ANTIGRID_STOP_PIPS = 200; // pips
 
@@ -113,6 +113,8 @@ double adjustGridStepByExposure(int isMaster,double baseGridStep) {
 
 void tradeGridAndAntiGrid(int isMaster) {
    readDistantAndAllowReenter(isMaster);
+   
+   distant = false;
    
    isGrid = false; // ANTIGRID
    
@@ -289,6 +291,7 @@ void tradeGrid(int isMaster) {
    
    maldaLog("exposure="+DoubleToStr(exposure,4));
    
+   /*
    if (distant && (numOrders>0) && (exposure<0.0001)) {
        double delta;
        if (isMaster==0 && (max<Bid-GRID_STEP*pip*GRID_PENDINGORDERS)) {
@@ -301,7 +304,7 @@ void tradeGrid(int isMaster) {
          moveOrders_GRID(delta);   
          for (i=0;i<numOrders;i++) openPrices[i]+=delta;
        }   
-   }
+   }*/
 
    
    if (numOrders == 0) {
