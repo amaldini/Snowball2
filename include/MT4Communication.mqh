@@ -63,7 +63,7 @@ double GRID_STOP_PIPS = 200; // pips
 
 extern double maxExposureLots = 0.16;
 
-double ANTIGRID_TRADING_STEP = 10; // pips
+double ANTIGRID_TRADING_STEP = 1; // pips
 double ANTIGRID_TRADING_PENDINGORDERS = 3;
 double ANTIGRID_TAKEPROFIT = 200; // pips
 double ANTIGRID_STOP_PIPS = 200; // pips
@@ -330,7 +330,7 @@ void tradeGrid(int isMaster) {
          DoubleToStr((ATR/3)/pip,2)+" pips"
       );
    } else {
-      ATRdiv3 = ATR / 3 * (1+danglers);
+      ATRdiv3 = 3* GRID_STEP*pip * (1+danglers);
       maldaLog("ATR="+
          DoubleToStr(ATR,Digits)+" ATR/3="+
          DoubleToStr((ATR/3)/pip,2)+" pips"+
@@ -341,7 +341,7 @@ void tradeGrid(int isMaster) {
    for (i = -20;
       (i<20) && 
       (nLevels<GRID_PENDINGORDERS) && 
-      (GRID_STEP>=2); 
+      (GRID_STEP>=1); 
       i++) {
       
       double price;
