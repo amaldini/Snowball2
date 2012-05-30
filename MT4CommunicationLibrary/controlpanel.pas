@@ -352,7 +352,7 @@ begin
                             FormatFloat(myFormat,profits1)+' '+
                             FormatFloat(myFormat,profits2)+' '+
                             FormatFloat(myFormat,profits1+profits2)+' '+sLineBreak;
-             if ((profits1+profits2)>2) then
+             if ((profits1+profits2)>1) then
              begin
                   setCloseOpenTrades(PChar(symbol),0,1);
                   setCloseOpenTrades(PChar(symbol),1,1);
