@@ -1143,6 +1143,7 @@ void onTick(){
       closeOpenOrders(OP_SELLSTOP, magic,"onTick:W");
       closeOpenOrders(OP_BUYSTOP, magic,"onTick:W");
       sendStatsToControlPanel();
+      initialOrdersDone = false;
       return(0);
    }
 
