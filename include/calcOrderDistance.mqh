@@ -14,7 +14,8 @@ double calcOrderDistance(int danglers) {
          DoubleToStr(ATR,Digits)+" ATR/3="+
          DoubleToStr((ATR/3)/pip,2)+" pips"
       );
-      res = ATRdiv3;
+      // res = ATRdiv3;
+      res = 0;
    } else {
       if (!initialOrdersDone) {
          res = GRID_STEP / 2 * pip;
