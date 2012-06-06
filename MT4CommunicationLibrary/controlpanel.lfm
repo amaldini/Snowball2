@@ -4,7 +4,7 @@ object Form1: TForm1
   Top = 645
   Width = 582
   Caption = 'SnowBall ControlPanel'
-  ClientHeight = 252
+  ClientHeight = 253
   ClientWidth = 582
   FormStyle = fsSystemStayOnTop
   Menu = MainMenu1
@@ -42,7 +42,7 @@ object Form1: TForm1
       Left = 6
       Height = 17
       Top = 8
-      Width = 45
+      Width = 47
       Caption = 'WAIT'
       TabOrder = 0
     end
@@ -50,7 +50,7 @@ object Form1: TForm1
       Left = 6
       Height = 17
       Top = 32
-      Width = 43
+      Width = 45
       Caption = 'GRID'
       TabOrder = 1
     end
@@ -58,7 +58,7 @@ object Form1: TForm1
       Left = 6
       Height = 17
       Top = 56
-      Width = 71
+      Width = 73
       Caption = 'ANTI-GRID'
       Enabled = False
       TabOrder = 2
@@ -87,7 +87,7 @@ object Form1: TForm1
       Left = 6
       Height = 17
       Top = 8
-      Width = 45
+      Width = 47
       Caption = 'WAIT'
       TabOrder = 0
     end
@@ -95,7 +95,7 @@ object Form1: TForm1
       Left = 6
       Height = 17
       Top = 32
-      Width = 43
+      Width = 45
       Caption = 'GRID'
       TabOrder = 1
     end
@@ -103,7 +103,7 @@ object Form1: TForm1
       Left = 6
       Height = 17
       Top = 56
-      Width = 71
+      Width = 73
       Caption = 'ANTI-GRID'
       Enabled = False
       TabOrder = 2
@@ -129,8 +129,8 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 23
-    Top = 229
+    Height = 20
+    Top = 233
     Width = 582
     Panels = <>
   end
@@ -243,14 +243,6 @@ object Form1: TForm1
     top = 40
     object AntiGridOptions: TMenuItem
       Caption = 'AntiGrid'
-      object LongDistant: TMenuItem
-        Caption = 'Long distant'
-        OnClick = LongDistantClick
-      end
-      object ShortDistant: TMenuItem
-        Caption = 'Short distant'
-        OnClick = ShortDistantClick
-      end
       object LongReenter: TMenuItem
         Caption = 'Long Reenter'
         OnClick = LongReenterClick

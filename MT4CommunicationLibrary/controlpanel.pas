@@ -39,7 +39,6 @@ type
     LongWait: TRadioButton;
     LongGrid: TRadioButton;
     LongAntiGrid: TRadioButton;
-    LongDistant: TMenuItem;
     MenuItem1: TMenuItem;
     Lots001: TMenuItem;
     Lots002: TMenuItem;
@@ -48,7 +47,6 @@ type
     Lots005: TMenuItem;
     LongReenter: TMenuItem;
     ShortReenter: TMenuItem;
-    ShortDistant: TMenuItem;
     ShortWait: TRadioButton;
     ShortGrid: TRadioButton;
     ShortAntiGrid: TRadioButton;
@@ -64,7 +62,6 @@ type
     procedure GridSetBottomPriceClick(Sender: TObject);
     procedure Label2Click(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
-    procedure LongDistantClick(Sender: TObject);
     procedure Lots001Click(Sender: TObject);
     procedure Lots002Click(Sender: TObject);
     procedure Lots003Click(Sender: TObject);
@@ -73,7 +70,6 @@ type
     procedure LongReenterClick(Sender: TObject);
     procedure GridSetTopPriceClick(Sender: TObject);
     procedure mnuRebalanceClick(Sender: TObject);
-    procedure ShortDistantClick(Sender: TObject);
     procedure ShortReenterClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
 
@@ -160,7 +156,7 @@ begin
        if (distant[0]<>0) then boolValue:=true;
        if (distant[1]<>0) then boolValue2:=true;
   end;
-  longDistant.checked:=boolValue;
+  // longDistant.checked:=boolValue;
   LongReenter.Checked:=boolValue2;
 
   boolValue:=false;
@@ -170,7 +166,7 @@ begin
        if (distant[0]<>0) then boolValue:=true;
        if (distant[1]<>0) then boolValue2:=true;
   end;
-  shortDistant.checked:=boolValue;
+  // shortDistant.checked:=boolValue;
   ShortReenter.Checked:= boolValue2;
 
   multiplierForMicroLot:=getMultiplierForMicroLot(symbol);
@@ -194,7 +190,7 @@ begin
   begin
        isDistant:=0; allowReenter:=0;
        symbol:=getSelectedSymbol();
-       if (form1.longDistant.checked) then isDistant:=1;
+       // if (form1.longDistant.checked) then isDistant:=1;
        if (form1.longReenter.checked) then allowReenter:=1;
        setAntiGridOptions(symbol,1,isDistant,allowReenter);
   end;
@@ -209,7 +205,7 @@ begin
      begin
         isDistant:=0; allowReenter:=0;
         symbol:=getSelectedSymbol();
-        if (form1.shortDistant.checked) then isDistant:=1;
+        // if (form1.shortDistant.checked) then isDistant:=1;
         if (form1.ShortReenter.checked) then allowReenter:=1;
         setAntiGridOptions(symbol,0,isDistant,allowReenter);
      end;
@@ -227,12 +223,6 @@ begin
         setGridOptions(symbol,enable,gridBottom,gridTop);
         updateGridTopAndBottom();
      end;
-end;
-
-procedure TForm1.LongDistantClick(Sender: TObject);
-begin
-       LongDistant.Checked:=not longDistant.Checked;
-       updateAntiGridLongOptions();
 end;
 
 procedure TForm1.LongReenterClick(Sender: TObject);
@@ -280,12 +270,6 @@ procedure TForm1.GridEnableClick(Sender: TObject);
 begin
   GridEnable.Checked:=not GridEnable.Checked;
   updateGridOptions();
-end;
-
-procedure TForm1.ShortDistantClick(Sender: TObject);
-begin
-     ShortDistant.checked := not shortDistant.checked;
-     updateAntiGridShortOptions();
 end;
 
 procedure TForm1.ShortReenterClick(Sender: TObject);
