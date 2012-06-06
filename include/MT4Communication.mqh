@@ -52,6 +52,7 @@ double GRID_STOP;
 double GRID_CENTER;
 double GRID_HEIGHT_PIPS;
 bool GRID_ENABLE=false;
+bool BURSTGRID_ENABLE=false;
 
 bool isGrid;
 
@@ -66,6 +67,11 @@ double ANTIGRID_TRADING_STEP = 10; // pips
 double ANTIGRID_TRADING_PENDINGORDERS = 3;
 double ANTIGRID_TAKEPROFIT = 200; // pips
 double ANTIGRID_STOP_PIPS = 200; // pips
+
+double BURSTGRID_TRADING_STEP = 1; // pips
+double BURSTGRID_TRADING_PENDINGORDERS = 5;
+double BURSTGRID_TAKEPROFIT = 20; // pips 
+double BURSTGRID_STOP_PIPS = 20; // pips
 
 double prevGridStep_Grid = 0;
 double prevGridStep_AntiGrid = 0;
@@ -145,6 +151,18 @@ void tradeGridAndAntiGrid(int isMaster) {
       tradeGrid(isMaster);
    } else {
       deleteGridPendingOrders();
+   }
+   
+   if (BURSTGRID_ENABLE) {
+      GRID_STEP = adjustGridStepByExposure(isMaster,BURSTGRID_TRADING_STEP);
+      GRID_PENDINGORDERS = BURSTGRID_TRADING_PENDINGORDERS;
+      GRID_TP = BURSTGRID_TAKEPROFIT;
+      if (GRID_TP<6) GRID_TP = 6; 
+      GRID_STOP = BURSTGRID_STOP_PIPS;
+      
+      tradeGrid(isMaster);
+   } else {
+      deleteBurstGridPendingOrders();
    }
    
    setProfits(Symbol6(),isMaster,getCurrentProfit());
