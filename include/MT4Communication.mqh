@@ -38,8 +38,6 @@ string comment;
 int magic;
 string stringToAppendToInfo;
 
-
-bool distant=true;
 bool allowReenter=false;
 
 extern bool GRID_TRADING = true;
@@ -125,7 +123,6 @@ void tradeGridAndAntiGrid(int isMaster) {
    
    tradeGrid(isMaster);
    
-   distant = false;
    allowReenter = false; 
    
    readGridOptions(isMaster);
@@ -279,15 +276,9 @@ void tradeGrid(int isMaster) {
       if (isMaster==0) { // SHORT
          price = NormalizeDouble(gridStart-GRID_STEP*i*pip,Digits);
          condition1 = (price<(Bid-orderDistance)); 
-         if (distant) {
-            condition1 = condition1 && (price<(Bid-GRID_STEP*pip*GRID_PENDINGORDERS));
-         }
       } else {           // LONG
          price = NormalizeDouble(gridStart+GRID_STEP*i*pip,Digits);
          condition1 = (price>(Ask+orderDistance)); 
-         if (distant) {
-            condition1 = condition1 && (price>(Ask+GRID_STEP*pip*GRID_PENDINGORDERS));
-         }
       }
       if (isGrid) {
          condition1 = condition1 && (MathAbs(price-GRID_CENTER)<=(pip*(GRID_HEIGHT_PIPS+GRID_STEP)/2));
@@ -350,7 +341,7 @@ void readDistantAndAllowReenter(int isMaster) {
    int i[2];
    i[0]=0;
    allowReenter = false;
-   distant = true;
+   bool distant = true; // UNUSED
    if (getAntiGridOptions(Symbol6(),isMaster,i)) {
       if (i[0]==0) distant = false;
       if (i[1]!=0) allowReenter = true;
