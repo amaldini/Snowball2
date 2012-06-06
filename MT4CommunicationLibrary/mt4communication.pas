@@ -21,6 +21,9 @@ function setAntiGridOptions(symbolName:PChar;isMaster:integer;isDistant:integer;
 function setGridOptions(symbolName:PChar;enable:integer;gridBottom:double;gridTop:double):boolean;stdcall;
 function getGridOptions(symbolName:PChar;var enable:tiPair;var bottomAndTop:TD_Terna):boolean;stdcall;
 
+function setBurstGridOptions(symbolName:PChar;enable:integer):boolean;stdcall;
+function getBurstGridOptions(symbolName:PChar;var enable:tiPair):boolean;stdcall;
+
 function setExposure(symbolName:PChar;isMaster:integer;isGrid:integer;exposureLots:double):boolean;stdcall;
 function getExposure(symbolName:PChar;isMaster:integer;isGrid:integer):double;stdcall;
 
@@ -521,6 +524,72 @@ begin
               0: enable[0] := strToInt(list.valueFromIndex[i]);
               1: bottomAndTop[0] := strToFloat(list.ValueFromIndex[i]);          // gridBottom
               2: bottomAndTop[1] := strToFloat(list.ValueFromIndex[i]);          // gridTop
+              end;
+              // Writeln(list.ValueFromIndex[i]);
+         end;
+         result:=true;
+  end;
+
+
+  // Writeln(list.Count);
+
+  list.free;
+end;
+
+function setBurstGridOptions(symbolName:PChar;enable:integer):boolean;stdcall;
+var
+   entry:ansistring;
+   s :ansistring; // reference counted and memory managed strings.
+begin
+    entry:=appendMasterTagToSymbolName(0,symbolName);
+
+    s := IntToStr(enable);
+
+    With TRegistry.Create do
+         try
+            RootKey:=HKEY_CURRENT_USER;
+            if OpenKey('Software\VB and VBA Program Settings\MT4Channel\BurstGridOptions',true) then
+            WriteString(entry,s);
+         finally
+            free;
+         end;
+
+    result := true;
+end;
+
+function getBurstGridOptions(symbolName:PChar;var enable:tiPair):boolean;stdcall;
+var
+   entry:ansistring;
+   list:TStringList;
+   i:integer;
+   s:string;
+begin
+   entry:=appendMasterTagToSymbolName(0,symbolName);
+
+   With TRegistry.Create do
+       try
+         RootKey:=HKEY_CURRENT_USER;
+         If OpenKeyReadOnly('Software\VB and VBA Program Settings\MT4Channel\BurstGridOptions') then
+         If ValueExists(entry) then
+            s:=ReadString(entry); // Or whatever it is. ReadInteger/ReadBool
+       finally
+         free;
+       end;
+
+  // ShowMessage(s);
+
+  list := TStringList.Create;
+  list.Delimiter := ';';
+  list.StrictDelimiter:=true;
+  list.DelimitedText:=s;
+
+  result:=false;
+  if (list.Count=1) then
+  begin
+         for i:=0 to list.Count-1 do
+         begin
+              case i of
+              0: enable[0] := strToInt(list.valueFromIndex[i]);
               end;
               // Writeln(list.ValueFromIndex[i]);
          end;

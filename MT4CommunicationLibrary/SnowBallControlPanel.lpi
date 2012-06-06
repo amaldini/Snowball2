@@ -43,12 +43,11 @@
         <Filename Value="SnowBallControlPanel.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="SnowBallControlPanel"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
-        <CursorPos X="1" Y="19"/>
-        <UsageCount Value="81"/>
+        <CursorPos X="14" Y="10"/>
+        <UsageCount Value="82"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -57,11 +56,12 @@
         <ComponentName Value="Form1"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="ControlPanel"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="42"/>
-        <CursorPos X="50" Y="72"/>
-        <UsageCount Value="81"/>
+        <TopLine Value="156"/>
+        <CursorPos X="26" Y="199"/>
+        <UsageCount Value="82"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -70,8 +70,8 @@
         <UnitName Value="MT4Communication"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="81"/>
-        <CursorPos X="28" Y="87"/>
+        <TopLine Value="524"/>
+        <CursorPos X="64" Y="592"/>
         <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -93,127 +93,123 @@
         <UsageCount Value="10"/>
       </Unit4>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="233" Column="57" TopLine="124"/>
+        <Caret Line="93" Column="24" TopLine="92"/>
       </Position1>
       <Position2>
-        <Filename Value="controlpanel.pas"/>
-        <Caret Line="106" Column="11" TopLine="93"/>
+        <Filename Value="mt4communication.pas"/>
+        <Caret Line="40" Column="66" TopLine="10"/>
       </Position2>
       <Position3>
-        <Filename Value="controlpanel.pas"/>
-        <Caret Line="113" Column="36" TopLine="91"/>
+        <Filename Value="mt4communication.pas"/>
+        <Caret Line="38" Column="122" TopLine="23"/>
       </Position3>
       <Position4>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="209" Column="28" TopLine="191"/>
+        <Caret Line="268" Column="30" TopLine="250"/>
       </Position4>
       <Position5>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="241" Column="26" TopLine="214"/>
+        <Caret Line="264" Column="79" TopLine="243"/>
       </Position5>
       <Position6>
-        <Filename Value="mt4communication.pas"/>
-        <Caret Line="463" Column="22" TopLine="439"/>
+        <Filename Value="controlpanel.pas"/>
+        <Caret Line="75" Column="53" TopLine="60"/>
       </Position6>
       <Position7>
-        <Filename Value="mt4communication.pas"/>
-        <Caret Line="9" Column="28" TopLine="1"/>
+        <Filename Value="controlpanel.pas"/>
+        <Caret Line="74" Column="53" TopLine="59"/>
       </Position7>
       <Position8>
         <Filename Value="mt4communication.pas"/>
-        <Caret Line="458" Column="26" TopLine="435"/>
+        <Caret Line="78" Column="81" TopLine="22"/>
       </Position8>
       <Position9>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="7" Column="1" TopLine="1"/>
+        <Caret Line="6" Column="18" TopLine="1"/>
       </Position9>
       <Position10>
-        <Filename Value="mt4communication.pas"/>
-        <Caret Line="42" Column="31" TopLine="31"/>
+        <Filename Value="controlpanel.pas"/>
+        <Caret Line="367" Column="22" TopLine="357"/>
       </Position10>
       <Position11>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="118" Column="77" TopLine="100"/>
+        <Caret Line="366" Column="22" TopLine="356"/>
       </Position11>
       <Position12>
-        <Filename Value="mt4communication.pas"/>
-        <Caret Line="139" Column="30" TopLine="121"/>
+        <Filename Value="controlpanel.pas"/>
+        <Caret Line="365" Column="22" TopLine="355"/>
       </Position12>
       <Position13>
-        <Filename Value="SnowBallControlPanel.lpr"/>
-        <Caret Line="19" Column="1" TopLine="1"/>
+        <Filename Value="controlpanel.pas"/>
+        <Caret Line="171" Column="5" TopLine="148"/>
       </Position13>
       <Position14>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="93" Column="24" TopLine="92"/>
+        <Caret Line="210" Column="12" TopLine="172"/>
       </Position14>
       <Position15>
-        <Filename Value="mt4communication.pas"/>
-        <Caret Line="40" Column="66" TopLine="10"/>
+        <Filename Value="controlpanel.pas"/>
+        <Caret Line="228" Column="5" TopLine="182"/>
       </Position15>
       <Position16>
-        <Filename Value="mt4communication.pas"/>
-        <Caret Line="38" Column="122" TopLine="23"/>
+        <Filename Value="controlpanel.pas"/>
+        <Caret Line="275" Column="5" TopLine="256"/>
       </Position16>
       <Position17>
-        <Filename Value="controlpanel.pas"/>
-        <Caret Line="268" Column="30" TopLine="250"/>
+        <Filename Value="SnowBallControlPanel.lpr"/>
+        <Caret Line="19" Column="1" TopLine="1"/>
       </Position17>
       <Position18>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="264" Column="79" TopLine="243"/>
+        <Caret Line="72" Column="50" TopLine="42"/>
       </Position18>
       <Position19>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="75" Column="53" TopLine="60"/>
+        <Caret Line="480" Column="6" TopLine="445"/>
       </Position19>
       <Position20>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="74" Column="53" TopLine="59"/>
+        <Caret Line="487" Column="6" TopLine="452"/>
       </Position20>
       <Position21>
-        <Filename Value="mt4communication.pas"/>
-        <Caret Line="78" Column="81" TopLine="22"/>
+        <Filename Value="controlpanel.pas"/>
+        <Caret Line="252" Column="3" TopLine="250"/>
       </Position21>
       <Position22>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="6" Column="18" TopLine="1"/>
+        <Caret Line="253" Column="3" TopLine="251"/>
       </Position22>
       <Position23>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="367" Column="22" TopLine="357"/>
+        <Caret Line="286" Column="24" TopLine="283"/>
       </Position23>
       <Position24>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="366" Column="22" TopLine="356"/>
+        <Caret Line="260" Column="23" TopLine="257"/>
       </Position24>
       <Position25>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="365" Column="22" TopLine="355"/>
+        <Caret Line="268" Column="17" TopLine="258"/>
       </Position25>
       <Position26>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="171" Column="5" TopLine="148"/>
+        <Caret Line="241" Column="28" TopLine="218"/>
       </Position26>
       <Position27>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="210" Column="12" TopLine="172"/>
+        <Caret Line="73" Column="53" TopLine="1"/>
       </Position27>
       <Position28>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="228" Column="5" TopLine="182"/>
+        <Caret Line="139" Column="18" TopLine="115"/>
       </Position28>
       <Position29>
         <Filename Value="controlpanel.pas"/>
-        <Caret Line="275" Column="5" TopLine="256"/>
+        <Caret Line="110" Column="26" TopLine="110"/>
       </Position29>
-      <Position30>
-        <Filename Value="SnowBallControlPanel.lpr"/>
-        <Caret Line="19" Column="1" TopLine="1"/>
-      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

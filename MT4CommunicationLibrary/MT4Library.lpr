@@ -21,6 +21,7 @@ exports
   setBalance_NAV_UsedMargin,
   getAntiGridOptions,
   getGridOptions,
+  getBurstGridOptions,
   getMultiplierForMicroLot,
   setMultiplierForMicroLot,
   setExposure,

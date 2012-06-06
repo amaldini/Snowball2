@@ -23,6 +23,8 @@ type
     GridSetBottomPrice: TMenuItem;
     GridEnable: TMenuItem;
     MenuItem2: TMenuItem;
+    BurstGridEnable: TMenuItem;
+    mnuRebalance: TMenuItem;
     txtProfitTarget: TEdit;
     Label2: TLabel;
     lblTargetNAV: TLabel;
@@ -69,6 +71,7 @@ type
     procedure Lots005Click(Sender: TObject);
     procedure LongReenterClick(Sender: TObject);
     procedure GridSetTopPriceClick(Sender: TObject);
+    procedure BurstGridEnableClick(Sender: TObject);
     procedure mnuRebalanceClick(Sender: TObject);
     procedure ShortReenterClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
@@ -121,6 +124,20 @@ begin
      end;
      Form1.gridEnable.checked:=bEnable;
      updateGridTopAndBottom();
+end;
+
+procedure loadBurstGridOptions();
+var
+   enable:tiPair;
+   bEnable:boolean;
+begin
+     bEnable:=false;
+
+     if (getBurstGridOptions(getSelectedSymbol(),enable)) then
+     begin
+          bEnable:=(enable[0]<>0);
+     end;
+     Form1.BurstGridEnable.checked:=bEnable;
 end;
 
 procedure TForm1.ListBox1Click(Sender: TObject);
@@ -179,6 +196,7 @@ begin
   end;
 
   loadGridOptions();
+  loadBurstGridOptions();
 end;
 
 procedure updateAntiGridLongOptions();
@@ -225,6 +243,19 @@ begin
      end;
 end;
 
+procedure updateBurstGridOptions();
+var symbol:pchar;
+    enable:integer;
+begin
+     if (form1.listbox1.itemindex>=0) then
+     begin
+        enable:=0;
+        symbol:=getSelectedSymbol();
+        if (form1.BurstGridEnable.Checked) then enable:=1;
+        setBurstGridOptions(symbol,enable);
+     end;
+end;
+
 procedure TForm1.LongReenterClick(Sender: TObject);
 begin
      LongReenter.Checked:=not LongReenter.Checked;
@@ -243,6 +274,12 @@ begin
        on E:Exception do
           ShowMessage(E.Message);
      end;
+end;
+
+procedure TForm1.BurstGridEnableClick(Sender: TObject);
+begin
+     BurstGridEnable.Checked:=not BurstGridEnable.Checked;
+     updateBurstGridOptions();
 end;
 
 procedure TForm1.mnuRebalanceClick(Sender: TObject);

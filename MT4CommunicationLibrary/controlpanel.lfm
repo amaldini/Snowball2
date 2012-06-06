@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 477
+  Left = 287
   Height = 272
-  Top = 645
+  Top = 247
   Width = 582
   Caption = 'SnowBall ControlPanel'
   ClientHeight = 253
@@ -304,6 +304,13 @@ object Form1: TForm1
       object GridEnable: TMenuItem
         Caption = 'Enable'
         OnClick = GridEnableClick
+      end
+    end
+    object MenuItem2: TMenuItem
+      Caption = 'BurstGrid'
+      object BurstGridEnable: TMenuItem
+        Caption = 'Enable'
+        OnClick = BurstGridEnableClick
       end
     end
     object mnuRebalance: TMenuItem

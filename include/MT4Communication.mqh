@@ -15,7 +15,8 @@ bool   setGridMode(string symbolName,int isMaster,string gridMode);
 bool   getAntiGridOptions(string symbolName,int isMaster,int& distant[]); 
 int    getMultiplierForMicroLot(string symbolName);
 
-bool getGridOptions(string symbolName,int& enable[],double& bottomAndTop[]);  
+bool getGridOptions(string symbolName,int& enable[],double& bottomAndTop[]); 
+bool getBurstGridOptions(string symbolName,int &enable[]); 
 
 bool   setProfits(string symbolName,int isMaster,double profits);
 
@@ -359,6 +360,11 @@ void readGridOptions(int isMaster) {
       place_SL_Line(bottomAndTop[1],"GridTop","Grid TOP");
       place_SL_Line(bottomAndTop[0],"GridBottom","Grid BOTTOM");
    } 
+   if (getBurstGridOptions(Symbol6(),enable))  {
+      BURST_GRID_ENABLE = (enable[0]!=0);
+   }
+      
+   
 }
 
 void GR_TrailStops() {
