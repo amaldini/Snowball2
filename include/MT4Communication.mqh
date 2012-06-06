@@ -38,8 +38,6 @@ string comment;
 int magic;
 string stringToAppendToInfo;
 
-
-bool distant=true;
 bool allowReenter=false;
 
 extern bool GRID_TRADING = true;
@@ -77,7 +75,8 @@ double BURSTGRID_STOP_PIPS = 20; // pips
 double prevGridStep_Grid = 0;
 double prevGridStep_AntiGrid = 0;
 
-double ATRdiv3 = 0,ATRdiv2 = 0;
+
+#include <calcOrderDistance.mqh>
 
 double adjustGridStepByExposure(int isMaster,double baseGridStep) {
    int isGridInt = 0;
@@ -88,7 +87,7 @@ double adjustGridStepByExposure(int isMaster,double baseGridStep) {
    } else {
       pgs = prevGridStep_AntiGrid;
    }
-   double myExposure = getExposure(Symbol6(),isMaster,isGridInt);
+   // double myExposure = getExposure(Symbol6(),isMaster,isGridInt);
    
    
    double GRID_STEP = baseGridStep;
@@ -130,7 +129,6 @@ void tradeGridAndAntiGrid(int isMaster) {
    
    tradeGrid(isMaster);
    
-   distant = false;
    allowReenter = false; 
    
    readGridOptions(isMaster);
@@ -194,47 +192,6 @@ bool isMyOrderGrid(int magic) {
    if (isGrid && (!isAntiGridTrade())) return (true);
    
    return (false);
-}
-
-/**
-* move all entry orders by the amount of d
-*/
-void moveOrders_GRID(double d){
-   int i;
-   
-   double maxOffset = (1+GRID_PENDINGORDERS) * GRID_STEP * pip + ATRdiv3;
-   
-   if (distant) maxOffset += GRID_STEP*pip*GRID_PENDINGORDERS;
-  
-   string GRIDDESCR;
-   if (isGrid) {
-      GRIDDESCR = "GRID";
-   } else {
-      GRIDDESCR = "ANTIGRID";
-   }
-   
-   for(i=0; i<OrdersTotal(); i++){
-      OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
-      int otype = OrderType();
-      if ((otype!=OP_SELL) && (otype!=OP_BUY)) { 
-         if (isMyOrderGrid(magic)){
-            if (MathAbs(OrderOpenPrice() - ((Bid+Ask)/2)) > maxOffset){
-               maldaLog(GRIDDESCR+": Deleting too distant order");
-               orderDeleteReliable(OrderTicket());
-            }else{
-               maldaLog(GRIDDESCR+": moving order "+OrderTicket()+" by "+DoubleToStr(d,Digits));
-               orderModifyReliable(
-                  OrderTicket(),
-                  NormalizeDouble(OrderOpenPrice() + d,Digits),
-                  NormalizeDouble(OrderStopLoss() + d,Digits), //OK
-                  NormalizeDouble(OrderTakeProfit() + d, Digits),
-                  0,
-                  CLR_NONE
-               );
-            }
-         }
-      }
-   }
 }
 
 double getLotSize() {
@@ -303,24 +260,7 @@ void tradeGrid(int isMaster) {
       lastExposureAntiGrid = exposure;
    }
      
-   
-   
    maldaLog("exposure="+DoubleToStr(exposure,4));
-   
-   if (distant && (numOrders>0) && (exposure<0.0001)) {
-       double delta;
-       if (isMaster==0 && (max<Bid-GRID_STEP*pip*GRID_PENDINGORDERS)) {
-         delta = (Bid-GRID_STEP*pip*GRID_PENDINGORDERS)-max;
-         moveOrders_GRID(delta); 
-         for (i=0;i<numOrders;i++) openPrices[i]+=delta;
-       }
-       if (isMaster==1 && (min>Ask+GRID_STEP*pip*GRID_PENDINGORDERS)) {
-         delta = -(min-(Ask+GRID_STEP*pip*GRID_PENDINGORDERS));
-         moveOrders_GRID(delta);   
-         for (i=0;i<numOrders;i++) openPrices[i]+=delta;
-       }   
-   }
-
    
    if (numOrders == 0) {
       gridStart = NormalizeDouble((Ask+Bid)/2,Digits);
@@ -340,22 +280,8 @@ void tradeGrid(int isMaster) {
    }
    */
    
-   double ATR = iATR(NULL, PERIOD_D1,14,1);
-   if (isGrid) {
-      ATRdiv3 = ATR / 3;
-      maldaLog("ATR="+
-         DoubleToStr(ATR,Digits)+" ATR/3="+
-         DoubleToStr((ATR/3)/pip,2)+" pips"
-      );
-   } else {
-      ATRdiv3 = ATR / 3 * (1+danglers);
-      maldaLog("ATR="+
-         DoubleToStr(ATR,Digits)+" ATR/3="+
-         DoubleToStr((ATR/3)/pip,2)+" pips"+
-         " ATR/3*(1+"+danglers+")="+DoubleToStr(ATRdiv3/pip,2)+" pips"
-      );
-   }
-   ATRdiv2 = ATR / 2;
+   double orderDistance = calcOrderDistance(danglers);
+   
    for (i = -20;
       (i<20) && 
       (nLevels<GRID_PENDINGORDERS) && 
@@ -367,16 +293,10 @@ void tradeGrid(int isMaster) {
       
       if (isMaster==0) { // SHORT
          price = NormalizeDouble(gridStart-GRID_STEP*i*pip,Digits);
-         condition1 = (price<(Bid-ATRdiv3)); 
-         if (distant) {
-            condition1 = condition1 && (price<(Bid-GRID_STEP*pip*GRID_PENDINGORDERS));
-         }
+         condition1 = (price<(Bid-orderDistance)); 
       } else {           // LONG
          price = NormalizeDouble(gridStart+GRID_STEP*i*pip,Digits);
-         condition1 = (price>(Ask+ATRdiv3)); 
-         if (distant) {
-            condition1 = condition1 && (price>(Ask+GRID_STEP*pip*GRID_PENDINGORDERS));
-         }
+         condition1 = (price>(Ask+orderDistance)); 
       }
       if (isGrid) {
          condition1 = condition1 && (MathAbs(price-GRID_CENTER)<=(pip*(GRID_HEIGHT_PIPS+GRID_STEP)/2));
@@ -429,11 +349,7 @@ void tradeGrid(int isMaster) {
       }
    }
    
-   if (getCloseOpenTrades(Symbol6(),isMaster)) {
-      closeOpenOrders(OP_BUY,magic,"command issued by controlpanel");
-      closeOpenOrders(OP_SELL,magic,"command issued by controlpanel");
-      setCloseOpenTrades(Symbol6(),isMaster,0);
-   }
+   ExitConditions(isMaster);
    
    maldaLog("tradeGrid("+ danglers +") danglers");
 }
@@ -443,7 +359,7 @@ void readDistantAndAllowReenter(int isMaster) {
    int i[2];
    i[0]=0;
    allowReenter = false;
-   distant = true;
+   bool distant = true; // UNUSED
    if (getAntiGridOptions(Symbol6(),isMaster,i)) {
       if (i[0]==0) distant = false;
       if (i[1]!=0) allowReenter = true;
