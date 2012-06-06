@@ -52,9 +52,10 @@ double GRID_STOP;
 double GRID_CENTER;
 double GRID_HEIGHT_PIPS;
 bool GRID_ENABLE=false;
-bool BURSTGRID_ENABLE=false;
+bool BURST_GRID_ENABLE=false;
 
 bool isGrid;
+bool isBurstGrid;
 
 double GRID_TRADING_STEP = 10; // pips
 int GRID_TRADING_PENDINGORDERS = 3;
@@ -121,6 +122,7 @@ void tradeGridAndAntiGrid(int isMaster) {
    readDistantAndAllowReenter(isMaster);
    
    isGrid = false; // ANTIGRID
+   isBurstGrid = false;
    
    GRID_STEP = adjustGridStepByExposure(isMaster,ANTIGRID_TRADING_STEP);
    GRID_PENDINGORDERS = ANTIGRID_TRADING_PENDINGORDERS;
@@ -153,7 +155,10 @@ void tradeGridAndAntiGrid(int isMaster) {
       deleteGridPendingOrders();
    }
    
-   if (BURSTGRID_ENABLE) {
+   isGrid=false;
+   isBurstGrid=true;
+   
+   if (BURST_GRID_ENABLE) {
       GRID_STEP = adjustGridStepByExposure(isMaster,BURSTGRID_TRADING_STEP);
       GRID_PENDINGORDERS = BURSTGRID_TRADING_PENDINGORDERS;
       GRID_TP = BURSTGRID_TAKEPROFIT;
@@ -162,8 +167,10 @@ void tradeGridAndAntiGrid(int isMaster) {
       
       tradeGrid(isMaster);
    } else {
-      deleteBurstGridPendingOrders();
+      deleteGridPendingOrders();
    }
+   
+   isBurstGrid=false;
    
    setProfits(Symbol6(),isMaster,getCurrentProfit());
    
@@ -186,8 +193,22 @@ bool isAntiGridTrade() {
    }
 }
 
+bool isBurstGridTrade() {
+   double delta = MathAbs(OrderOpenPrice()-OrderTakeProfit())/pip;
+   if (MathAbs(delta-BURSTGRID_TAKEPROFIT)<5) {
+      return(true);
+   } else { 
+      return(false);
+   }
+}
+
 bool isMyOrderGrid(int magic) {
    if (!isMyOrder(magic)) return (false);
+   
+   if (isBurstGrid){
+      if (isBurstGridTrade()) return (true);
+      return (false);
+   }
    
    if ((!isGrid) && isAntiGridTrade()) return (true);
    if (isGrid && (!isAntiGridTrade())) return (true);

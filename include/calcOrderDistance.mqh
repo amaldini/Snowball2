@@ -2,7 +2,8 @@
 
 
 double ATRdiv2 = 0;
-bool initialOrdersDone = false;
+bool initialOrdersDone_AntiGrid = false;
+bool initialOrdersDone_BurstGrid = false;
 
 double calcOrderDistance(int danglers) {
    double ATR = iATR(NULL, PERIOD_D1,14,1);
@@ -17,6 +18,10 @@ double calcOrderDistance(int danglers) {
       // res = ATRdiv3;
       res = 0;
    } else {
+   
+      if (isBurstGrid) 
+      bool initialOrdersDone = initialOrdersDone_
+   
       if (!initialOrdersDone) {
          res = GRID_STEP / 2 * pip;
          initialOrdersDone = true;
