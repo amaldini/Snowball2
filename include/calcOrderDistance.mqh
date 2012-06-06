@@ -19,12 +19,12 @@ double calcOrderDistance(int danglers) {
       res = 0;
    } else {
    
-   	  bool initialOrdersDone = false;
+   	bool initialOrdersDone = false;
       if (isBurstGrid) {
       	initialOrdersDone = initialOrdersDone_BurstGrid;
       } else {
       	initialOrdersDone = initialOrdersDone_AntiGrid;
-   	  }
+   	}
       if (!initialOrdersDone) {
          res = GRID_STEP / 2 * pip;
          initialOrdersDone = true;
@@ -40,7 +40,7 @@ double calcOrderDistance(int danglers) {
       	initialOrdersDone_BurstGrid = initialOrdersDone;
       } else {
       	initialOrdersDone_AntiGrid = initialOrdersDone;
-   	  }
+   	}
    }
    return (res);
 }

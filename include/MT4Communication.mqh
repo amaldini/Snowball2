@@ -168,6 +168,7 @@ void tradeGridAndAntiGrid(int isMaster) {
       tradeGrid(isMaster);
    } else {
       deleteGridPendingOrders();
+      initialOrdersDone_BurstGrid = false;
    }
    
    isBurstGrid=false;
@@ -307,7 +308,7 @@ void tradeGrid(int isMaster) {
    for (i = -20;
       (i<20) && 
       (nLevels<GRID_PENDINGORDERS) && 
-      (GRID_STEP>=2); 
+      (GRID_STEP>=1); 
       i++) {
       
       double price;
