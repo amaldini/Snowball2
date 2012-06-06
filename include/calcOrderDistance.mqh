@@ -19,9 +19,12 @@ double calcOrderDistance(int danglers) {
       res = 0;
    } else {
    
-      if (isBurstGrid) 
-      bool initialOrdersDone = initialOrdersDone_
-   
+   	  bool initialOrdersDone = false;
+      if (isBurstGrid) {
+      	initialOrdersDone = initialOrdersDone_BurstGrid;
+      } else {
+      	initialOrdersDone = initialOrdersDone_AntiGrid;
+   	  }
       if (!initialOrdersDone) {
          res = GRID_STEP / 2 * pip;
          initialOrdersDone = true;
@@ -33,6 +36,11 @@ double calcOrderDistance(int danglers) {
             " ATR/3*(1+"+danglers+")="+DoubleToStr(res/pip,2)+" pips"
          );
       }
+      if (isBurstGrid) {
+      	initialOrdersDone_BurstGrid = initialOrdersDone;
+      } else {
+      	initialOrdersDone_AntiGrid = initialOrdersDone;
+   	  }
    }
    return (res);
 }
@@ -42,6 +50,7 @@ void ExitConditions(int isMaster) {
       closeOpenOrders(OP_BUY,magic,"command issued by controlpanel");
       closeOpenOrders(OP_SELL,magic,"command issued by controlpanel");
       setCloseOpenTrades(Symbol6(),isMaster,0);
-      initialOrdersDone = false;
+      initialOrdersDone_BurstGrid = false;
+      initialOrdersDone_AntiGrid = false;
    }
 }
