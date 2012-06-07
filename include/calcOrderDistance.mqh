@@ -29,7 +29,11 @@ double calcOrderDistance(int danglers) {
          res = GRID_STEP / 2 * pip;
          initialOrdersDone = true;
       } else {
-         res =  ATRdiv3 * (1+danglers);
+         if (isBurstGrid) {
+            res = 3* GRID_STEP*pip * (1+danglers);
+         } else {
+            res =  ATRdiv3 * (1+danglers);
+         }
          maldaLog("ATR="+
             DoubleToStr(ATR,Digits)+" ATR/3="+
             DoubleToStr((ATR/3)/pip,2)+" pips"+
