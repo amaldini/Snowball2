@@ -16,7 +16,7 @@ bool   getAntiGridOptions(string symbolName,int isMaster,int& distant[]);
 int    getMultiplierForMicroLot(string symbolName);
 
 bool getGridOptions(string symbolName,int& enable[],double& bottomAndTop[]); 
-bool getBurstGridOptions(string symbolName,int &enable[]); 
+bool getBurstGridOptions(string symbolName,int& enable[]); 
 
 bool   setProfits(string symbolName,int isMaster,double profits);
 
@@ -211,8 +211,10 @@ bool isMyOrderGrid(int magic) {
       return (false);
    }
    
-   if ((!isGrid) && isAntiGridTrade()) return (true);
-   if (isGrid && (!isAntiGridTrade())) return (true);
+   if (!isBurstGridTrade()) {
+      if ((!isGrid) && isAntiGridTrade()) return (true);
+      if (isGrid && (!isAntiGridTrade())) return (true);
+   }
    
    return (false);
 }
@@ -403,6 +405,7 @@ void readGridOptions(int isMaster) {
    if (getBurstGridOptions(Symbol6(),enable))  {
       BURST_GRID_ENABLE = (enable[0]!=0);
    }
+   maldaLog("BurstGridEnable:"+BURST_GRID_ENABLE);
       
    
 }

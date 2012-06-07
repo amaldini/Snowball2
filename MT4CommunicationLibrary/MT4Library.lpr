@@ -1,4 +1,4 @@
-//{$define TESTING}
+// {$define TESTING}
 
 {$IFDEF TESTING}
 program MT4Library;
@@ -60,9 +60,12 @@ begin
   setGridMode('EURUSDtest',1,'TEST OK!');
   Writeln(getGridMode('EURUSDTest',1));
   readln;
-  setBalance_NAV_UsedMargin(1,100,90,10);
-  if getBalance_NAV_UsedMargin(1,balance,nav,usedMargin) then
-     Writeln('Balance:'+FloatToStr(balance)+' NAV:'+FloatToStr(nav)+' UsedMargin:'+FloatToStr(usedMargin));
+  // setBalance_NAV_UsedMargin(1,100,90,10);
+  // if getBalance_NAV_UsedMargin(1,balance,nav,usedMargin) then
+  //    Writeln('Balance:'+FloatToStr(balance)+' NAV:'+FloatToStr(nav)+' UsedMargin:'+FloatToStr(usedMargin));
+
+  if (getBurstGridOptions('EURUSD',a)) then
+     Writeln('EurUsd BurstGrid Enabled:'+IntToStr(a[0]));
 
   readln;
 end.
