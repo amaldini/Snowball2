@@ -2,10 +2,8 @@
 
 
 double ATRdiv2 = 0;
-bool initialOrdersDone_AntiGrid = false;
-bool initialOrdersDone_BurstGrid = false;
 
-double calcOrderDistance(int danglers) {
+double calcOrderDistance(int danglers,int openTrades) {
    double ATR = iATR(NULL, PERIOD_D1,14,1);
    double ATRdiv3 = ATR / 3;
    double res;
@@ -18,13 +16,7 @@ double calcOrderDistance(int danglers) {
       // res = ATRdiv3;
       res = 0;
    } else {
-   
-   	bool initialOrdersDone = false;
-      if (isBurstGrid) {
-      	initialOrdersDone = initialOrdersDone_BurstGrid;
-      } else {
-      	initialOrdersDone = initialOrdersDone_AntiGrid;
-   	}
+   	bool initialOrdersDone = (openTrades>0);
       if (!initialOrdersDone) {
          res = GRID_STEP / 2 * pip;
          initialOrdersDone = true;
@@ -40,11 +32,6 @@ double calcOrderDistance(int danglers) {
             " ATR/3*(1+"+danglers+")="+DoubleToStr(res/pip,2)+" pips"
          );
       }
-      if (isBurstGrid) {
-      	initialOrdersDone_BurstGrid = initialOrdersDone;
-      } else {
-      	initialOrdersDone_AntiGrid = initialOrdersDone;
-   	}
    }
    return (res);
 }
