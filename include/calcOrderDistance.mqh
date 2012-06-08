@@ -41,7 +41,5 @@ void ExitConditions(int isMaster) {
       closeOpenOrders(OP_BUY,magic,"command issued by controlpanel");
       closeOpenOrders(OP_SELL,magic,"command issued by controlpanel");
       setCloseOpenTrades(Symbol6(),isMaster,0);
-      initialOrdersDone_BurstGrid = false;
-      initialOrdersDone_AntiGrid = false;
    }
 }

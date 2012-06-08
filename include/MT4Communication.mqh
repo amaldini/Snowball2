@@ -168,7 +168,6 @@ void tradeGridAndAntiGrid(int isMaster) {
       tradeGrid(isMaster);
    } else {
       deleteGridPendingOrders();
-      initialOrdersDone_BurstGrid = false;
    }
    
    isBurstGrid=false;
@@ -252,6 +251,8 @@ void tradeGrid(int isMaster) {
    double profit = 0;
    double gridStart = -1;
    
+   int openTrades = 0;
+   
    for (i=0;i<numOrders;i++) {
       if ((orderTypes[i]==OP_SELL && openPrices[i]<Ask) ||
           (orderTypes[i]==OP_BUY  && openPrices[i]>Bid)) { 
@@ -261,6 +262,7 @@ void tradeGrid(int isMaster) {
       
       if (orderTypes[i]==OP_SELL || orderTypes[i]==OP_BUY) {
          profit += orderProfits[i];
+         openTrades++;
       }
       
       if (openPrices[i]>max) max=openPrices[i];
@@ -305,7 +307,7 @@ void tradeGrid(int isMaster) {
    }
    */
    
-   double orderDistance = calcOrderDistance(danglers);
+   double orderDistance = calcOrderDistance(danglers, openTrades);
    
    for (i = -20;
       (i<20) && 
