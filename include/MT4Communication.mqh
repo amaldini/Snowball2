@@ -71,7 +71,6 @@ double ANTIGRID_STOP_PIPS = 200; // pips
 
 double BURSTGRID_TRADING_STEP = 1; // pips
 double BURSTGRID_TRADING_PENDINGORDERS = 10;
-double BURSTGRID_TRADING_PENDINGORDERS = 5;
 double BURSTGRID_TAKEPROFIT = 20; // pips 
 double BURSTGRID_STOP_PIPS = 20; // pips
 
@@ -80,44 +79,6 @@ double prevGridStep_AntiGrid = 0;
 
 
 #include <calcOrderDistance.mqh>
-
-double adjustGridStepByExposure(int isMaster,double baseGridStep) {
-   int isGridInt = 0;
-   double pgs;
-   if (isGrid) {
-      isGridInt = 1;
-      pgs = prevGridStep_Grid;
-   } else {
-      pgs = prevGridStep_AntiGrid;
-   }
-   // double myExposure = getExposure(Symbol6(),isMaster,isGridInt);
-   
-   
-   double GRID_STEP = baseGridStep;
-   /*
-   if (myExposure / 0.01 <= 1.001) {
-      GRID_STEP = baseGridStep;
-   } else {
-      double exposureDelta = myExposure -getExposure(Symbol6(),1-isMaster,isGridInt);
-      GRID_STEP = baseGridStep*(1+MathMax(0,exposureDelta/0.01));
-   }
-   */
-   
-   /*
-   if (MathAbs(GRID_STEP-pgs)>0.0001) {
-      maldaLog("deleting grid pending orders because grid step changed");
-      deleteGridPendingOrders();
-   }
-   */
-   
-   if (isGrid) {
-      prevGridStep_Grid = GRID_STEP;
-   } else {
-      prevGridStep_AntiGrid = GRID_STEP;
-   }
-   
-   return (GRID_STEP);
-}
 
 void tradeGridAndAntiGrid(int isMaster) {
    readDistantAndAllowReenter(isMaster);
