@@ -378,9 +378,15 @@ void GR_TrailStops() {
    if (isBurstGrid) {
       double GRID_BreakEven = GRID_STEP*3;
       double GRID_LockGainPips = GRID_STEP;
+      GRID_TrailStops(pip,GRID_BreakEven, GRID_LockGainPips);   
+      
       double GRID_BreakEven2 = GRID_STEP * 6;
       double GRID_LockGainPips2 = GRID_STEP * 3;
-      GRID_TrailStops(pip,GRID_BreakEven, GRID_LockGainPips,GRID_BreakEven2,GRID_LockGainPips2);   
+      GRID_TrailStops(pip,GRID_BreakEven2, GRID_LockGainPips2);   
+      
+      double GRID_BreakEven3 = GRID_STEP * 12;
+      double GRID_LockGainPips3 = GRID_STEP * 6;
+      GRID_TrailStops(pip,GRID_BreakEven3,GRID_LockGainPips3);
    }
    /*
    double GRID_BreakEven = GRID_STEP*3;
@@ -431,7 +437,7 @@ void GRID_TrailStopsATRdiv2() {
 }
 
 // ---- Trailing Stops
-void GRID_TrailStops(double pip,double BreakEven, double LockGainPips,double BreakEven2,double LockGainPips2)
+void GRID_TrailStops(double pip,double BreakEven, double LockGainPips)
 {        
     int total=OrdersTotal();
     for (int cnt=0;cnt<total;cnt++)
@@ -448,9 +454,6 @@ void GRID_TrailStops(double pip,double BreakEven, double LockGainPips,double Bre
                    {
                       BuyStop = OrderOpenPrice()+pip*LockGainPips;
                    }
-                   if ( BreakEven2>BreakEven && LockGainPips2>LockGainPips && ((Bid-OrderOpenPrice())>pip*BreakEven2)) {
-                      BuyStop = OrderOpenPrice()+pip*LockGainPips2;
-                   }
                
                    if (OrderStopLoss()<BuyStop) {
                       OrderModify(OrderTicket(),OrderOpenPrice(),
@@ -465,9 +468,6 @@ void GRID_TrailStops(double pip,double BreakEven, double LockGainPips,double Bre
                    if ( OrderOpenPrice()-Ask>pip*BreakEven ) 
                    {
                       SellStop = OrderOpenPrice()-pip*LockGainPips;
-                   }
-                   if ( BreakEven2>BreakEven && LockGainPips2>LockGainPips && ((OrderOpenPrice()-Ask)>pip*BreakEven2)) {
-                      SellStop = OrderOpenPrice()-pip*LockGainPips2;
                    }
                    if (OrderStopLoss()>SellStop) {
                       OrderModify(OrderTicket(),OrderOpenPrice(),
