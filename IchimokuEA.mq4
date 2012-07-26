@@ -219,8 +219,10 @@ int fib(int i) {
 // ------------------------------------------------------------------------------------------------
 double CalcularVolumen()
 { 
+   int myfib = fib(nLastConsecutiveLosses);
+   if (myfib==0) myfib = 1;
    // return (min_lots);
-   return (min_lots*fib(nLastConsecutiveLosses));    
+   return (min_lots*myfib);    
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -520,36 +522,38 @@ void Robot3()
   
   signal1 = CalculaSignal(3,tenkan_sen,kijun_sen,senkou_span,shift);
   
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=1 
-  // **************************************************
-  if (orders1>0 && direction1==1 && signal1==2)
-  {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_BID),slippage,Blue);
+  bool bToClose=FALSE;
+  if (orders1>0) {
+      switch (signal1) {
+         case 3:
+            bToClose=TRUE;
+            Comment("Close!!!");
+            break;
+         case 1:
+            if (direction1==2) bToClose=TRUE;
+            break;
+         case 2:
+            if (direction1==1) bToClose=TRUE;
+            break;
+      }
+      
+      if (!bToClose) {
+         // VALUTARE QUI EVENTUALI TP E SL
+      }
+      
+  }
+  
+  if (bToClose) {
+      if (direction1==1) {
+         cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_BID),slippage,Blue);
+      } else if (direction1==2) {
+         cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_ASK),slippage,Red); 
+      }
       orders1=0;
       direction1=0; 
       if (order_profit1<0) nLastConsecutiveLosses++;
-      if (order_profit1>10) { nLastConsecutiveLosses=0; numCycles++; }    
-  }
-    
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=2
-  // **************************************************
-  if (orders1>0 && direction1==2 && signal1==1)
-  {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_ASK),slippage,Red); 
-      orders1=0;
-      direction1=0;  
-      if (order_profit1<0) nLastConsecutiveLosses++;
-      if (order_profit1>10) { nLastConsecutiveLosses=0; numCycles++; }    
-  }  
-  /*
-  if (orders1>0 && order_profit1>50) {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_ASK),slippage,Red); 
-      orders1=0;
-      direction1=0;  
-      nLastConsecutiveLosses=0;numCycles++;
-  } */
+      if (order_profit1>10) { nLastConsecutiveLosses=0; numCycles++; }   
+  } 
   
   if (orders1==0 && direction1==0)
   {     
