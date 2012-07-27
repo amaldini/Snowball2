@@ -11,27 +11,19 @@
 // VARIABLES EXTERNAS
 // ------------------------------------------------------------------------------------------------
 
-extern int magic1 = 47291;
-extern int magic2 = 47292;
-extern int magic3 = 47293;
+
 // Configuration
 extern string www.lifesdream.org = "Ichimoku EA v1.3";
 extern string CommonSettings = "---------------------------------------------";
 extern int user_slippage = 2; 
-extern int user_tp = 100;
-extern int user_sl = 100;
-extern int use_tp_sl = 1;
-extern double profit_lock = 0.90;
-extern int strategy1 = 1; // Tenkan Sen/Kijun Sen Cross
-extern int strategy2 = 1; // Kijun Sen Cross
-extern int strategy3 = 1;  // Kumo Breakout
+
 extern int signal_strength = 1; // 1=strong | 2: neutral | 3: weak
 extern string MoneyManagementSettings = "---------------------------------------------";
 // Money Management
-extern int money_management = 1;
-extern double min_lots = 0.1;
-extern int risk=1;
-extern int progression = 0; // 0=none | 1:ascending | 2:martingale
+//extern int money_management = 1;
+extern double min_lots = 0.01;
+//extern int risk=1;
+// extern int progression = 2; // 0=none | 1:ascending | 2:martingale
 // Indicator
 extern string IndicatorSettings = "---------------------------------------------";
 extern int tenkan_sen=9;
@@ -46,30 +38,25 @@ string key1 = "Ichimoku EA v1.3 (strategy 1)";
 string key2 = "Ichimoku EA v1.3 (strategy 2)";
 string key3 = "Ichimoku EA v1.3 (strategy 3)";
 // Definimos 1 variable para guardar los tickets
-int order_ticket1,order_ticket2,order_ticket3;
+int order_ticket1;
 // Definimos 1 variable para guardar los lotes
-double order_lots1,order_lots2,order_lots3;
+double order_lots1;
 // Definimos 1 variable para guardar las valores de apertura de las ordenes
-double order_price1,order_price2,order_price3;
+double order_price1;
 // Definimos 1 variable para guardar los beneficios
-double order_profit1,order_profit2,order_profit3;
+double order_profit1;
 // Definimos 1 variable para guardar los tiempos
-int order_time1,order_time2,order_time3;
+int order_time1;
 // indicadores
-double signal1=0,signal2=0,signal3=0;
+double signal1=0;
 // Cantidad de ordenes;
 int orders1 = 0;
 int direction1= 0;
-double max_profit1=0, close_profit1=0;
-double last_order_profit1=0, last_order_lots1=0;
-int orders2 = 0;
-int direction2= 0;
-double max_profit2=0, close_profit2=0;
-double last_order_profit2=0, last_order_lots2=0;
-int orders3 = 0;
-int direction3= 0;
-double max_profit3=0, close_profit3=0;
-double last_order_profit3=0, last_order_lots3=0;
+double last_order_profit=0, last_order_lots=0;
+
+int nLastConsecutiveLosses = 0;
+int numCycles=0;
+
 // Colores
 color c=Black;
 // Cuenta
@@ -107,20 +94,14 @@ int start()
     return;  
   }
   
-  if (use_tp_sl==0)
+  
     Comment(StringConcatenate("\nCopyright © 2011, www.lifesdream.org\nIchimoku EA v1.3 is running.",
-                              "\nStrategy 1 (Tenkan Sen/Kijun Sen Cross). Next order lots (: ",CalcularVolumen(1),
-                              "\nStrategy 2 (Kijun Sen Cross). Next order lots (: ",CalcularVolumen(2),
-                              "\nStrategy 3 (Kumo Breakout). Next order lots (: ",CalcularVolumen(3)
+                              "\nNext order lots (: ",CalcularVolumen(),
+                              "\nLast consecutive losses:"+nLastConsecutiveLosses,
+                              "\nNumCycles:"+numCycles
                              )
            );
-  else if (use_tp_sl==1)  
-    Comment(StringConcatenate("\nCopyright © 2011, www.lifesdream.org\nIchimoku EA v1.3 is running.",
-                              "\nStrategy 1 (Tenkan Sen/Kijun Sen Cross). Next order lots: ",CalcularVolumen(1),"\nTake profit ($): ",CalcularVolumen(1)*10*user_tp,"\nStop loss ($): ",CalcularVolumen(1)*10*user_sl,
-                              "\nStrategy 2 (Kijun Sen Cross). Next order lots: ",CalcularVolumen(2),"\nTake profit ($): ",CalcularVolumen(2)*10*user_tp,"\nStop loss ($): ",CalcularVolumen(2)*10*user_sl,
-                              "\nStrategy 3 (Kumo Breakout). Next order lots: ",CalcularVolumen(3),"\nTake profit ($): ",CalcularVolumen(3)*10*user_tp,"\nStop loss ($): ",CalcularVolumen(3)*10*user_sl
-                             )
-           );
+  
   
   // Actualizamos el estado actual
   InicializarVariables();
@@ -136,32 +117,23 @@ int start()
       n = OrdersHistoryTotal()-i;
       if(OrderSelect(n,SELECT_BY_POS,MODE_HISTORY)==TRUE)
       {
-        if (OrderMagicNumber()==magic1)
-        {
+        
           encontrada=TRUE;
-          last_order_profit1=OrderProfit();
-          last_order_lots1=OrderLots();
-        }
-        if (OrderMagicNumber()==magic2)
-        {
-          encontrada=TRUE;
-          last_order_profit2=OrderProfit();
-          last_order_lots2=OrderLots();
-        }
-        if (OrderMagicNumber()==magic3)
-        {
-          encontrada=TRUE;
-          last_order_profit3=OrderProfit();
-          last_order_lots3=OrderLots();
-        }
+          last_order_profit=OrderProfit();
+          last_order_lots=OrderLots();
+        
+        
       }
       i++;
     }
   }
   
+  /*
   if (strategy1==1) Robot1();
   if (strategy2==1) Robot2();
-  if (strategy3==1) Robot3();
+  */
+  
+  Robot3();
   
   return(0);
 }
@@ -179,28 +151,9 @@ void InicializarVariables()
   order_price1 = 0;
   order_time1 = 0;
   order_profit1 = 0;
-  last_order_profit1 = 0;
-  last_order_lots1 = 0;
+  last_order_profit = 0;
+  last_order_lots = 0;
   
-  orders2=0;
-  direction2=0;
-  order_ticket2 = 0;
-  order_lots2 = 0;
-  order_price2 = 0;
-  order_time2 = 0;
-  order_profit2 = 0;
-  last_order_profit2 = 0;
-  last_order_lots2 = 0;
-  
-  orders3=0;
-  direction3=0;
-  order_ticket3 = 0;
-  order_lots3 = 0;
-  order_price3 = 0;
-  order_time3 = 0;
-  order_profit3 = 0;
-  last_order_profit3 = 0;
-  last_order_lots3 = 0;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -208,7 +161,7 @@ void InicializarVariables()
 // ------------------------------------------------------------------------------------------------
 void ActualizarOrdenes()
 {
-  int ordenes1=0,ordenes2=0,ordenes3=0;
+  int ordenes1=0;
   
   // Lo que hacemos es introducir los tickets, los lotes, y los valores de apertura en las matrices. 
   // Además guardaremos el número de ordenes en una variables.
@@ -218,7 +171,7 @@ void ActualizarOrdenes()
   {
     if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES) == true)
     {
-      if(OrderSymbol() == Symbol() && OrderMagicNumber() == magic1)
+      if(OrderSymbol() == Symbol())
       {
         order_ticket1 = OrderTicket();
         order_lots1 = OrderLots();
@@ -229,35 +182,13 @@ void ActualizarOrdenes()
         if (OrderType()==OP_BUY) direction1=1;
         if (OrderType()==OP_SELL) direction1=2;
       }
-      if(OrderSymbol() == Symbol() && OrderMagicNumber() == magic2)
-      {
-        order_ticket2 = OrderTicket();
-        order_lots2 = OrderLots();
-        order_price2 = OrderOpenPrice();
-        order_time2 = OrderOpenTime();
-        order_profit2 = OrderProfit();
-        ordenes2++;
-        if (OrderType()==OP_BUY) direction2=1;
-        if (OrderType()==OP_SELL) direction2=2;
-      }
-      if(OrderSymbol() == Symbol() && OrderMagicNumber() == magic3)
-      {
-        order_ticket3 = OrderTicket();
-        order_lots3 = OrderLots();
-        order_price3 = OrderOpenPrice();
-        order_time3 = OrderOpenTime();
-        order_profit3 = OrderProfit();
-        ordenes3++;
-        if (OrderType()==OP_BUY) direction3=1;
-        if (OrderType()==OP_SELL) direction3=2;
-      }
+      
     }
   }
   
   // Actualizamos variables globales
   orders1 = ordenes1;
-  orders2 = ordenes2;
-  orders3 = ordenes3;
+  
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -278,184 +209,18 @@ void Escribe(string nombre, string s, int x, int y, string font, int size, color
   }
 }
 
+int fib(int i) {
+   if (i==0) return (1);
+   return (i+fib(i-1));
+}
+
 // ------------------------------------------------------------------------------------------------
 // CALCULAR VOLUMEN
 // ------------------------------------------------------------------------------------------------
-double CalcularVolumen(int strategy)
+double CalcularVolumen()
 { 
-  double aux; 
-  int n;
-  
-  if (strategy==1)
-  {
-    if (money_management==0)
-    {
-      aux=min_lots;
-    }
-    else
-    {    
-      if (progression==0) 
-      { 
-        aux = risk*AccountFreeMargin();
-        aux= aux/100000;
-        n = MathFloor(aux/min_lots);
-      
-        aux = n*min_lots;                   
-      }  
-  
-      if (progression==1)
-      {
-        if (last_order_profit1<0)
-        {
-          aux = last_order_lots1+min_lots;
-        }
-        else 
-        {
-          aux = last_order_lots1-min_lots;
-        }  
-      }        
-     
-      if (progression==2)
-      {
-        if (last_order_profit1<0)
-        {
-          aux = last_order_lots1*2;
-        }
-        else 
-        {
-           aux = risk*AccountFreeMargin();
-           aux= aux/100000;
-           n = MathFloor(aux/min_lots);
-           
-           aux = n*min_lots;         
-        }  
-      }     
-    
-      if (aux<min_lots)
-        aux=min_lots;
-     
-      if (aux>MarketInfo(Symbol(),MODE_MAXLOT))
-        aux=MarketInfo(Symbol(),MODE_MAXLOT);
-      
-      if (aux<MarketInfo(Symbol(),MODE_MINLOT))
-        aux=MarketInfo(Symbol(),MODE_MINLOT);
-    }
-  }
-  
-  if (strategy==2)
-  {
-    if (money_management==0)
-    {
-      aux=min_lots;
-    }
-    else
-    {    
-      if (progression==0) 
-      { 
-        aux = risk*AccountFreeMargin();
-        aux= aux/100000;
-        n = MathFloor(aux/min_lots);
-      
-        aux = n*min_lots;                   
-      }  
-  
-      if (progression==1)
-      {
-        if (last_order_profit2<0)
-        {
-          aux = last_order_lots2+min_lots;
-        }
-        else 
-        {
-          aux = last_order_lots2-min_lots;
-        }  
-      }        
-     
-      if (progression==2)
-      {
-        if (last_order_profit2<0)
-        {
-          aux = last_order_lots2*2;
-        }
-        else 
-        {
-           aux = risk*AccountFreeMargin();
-           aux= aux/100000;
-           n = MathFloor(aux/min_lots);
-           
-           aux = n*min_lots;         
-        }  
-      }     
-    
-      if (aux<min_lots)
-        aux=min_lots;
-     
-      if (aux>MarketInfo(Symbol(),MODE_MAXLOT))
-        aux=MarketInfo(Symbol(),MODE_MAXLOT);
-      
-      if (aux<MarketInfo(Symbol(),MODE_MINLOT))
-        aux=MarketInfo(Symbol(),MODE_MINLOT);
-    }
-  }
-  
-  if (strategy==3)
-  {
-    if (money_management==0)
-    {
-      aux=min_lots;
-    }
-    else
-    {    
-      if (progression==0) 
-      { 
-        aux = risk*AccountFreeMargin();
-        aux= aux/100000;
-        n = MathFloor(aux/min_lots);
-      
-        aux = n*min_lots;                   
-      }  
-  
-      if (progression==1)
-      {
-        if (last_order_profit3<0)
-        {
-          aux = last_order_lots3+min_lots;
-        }
-        else 
-        {
-          aux = last_order_lots3-min_lots;
-        }  
-      }        
-     
-      if (progression==2)
-      {
-        if (last_order_profit3<0)
-        {
-          aux = last_order_lots3*2;
-        }
-        else 
-        {
-           aux = risk*AccountFreeMargin();
-           aux= aux/100000;
-           n = MathFloor(aux/min_lots);
-           
-           aux = n*min_lots;         
-        }  
-      }     
-    
-      if (aux<min_lots)
-        aux=min_lots;
-     
-      if (aux>MarketInfo(Symbol(),MODE_MAXLOT))
-        aux=MarketInfo(Symbol(),MODE_MAXLOT);
-      
-      if (aux<MarketInfo(Symbol(),MODE_MINLOT))
-        aux=MarketInfo(Symbol(),MODE_MINLOT);
-    }
-  }
-  
-  
-  return(aux);
+   // return (min_lots);
+   return (min_lots*fib(nLastConsecutiveLosses));    
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -491,34 +256,6 @@ double CalculaValorPip(double lotes)
    aux_mm_valor = aux_mm_valor/aux_mm_veces_lots;
    
    return(aux_mm_valor);
-}
-
-// ------------------------------------------------------------------------------------------------
-// CALCULA TAKE PROFIT
-// ------------------------------------------------------------------------------------------------
-int CalculaTakeProfit(int strategy)
-{ 
-  int aux_take_profit;      
-  
-  if (strategy==1) aux_take_profit=MathRound(CalculaValorPip(order_lots1)*user_tp);  
-  if (strategy==2) aux_take_profit=MathRound(CalculaValorPip(order_lots2)*user_tp);  
-  if (strategy==3) aux_take_profit=MathRound(CalculaValorPip(order_lots3)*user_tp);  
-
-  return(aux_take_profit);
-}
-
-// ------------------------------------------------------------------------------------------------
-// CALCULA STOP LOSS
-// ------------------------------------------------------------------------------------------------
-int CalculaStopLoss(int strategy)
-{ 
-  int aux_stop_loss;      
-  
-  if (strategy==1) aux_stop_loss=-1*CalculaValorPip(order_lots1)*user_sl;
-  if (strategy==2) aux_stop_loss=-1*CalculaValorPip(order_lots2)*user_sl;
-  if (strategy==3) aux_stop_loss=-1*CalculaValorPip(order_lots3)*user_sl;
-    
-  return(aux_stop_loss);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -676,7 +413,7 @@ void Robot1()
     // COMPRA
     // ----------
     if (signal1==1)
-      ticket = OrderSendReliable(Symbol(),OP_BUY,CalcularVolumen(1),MarketInfo(Symbol(),MODE_ASK),slippage,0,0,key1,magic1,0,Blue); 
+      ticket = OrderSendReliable(Symbol(),OP_BUY,CalcularVolumen(),MarketInfo(Symbol(),MODE_ASK),slippage,0,0,key1,"",0,Blue); 
     // En este punto hemos ejecutado correctamente la orden de compra
     // Los arrays se actualizarán en la siguiente ejecución de start() con ActualizarOrdenes()
      
@@ -684,111 +421,32 @@ void Robot1()
     // VENTA
     // ----------
     if (signal1==2)
-      ticket = OrderSendReliable(Symbol(),OP_SELL,CalcularVolumen(1),MarketInfo(Symbol(),MODE_BID),slippage,0,0,key1,magic1,0,Red);         
+      ticket = OrderSendReliable(Symbol(),OP_SELL,CalcularVolumen(),MarketInfo(Symbol(),MODE_BID),slippage,0,0,key1,"",0,Red);         
     // En este punto hemos ejecutado correctamente la orden de venta
     // Los arrays se actualizarán en la siguiente ejecución de start() con ActualizarOrdenes()       
   }
   
   // **************************************************
-  // ORDERS>0 AND DIRECTION=1 AND USE_TP_SL=1
-  // **************************************************
-  if (orders1>0 && direction1==1 && use_tp_sl==1)
-  {
-    // CASO 1.1 >>> Tenemos el beneficio y  activamos el profit lock
-    if (order_profit1 > CalculaTakeProfit(1) && max_profit1==0)
-    {
-      max_profit1 = order_profit1;
-      close_profit1 = profit_lock*order_profit1;      
-    } 
-    // CASO 1.2 >>> Segun va aumentando el beneficio actualizamos el profit lock
-    if (max_profit1>0)
-    {
-      if (order_profit1>max_profit1)
-      {      
-        max_profit1 = order_profit1;
-        close_profit1 = profit_lock*order_profit1; 
-      }
-    }   
-    // CASO 1.3 >>> Cuando el beneficio caiga por debajo de profit lock cerramos las ordenes
-    if (max_profit1>0 && close_profit1>0 && max_profit1>close_profit1 && order_profit1<close_profit1) 
-    {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_BID),slippage,Blue);
-      max_profit1=0;
-      close_profit1=0;  
-    }
-      
-    // CASO 2 >>> Tenemos "size" pips de perdida
-    if (order_profit1 <= CalculaStopLoss(1))
-    {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_BID),slippage,Blue);
-      max_profit1=0;
-      close_profit1=0;  
-    }   
-    
-  }
-    
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=2 AND USE_TP_SL=1
-  // **************************************************
-  if (orders1>0 && direction1==2 && use_tp_sl==1)
-  {
-    // CASO 1.1 >>> Tenemos el beneficio y  activamos el profit lock
-    if (order_profit1 > CalculaTakeProfit(1) && max_profit1==0)
-    {
-      max_profit1 = order_profit1;
-      close_profit1 = profit_lock*order_profit1;      
-    } 
-    // CASO 1.2 >>> Segun va aumentando el beneficio actualizamos el profit lock
-    if (max_profit1>0)
-    {
-      if (order_profit1>max_profit1)
-      {      
-        max_profit1 = order_profit1;
-        close_profit1 = profit_lock*order_profit1; 
-      }
-    }   
-    // CASO 1.3 >>> Cuando el beneficio caiga por debajo de profit lock cerramos las ordenes
-    if (max_profit1>0 && close_profit1>0 && max_profit1>close_profit1 && order_profit1<close_profit1) 
-    {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_ASK),slippage,Red);
-      max_profit1=0;
-      close_profit1=0;  
-    }
-      
-    // CASO 2 >>> Tenemos "size" pips de perdida
-    if (order_profit1 <= CalculaStopLoss(1))
-    {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_ASK),slippage,Red);
-      max_profit1=0;
-      close_profit1=0;  
-    }   
-  }
-  
-  // **************************************************
   // ORDERS>0 AND DIRECTION=1 AND USE_TP_SL=0
   // **************************************************
-  if (orders1>0 && direction1==1 && use_tp_sl==0)
+  if (orders1>0 && direction1==1)
   {
     signal1 = CalculaSignal(1,tenkan_sen,kijun_sen,senkou_span,shift);
     if (signal1==2)
     {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_BID),slippage,Blue);
-      max_profit1=0;
-      close_profit1=0;    
+      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_BID),slippage,Blue);   
     }  
   }
     
   // **************************************************
   // ORDERS>0 AND DIRECTION=2 AND USE_TP_SL=0
   // **************************************************
-  if (orders1>0 && direction1==2 && use_tp_sl==0)
+  if (orders1>0 && direction1==2)
   {
     signal1 = CalculaSignal(1,tenkan_sen,kijun_sen,senkou_span,shift);
     if (signal1==1)
     {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_ASK),slippage,Red);
-      max_profit1=0;
-      close_profit1=0;   
+      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_ASK),slippage,Red);   
     }  
   }    
     
@@ -802,126 +460,51 @@ void Robot2()
   int ticket=-1, i;
   bool cerrada=FALSE;  
   
-  if (orders2==0 && direction2==0)
+  if (orders1==0 && direction1==0)
   {     
-    signal2 = CalculaSignal(2,tenkan_sen,kijun_sen,senkou_span,shift);
+    signal1 = CalculaSignal(2,tenkan_sen,kijun_sen,senkou_span,shift);
     // ----------
     // COMPRA
     // ----------
-    if (signal2==1)
-      ticket = OrderSendReliable(Symbol(),OP_BUY,CalcularVolumen(2),MarketInfo(Symbol(),MODE_ASK),slippage,0,0,key2,magic2,0,Blue); 
+    if (signal1==1)
+      ticket = OrderSendReliable(Symbol(),OP_BUY,CalcularVolumen(),MarketInfo(Symbol(),MODE_ASK),slippage,0,0,key2,"",0,Blue); 
     // En este punto hemos ejecutado correctamente la orden de compra
     // Los arrays se actualizarán en la siguiente ejecución de start() con ActualizarOrdenes()
      
     // ----------
     // VENTA
     // ----------
-    if (signal2==2)
-      ticket = OrderSendReliable(Symbol(),OP_SELL,CalcularVolumen(2),MarketInfo(Symbol(),MODE_BID),slippage,0,0,key2,magic2,0,Red);         
+    if (signal1==2)
+      ticket = OrderSendReliable(Symbol(),OP_SELL,CalcularVolumen(),MarketInfo(Symbol(),MODE_BID),slippage,0,0,key2,"",0,Red);         
     // En este punto hemos ejecutado correctamente la orden de venta
     // Los arrays se actualizarán en la siguiente ejecución de start() con ActualizarOrdenes()       
   }
   
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=1 AND USE_TP_SL=1
-  // **************************************************
-  if (orders2>0 && direction2==1 && use_tp_sl==1)
-  {
-    // CASO 1.1 >>> Tenemos el beneficio y  activamos el profit lock
-    if (order_profit2 > CalculaTakeProfit(2) && max_profit2==0)
-    {
-      max_profit2 = order_profit2;
-      close_profit2 = profit_lock*order_profit2;      
-    } 
-    // CASO 1.2 >>> Segun va aumentando el beneficio actualizamos el profit lock
-    if (max_profit2>0)
-    {
-      if (order_profit2>max_profit2)
-      {      
-        max_profit2 = order_profit2;
-        close_profit2 = profit_lock*order_profit2; 
-      }
-    }   
-    // CASO 1.3 >>> Cuando el beneficio caiga por debajo de profit lock cerramos las ordenes
-    if (max_profit2>0 && close_profit2>0 && max_profit2>close_profit2 && order_profit2<close_profit2) 
-    {
-      cerrada=OrderCloseReliable(order_ticket2,order_lots2,MarketInfo(Symbol(),MODE_BID),slippage,Blue);
-      max_profit2=0;
-      close_profit2=0;  
-    }
-      
-    // CASO 2 >>> Tenemos "size" pips de perdida
-    if (order_profit2 <= CalculaStopLoss(2))
-    {
-      cerrada=OrderCloseReliable(order_ticket2,order_lots2,MarketInfo(Symbol(),MODE_BID),slippage,Blue);
-      max_profit2=0;
-      close_profit2=0;  
-    }   
+  
     
-  }
-    
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=2 AND USE_TP_SL=1
-  // **************************************************
-  if (orders2>0 && direction2==2 && use_tp_sl==1)
-  {
-    // CASO 1.1 >>> Tenemos el beneficio y  activamos el profit lock
-    if (order_profit2 > CalculaTakeProfit(2) && max_profit2==0)
-    {
-      max_profit2 = order_profit2;
-      close_profit2 = profit_lock*order_profit2;      
-    } 
-    // CASO 1.2 >>> Segun va aumentando el beneficio actualizamos el profit lock
-    if (max_profit2>0)
-    {
-      if (order_profit2>max_profit2)
-      {      
-        max_profit2 = order_profit2;
-        close_profit2 = profit_lock*order_profit2; 
-      }
-    }   
-    // CASO 1.3 >>> Cuando el beneficio caiga por debajo de profit lock cerramos las ordenes
-    if (max_profit2>0 && close_profit2>0 && max_profit2>close_profit2 && order_profit2<close_profit2) 
-    {
-      cerrada=OrderCloseReliable(order_ticket2,order_lots2,MarketInfo(Symbol(),MODE_ASK),slippage,Red);
-      max_profit2=0;
-      close_profit2=0;  
-    }
-      
-    // CASO 2 >>> Tenemos "size" pips de perdida
-    if (order_profit2 <= CalculaStopLoss(2))
-    {
-      cerrada=OrderCloseReliable(order_ticket2,order_lots2,MarketInfo(Symbol(),MODE_ASK),slippage,Red);
-      max_profit2=0;
-      close_profit2=0;  
-    }   
-  }
+  
   
   // **************************************************
   // ORDERS>0 AND DIRECTION=1 AND USE_TP_SL=0
   // **************************************************
-  if (orders2 && direction2==1 && use_tp_sl==0)
+  if (orders1 && direction1==1)
   {
-    signal2 = CalculaSignal(2,tenkan_sen,kijun_sen,senkou_span,shift);
-    if (signal2==2)
+    signal1 = CalculaSignal(2,tenkan_sen,kijun_sen,senkou_span,shift);
+    if (signal1==2)
     {
-      cerrada=OrderCloseReliable(order_ticket2,order_lots2,MarketInfo(Symbol(),MODE_BID),slippage,Blue);
-      max_profit2=0;
-      close_profit2=0;    
+      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_BID),slippage,Blue);   
     }  
   }
     
   // **************************************************
   // ORDERS>0 AND DIRECTION=2 AND USE_TP_SL=0
   // **************************************************
-  if (orders2>0 && direction2==2 && use_tp_sl==0)
+  if (orders1>0 && direction1==2)
   {
-    signal2 = CalculaSignal(2,tenkan_sen,kijun_sen,senkou_span,shift);
-    if (signal2==1)
+    signal1 = CalculaSignal(2,tenkan_sen,kijun_sen,senkou_span,shift);
+    if (signal1==1)
     {
-      cerrada=OrderCloseReliable(order_ticket2,order_lots2,MarketInfo(Symbol(),MODE_ASK),slippage,Red);
-      max_profit2=0;
-      close_profit2=0;   
+      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_ASK),slippage,Red);   
     }  
   }    
     
@@ -935,128 +518,58 @@ void Robot3()
   int ticket=-1, i;
   bool cerrada=FALSE;  
   
-  if (orders3==0 && direction3==0)
+  signal1 = CalculaSignal(3,tenkan_sen,kijun_sen,senkou_span,shift);
+  
+  // **************************************************
+  // ORDERS>0 AND DIRECTION=1 
+  // **************************************************
+  if (orders1>0 && direction1==1 && signal1==2)
+  {
+      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_BID),slippage,Blue);
+      orders1=0;
+      direction1=0; 
+      if (order_profit1<0) nLastConsecutiveLosses++;
+      if (order_profit1>10) { nLastConsecutiveLosses=0; numCycles++; }    
+  }
+    
+  // **************************************************
+  // ORDERS>0 AND DIRECTION=2
+  // **************************************************
+  if (orders1>0 && direction1==2 && signal1==1)
+  {
+      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_ASK),slippage,Red); 
+      orders1=0;
+      direction1=0;  
+      if (order_profit1<0) nLastConsecutiveLosses++;
+      if (order_profit1>10) { nLastConsecutiveLosses=0; numCycles++; }    
+  }  
+  /*
+  if (orders1>0 && order_profit1>50) {
+      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_ASK),slippage,Red); 
+      orders1=0;
+      direction1=0;  
+      nLastConsecutiveLosses=0;numCycles++;
+  } */
+  
+  if (orders1==0 && direction1==0)
   {     
-    signal3 = CalculaSignal(3,tenkan_sen,kijun_sen,senkou_span,shift);
+    
     // ----------
     // COMPRA
     // ----------
-    if (signal3==1)
-      ticket = OrderSendReliable(Symbol(),OP_BUY,CalcularVolumen(3),MarketInfo(Symbol(),MODE_ASK),slippage,0,0,key3,magic3,0,Blue); 
+    if (signal1==1)
+      ticket = OrderSendReliable(Symbol(),OP_BUY,CalcularVolumen(),MarketInfo(Symbol(),MODE_ASK),slippage,0,0,key3,"",0,Blue); 
     // En este punto hemos ejecutado correctamente la orden de compra
     // Los arrays se actualizarán en la siguiente ejecución de start() con ActualizarOrdenes()
      
     // ----------
     // VENTA
     // ----------
-    if (signal3==2)
-      ticket = OrderSendReliable(Symbol(),OP_SELL,CalcularVolumen(3),MarketInfo(Symbol(),MODE_BID),slippage,0,0,key3,magic3,0,Red);         
+    if (signal1==2)
+      ticket = OrderSendReliable(Symbol(),OP_SELL,CalcularVolumen(),MarketInfo(Symbol(),MODE_BID),slippage,0,0,key3,"",0,Red);         
     // En este punto hemos ejecutado correctamente la orden de venta
     // Los arrays se actualizarán en la siguiente ejecución de start() con ActualizarOrdenes()       
-  }
-  
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=1 AND USE_TP_SL=1
-  // **************************************************
-  if (orders3>0 && direction3==1 && use_tp_sl==1)
-  {
-    // CASO 1.1 >>> Tenemos el beneficio y  activamos el profit lock
-    if (order_profit3 > CalculaTakeProfit(3) && max_profit3==0)
-    {
-      max_profit3 = order_profit3;
-      close_profit3 = profit_lock*order_profit3;      
-    } 
-    // CASO 1.2 >>> Segun va aumentando el beneficio actualizamos el profit lock
-    if (max_profit3>0)
-    {
-      if (order_profit3>max_profit3)
-      {      
-        max_profit3 = order_profit3;
-        close_profit3 = profit_lock*order_profit3; 
-      }
-    }   
-    // CASO 1.3 >>> Cuando el beneficio caiga por debajo de profit lock cerramos las ordenes
-    if (max_profit3>0 && close_profit3>0 && max_profit3>close_profit3 && order_profit3<close_profit3) 
-    {
-      cerrada=OrderCloseReliable(order_ticket3,order_lots3,MarketInfo(Symbol(),MODE_BID),slippage,Blue);
-      max_profit3=0;
-      close_profit3=0;  
-    }
-      
-    // CASO 2 >>> Tenemos "size" pips de perdida
-    if (order_profit3 <= CalculaStopLoss(3))
-    {
-      cerrada=OrderCloseReliable(order_ticket3,order_lots3,MarketInfo(Symbol(),MODE_BID),slippage,Blue);
-      max_profit3=0;
-      close_profit3=0;  
-    }   
-    
-  }
-    
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=2 AND USE_TP_SL=1
-  // **************************************************
-  if (orders3>0 && direction3==2 && use_tp_sl==1)
-  {
-    // CASO 1.1 >>> Tenemos el beneficio y  activamos el profit lock
-    if (order_profit3 > CalculaTakeProfit(3) && max_profit3==0)
-    {
-      max_profit3 = order_profit3;
-      close_profit3 = profit_lock*order_profit3;      
-    } 
-    // CASO 1.2 >>> Segun va aumentando el beneficio actualizamos el profit lock
-    if (max_profit3>0)
-    {
-      if (order_profit3>max_profit3)
-      {      
-        max_profit3 = order_profit3;
-        close_profit3 = profit_lock*order_profit3; 
-      }
-    }   
-    // CASO 1.3 >>> Cuando el beneficio caiga por debajo de profit lock cerramos las ordenes
-    if (max_profit3>0 && close_profit3>0 && max_profit3>close_profit3 && order_profit3<close_profit3) 
-    {
-      cerrada=OrderCloseReliable(order_ticket3,order_lots3,MarketInfo(Symbol(),MODE_ASK),slippage,Red);
-      max_profit3=0;
-      close_profit3=0;  
-    }
-      
-    // CASO 2 >>> Tenemos "size" pips de perdida
-    if (order_profit3 <= CalculaStopLoss(3))
-    {
-      cerrada=OrderCloseReliable(order_ticket3,order_lots3,MarketInfo(Symbol(),MODE_ASK),slippage,Red);
-      max_profit3=0;
-      close_profit3=0;  
-    }   
-  }
-  
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=1 AND USE_TP_SL=0
-  // **************************************************
-  if (orders3>0 && direction3==1 && use_tp_sl==0)
-  {
-    signal3 = CalculaSignal(3,tenkan_sen,kijun_sen,senkou_span,shift);
-    if (signal3==2)
-    {
-      cerrada=OrderCloseReliable(order_ticket3,order_lots3,MarketInfo(Symbol(),MODE_BID),slippage,Blue);
-      max_profit3=0;
-      close_profit3=0;    
-    }  
-  }
-    
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=2 AND USE_TP_SL=0
-  // **************************************************
-  if (orders3>0 && direction3==2 && use_tp_sl==0)
-  {
-    signal3 = CalculaSignal(3,tenkan_sen,kijun_sen,senkou_span,shift);
-    if (signal3==1)
-    {
-      cerrada=OrderCloseReliable(order_ticket3,order_lots3,MarketInfo(Symbol(),MODE_ASK),slippage,Red);
-      max_profit3=0;
-      close_profit3=0;   
-    }  
-  }    
+  }  
     
 }
 
