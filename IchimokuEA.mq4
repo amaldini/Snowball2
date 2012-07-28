@@ -37,6 +37,8 @@ extern int shift = 1;
 string key1 = "Ichimoku EA v1.3 (strategy 1)";
 string key2 = "Ichimoku EA v1.3 (strategy 2)";
 string key3 = "Ichimoku EA v1.3 (strategy 3)";
+double points_per_pip;
+double pip;
 // Definimos 1 variable para guardar los tickets
 int order_ticket1;
 // Definimos 1 variable para guardar los lotes
@@ -512,6 +514,10 @@ void Robot2()
     
 }
 
+int init() {
+   points_per_pip = pointsPerPip();
+   pip = Point * points_per_pip;
+}
 // ------------------------------------------------------------------------------------------------
 // ROBOT 3
 // ------------------------------------------------------------------------------------------------
