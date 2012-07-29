@@ -217,16 +217,6 @@ int fib(int i) {
    return (i+fib(i-1));
 }
 
-// ------------------------------------------------------------------------------------------------
-// CALCULAR VOLUMEN
-// ------------------------------------------------------------------------------------------------
-double CalcularVolumen()
-{ 
-   int myfib = fib(nLastConsecutiveLosses);
-   if (myfib==0) myfib = 1;
-   //return (min_lots);
-   return (min_lots*myfib);    
-}
 
 // ------------------------------------------------------------------------------------------------
 // CALCULA VALOR PIP
@@ -409,6 +399,17 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
 int init() {
    points_per_pip = pointsPerPip();
    pip = Point * points_per_pip;
+}
+
+// ------------------------------------------------------------------------------------------------
+// CALCULAR VOLUMEN
+// ------------------------------------------------------------------------------------------------
+double CalcularVolumen()
+{ 
+   // int myfib = fib(nLastConsecutiveLosses);
+   // if (myfib==0) myfib = 1;
+   return (min_lots);
+   // return (min_lots*myfib);    
 }
 // ------------------------------------------------------------------------------------------------
 // ROBOT 3
