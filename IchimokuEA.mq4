@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 #include <stdlib.mqh>
 #include <stderror.mqh> 
+#include <common_functions.mqh>
 #property copyright "Copyright © 2011, www.lifesdream.org"
 #property link "http://www.lifesdream.org"
 
@@ -223,7 +224,7 @@ double CalcularVolumen()
 { 
    int myfib = fib(nLastConsecutiveLosses);
    if (myfib==0) myfib = 1;
-   // return (min_lots);
+   //return (min_lots);
    return (min_lots*myfib);    
 }
 
@@ -396,123 +397,14 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
     if (close1<kb1 && close2>kb2)
     {
       aux=2;
-    }     
+    }    
+    if (close1>kb1 && close1<kt1) aux=3; 
   }
    
   return(aux);  
 }
 
-// ------------------------------------------------------------------------------------------------
-// ROBOT 1
-// ------------------------------------------------------------------------------------------------
-void Robot1()
-{
-  int ticket=-1, i;
-  bool cerrada=FALSE;  
-  
-  if (orders1==0 && direction1==0)
-  {     
-    signal1 = CalculaSignal(1,tenkan_sen,kijun_sen,senkou_span,shift);
-    // ----------
-    // COMPRA
-    // ----------
-    if (signal1==1)
-      ticket = OrderSendReliable(Symbol(),OP_BUY,CalcularVolumen(),MarketInfo(Symbol(),MODE_ASK),slippage,0,0,key1,"",0,Blue); 
-    // En este punto hemos ejecutado correctamente la orden de compra
-    // Los arrays se actualizarán en la siguiente ejecución de start() con ActualizarOrdenes()
-     
-    // ----------
-    // VENTA
-    // ----------
-    if (signal1==2)
-      ticket = OrderSendReliable(Symbol(),OP_SELL,CalcularVolumen(),MarketInfo(Symbol(),MODE_BID),slippage,0,0,key1,"",0,Red);         
-    // En este punto hemos ejecutado correctamente la orden de venta
-    // Los arrays se actualizarán en la siguiente ejecución de start() con ActualizarOrdenes()       
-  }
-  
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=1 AND USE_TP_SL=0
-  // **************************************************
-  if (orders1>0 && direction1==1)
-  {
-    signal1 = CalculaSignal(1,tenkan_sen,kijun_sen,senkou_span,shift);
-    if (signal1==2)
-    {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_BID),slippage,Blue);   
-    }  
-  }
-    
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=2 AND USE_TP_SL=0
-  // **************************************************
-  if (orders1>0 && direction1==2)
-  {
-    signal1 = CalculaSignal(1,tenkan_sen,kijun_sen,senkou_span,shift);
-    if (signal1==1)
-    {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_ASK),slippage,Red);   
-    }  
-  }    
-    
-}
 
-// ------------------------------------------------------------------------------------------------
-// ROBOT
-// ------------------------------------------------------------------------------------------------
-void Robot2()
-{
-  int ticket=-1, i;
-  bool cerrada=FALSE;  
-  
-  if (orders1==0 && direction1==0)
-  {     
-    signal1 = CalculaSignal(2,tenkan_sen,kijun_sen,senkou_span,shift);
-    // ----------
-    // COMPRA
-    // ----------
-    if (signal1==1)
-      ticket = OrderSendReliable(Symbol(),OP_BUY,CalcularVolumen(),MarketInfo(Symbol(),MODE_ASK),slippage,0,0,key2,"",0,Blue); 
-    // En este punto hemos ejecutado correctamente la orden de compra
-    // Los arrays se actualizarán en la siguiente ejecución de start() con ActualizarOrdenes()
-     
-    // ----------
-    // VENTA
-    // ----------
-    if (signal1==2)
-      ticket = OrderSendReliable(Symbol(),OP_SELL,CalcularVolumen(),MarketInfo(Symbol(),MODE_BID),slippage,0,0,key2,"",0,Red);         
-    // En este punto hemos ejecutado correctamente la orden de venta
-    // Los arrays se actualizarán en la siguiente ejecución de start() con ActualizarOrdenes()       
-  }
-  
-  
-    
-  
-  
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=1 AND USE_TP_SL=0
-  // **************************************************
-  if (orders1 && direction1==1)
-  {
-    signal1 = CalculaSignal(2,tenkan_sen,kijun_sen,senkou_span,shift);
-    if (signal1==2)
-    {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_BID),slippage,Blue);   
-    }  
-  }
-    
-  // **************************************************
-  // ORDERS>0 AND DIRECTION=2 AND USE_TP_SL=0
-  // **************************************************
-  if (orders1>0 && direction1==2)
-  {
-    signal1 = CalculaSignal(2,tenkan_sen,kijun_sen,senkou_span,shift);
-    if (signal1==1)
-    {
-      cerrada=OrderCloseReliable(order_ticket1,order_lots1,MarketInfo(Symbol(),MODE_ASK),slippage,Red);   
-    }  
-  }    
-    
-}
 
 int init() {
    points_per_pip = pointsPerPip();
