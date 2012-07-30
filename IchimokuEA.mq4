@@ -22,7 +22,7 @@ extern int signal_strength = 1; // 1=strong | 2: neutral | 3: weak
 extern string MoneyManagementSettings = "---------------------------------------------";
 // Money Management
 //extern int money_management = 1;
-extern double min_lots = 0.01;
+extern double min_lots = 0.10;
 //extern int risk=1;
 // extern int progression = 2; // 0=none | 1:ascending | 2:martingale
 // Indicator
@@ -388,7 +388,7 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
     {
       aux=2;
     }    
-    if (close1>kb1 && close1<kt1) aux=3; 
+    // if (close1>kb1 && close1<kt1) aux=3; 
   }
    
   return(aux);  
