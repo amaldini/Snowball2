@@ -322,7 +322,7 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
   
   if (PRICE_VS_KUMO==1 && CHINKOU_VS_KUMO==1 && CHINKOU_VS_PRICE==1) aux=1;
   if (PRICE_VS_KUMO==-1 && CHINKOU_VS_KUMO==-1 && CHINKOU_VS_PRICE==-1) aux=2;
-   
+  
   return(aux);  
 }
 
@@ -338,10 +338,10 @@ int init() {
 // ------------------------------------------------------------------------------------------------
 double CalcularVolumen()
 { 
-   // int myfib = fib(nLastConsecutiveLosses);
-   // if (myfib==0) myfib = 1;
-   return (min_lots);
-   // return (min_lots*myfib);    
+   int myfib = fib(nLastConsecutiveLosses);
+   if (myfib==0) myfib = 1;
+   // return (min_lots);
+   return (min_lots*myfib);    
 }
 // ------------------------------------------------------------------------------------------------
 // ROBOT 3
