@@ -53,9 +53,10 @@ int order_time1;
 // indicadores
 double signal1=0;
 
-int CHINKOU_VS_KUMO=0; -1 below, 0 inside 1 above
-int PRICE_VS_KUMO=0; -1 below, 0 inside, 1 above
-int TENKAN_VS_KIJOUN=0; -1 below, 0 inside, 1 above
+int CHINKOU_VS_KUMO=0;  // -1 below, 0 inside, 1 above
+int PRICE_VS_KUMO=0;    // -1 below, 0 inside, 1 above
+int TENKAN_VS_KIJOUN=0; // -1 below, 0 neutral, 1 above
+int CHINKOU_VS_PRICE=0; // -1 below, 0 neutral, 1 above
 
 // Cantidad de ordenes;
 int orders1 = 0;
@@ -266,6 +267,7 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
   int aux=0;
   double kt1=0, kb1=0, kt2=0, kb2=0;  
   double ts1,ts2,ks1,ks2,ssA1,ssA2,ssB1,ssB2,close1,close2; 
+  double chinkou1;
   
   ts1 = iIchimoku(Symbol(), 0, aux_tenkan_sen, aux_kijun_sen, aux_senkou_span, MODE_TENKANSEN, aux_shift);
   ks1 = iIchimoku(Symbol(), 0, aux_tenkan_sen, aux_kijun_sen, aux_senkou_span, MODE_KIJUNSEN, aux_shift);
@@ -278,18 +280,34 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
   ssB2 = iIchimoku(Symbol(), 0, aux_tenkan_sen, aux_kijun_sen, aux_senkou_span, MODE_SENKOUSPANB, aux_shift+1);
   close2 = iClose(Symbol(), 0, aux_shift+1);
   
-  if (ssA1 >= ssB1) kt1 = ssA1;
-  else kt1 = ssB1;
+  kt1 = MathMax(ssA1,ssB1);
+  kb1 = MathMin(ssA1,ssB1);
   
-  if (ssA1 <= ssB1) kb1 = ssA1;
-  else kb1 = ssB1;
+  kt2 = MathMax(ssA2,ssB2);
+  kb2 = MathMin(ssA2,ssB2);
   
-  if (ssA2 >= ssB2) kt2 = ssA2;
-  else kt2 = ssB2;
+  int chinkouShift = aux_kijun_sen;
+  chinkou1 = iIchimoku(Symbol(), 0, aux_tenkan_sen, aux_kijun_sen, aux_senkou_span, MODE_CHINKOUSPAN, chinkouShift+aux_shift);
+  double priceAtChinkou = iClose(Symbol(),0,chinkouShift+aux_shift);
+  double ssA3 = iIchimoku(Symbol(), 0, aux_tenkan_sen, aux_kijun_sen, aux_senkou_span, MODE_SENKOUSPANA, chinkouShift+aux_shift);
+  double ssB3 = iIchimoku(Symbol(), 0, aux_tenkan_sen, aux_kijun_sen, aux_senkou_span, MODE_SENKOUSPANB, chinkouShift+aux_shift);
   
-  if (ssA2 <= ssB2) kb2 = ssA2;
-  else kb2 = ssB2;
-    
+  double kt3 = MathMax(ssA3,ssB3);
+  double kb3 = MathMin(ssA3,ssB3);
+  
+  CHINKOU_VS_KUMO = 0;
+  if (chinkou1>kt3) CHINKOU_VS_KUMO = 1;
+  if (chinkou1<kb3) CHINKOU_VS_KUMO = -1;
+  
+  CHINKOU_VS_PRICE = 0;
+  if (chinkou1>priceAtChinkou) CHINKOU_VS_PRICE = 1;
+  if (chinkou1<priceAtChinkou) CHINKOU_VS_PRICE = -1;
+  
+   // int CHINKOU_VS_KUMO=0;  // -1 below, 0 inside 1 above
+   // int PRICE_VS_KUMO=0;    // -1 below, 0 inside, 1 above
+   // int TENKAN_VS_KIJOUN=0; // -1 below, 0 inside, 1 above
+  
+  
   // Valores de retorno
   // 1. Compra
   // 2. Venta
