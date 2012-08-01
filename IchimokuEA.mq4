@@ -58,6 +58,10 @@ int PRICE_VS_KUMO=0;    // -1 below, 0 inside, 1 above
 int TENKAN_VS_KIJOUN=0; // -1 below, 0 neutral, 1 above
 int CHINKOU_VS_PRICE=0; // -1 below, 0 neutral, 1 above
 
+bool touchedAboveKumo=false;
+bool touchedBelowKumo=false;
+bool touchedInsideKumo=false;
+
 // Cantidad de ordenes;
 int orders1 = 0;
 int direction1= 0;
@@ -319,9 +323,24 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
   // Valores de retorno
   // 1. Compra
   // 2. Venta
+  if (touchedBelowKumo || touchedInsideKumo) {
+      if (PRICE_VS_KUMO==1 && CHINKOU_VS_KUMO==1 && CHINKOU_VS_PRICE==1) aux=1;
+  }
+  if (touchedAboveKumo || touchedInsideKumo) {
+      if (PRICE_VS_KUMO==-1 && CHINKOU_VS_KUMO==-1 && CHINKOU_VS_PRICE==-1) aux=2;
+  }
   
-  if (PRICE_VS_KUMO==1 && CHINKOU_VS_KUMO==1 && CHINKOU_VS_PRICE==1) aux=1;
-  if (PRICE_VS_KUMO==-1 && CHINKOU_VS_KUMO==-1 && CHINKOU_VS_PRICE==-1) aux=2;
+   if (PRICE_VS_KUMO==1) touchedAboveKumo=true;
+   if (PRICE_VS_KUMO==-1) touchedBelowKumo=true;
+   if (PRICE_VS_KUMO==0) touchedInsideKumo=true;
+   // bool touchedAboveKumo=false;
+   // bool touchedBelowKumo=false;
+   // bool touchedInsideKumo=false;
+  if (aux!=0) {
+      touchedAboveKumo=false;
+      touchedBelowKumo=false;
+      touchedInsideKumo=false;    
+  }
   
   return(aux);  
 }
