@@ -1,11 +1,11 @@
 // ------------------------------------------------------------------------------------------------
-// Copyright © 2011, www.lifesdream.org
+// Copyright ï¿½ 2011, www.lifesdream.org
 // http://www.lifesdream.org
 // ------------------------------------------------------------------------------------------------
 #include <stdlib.mqh>
 #include <stderror.mqh> 
 #include <common_functions.mqh>
-#property copyright "Copyright © 2011, www.lifesdream.org"
+#property copyright "Copyright ï¿½ 2011, www.lifesdream.org"
 #property link "http://www.lifesdream.org"
 
 // ------------------------------------------------------------------------------------------------
@@ -52,6 +52,11 @@ double order_profit1;
 int order_time1;
 // indicadores
 double signal1=0;
+
+int CHINKOU_VS_KUMO=0; -1 below, 0 inside 1 above
+int PRICE_VS_KUMO=0; -1 below, 0 inside, 1 above
+int TENKAN_VS_KIJOUN=0; -1 below, 0 inside, 1 above
+
 // Cantidad de ordenes;
 int orders1 = 0;
 int direction1= 0;
@@ -93,12 +98,12 @@ int start()
   
   if(IsTradeAllowed() == false) 
   {
-    Comment("Copyright © 2011, www.lifesdream.org\nTrade not allowed.");
+    Comment("Copyright ï¿½ 2011, www.lifesdream.org\nTrade not allowed.");
     return;  
   }
   
   
-    Comment(StringConcatenate("\nCopyright © 2011, www.lifesdream.org\nIchimoku EA v1.3 is running.",
+    Comment(StringConcatenate("\nCopyright ï¿½ 2011, www.lifesdream.org\nIchimoku EA v1.3 is running.",
                               "\nNext order lots (: ",CalcularVolumen(),
                               "\nLast consecutive losses:"+nLastConsecutiveLosses,
                               "\nNumCycles:"+numCycles
@@ -167,7 +172,7 @@ void ActualizarOrdenes()
   int ordenes1=0;
   
   // Lo que hacemos es introducir los tickets, los lotes, y los valores de apertura en las matrices. 
-  // Además guardaremos el número de ordenes en una variables.
+  // Ademï¿½s guardaremos el nï¿½mero de ordenes en una variables.
   
   // Ordenes de compra
   for(int i=0; i<OrdersTotal(); i++)
@@ -463,7 +468,7 @@ void Robot3()
     if (signal1==1)
       ticket = OrderSendReliable(Symbol(),OP_BUY,CalcularVolumen(),MarketInfo(Symbol(),MODE_ASK),slippage,0,0,key3,"",0,Blue); 
     // En este punto hemos ejecutado correctamente la orden de compra
-    // Los arrays se actualizarán en la siguiente ejecución de start() con ActualizarOrdenes()
+    // Los arrays se actualizarï¿½n en la siguiente ejecuciï¿½n de start() con ActualizarOrdenes()
      
     // ----------
     // VENTA
@@ -471,7 +476,7 @@ void Robot3()
     if (signal1==2)
       ticket = OrderSendReliable(Symbol(),OP_SELL,CalcularVolumen(),MarketInfo(Symbol(),MODE_BID),slippage,0,0,key3,"",0,Red);         
     // En este punto hemos ejecutado correctamente la orden de venta
-    // Los arrays se actualizarán en la siguiente ejecución de start() con ActualizarOrdenes()       
+    // Los arrays se actualizarï¿½n en la siguiente ejecuciï¿½n de start() con ActualizarOrdenes()       
   }  
     
 }
