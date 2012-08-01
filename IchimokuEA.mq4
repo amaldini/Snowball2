@@ -303,6 +303,14 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
   if (chinkou1>priceAtChinkou) CHINKOU_VS_PRICE = 1;
   if (chinkou1<priceAtChinkou) CHINKOU_VS_PRICE = -1;
   
+  PRICE_VS_KUMO = 0;
+  if (close1>kt1) PRICE_VS_KUMO = 1;
+  if (close1<kb1) PRICE_VS_KUMO = -1;
+  
+  TENKAN_VS_KIJOUN = 0;
+  if (ts1>ks1) TENKAN_VS_KIJOUN = 1;
+  if (ts1<ks1) TENKAN_VS_KIJOUN = -1;
+  
    // int CHINKOU_VS_KUMO=0;  // -1 below, 0 inside 1 above
    // int PRICE_VS_KUMO=0;    // -1 below, 0 inside, 1 above
    // int TENKAN_VS_KIJOUN=0; // -1 below, 0 inside, 1 above
@@ -312,107 +320,8 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
   // 1. Compra
   // 2. Venta
   
-  // STRATEGY 1: Tenkan Sen / Kijun Sen Cross
-  if (strategy==1)
-  {
-    // BUY SIGNAL
-    if (ts1>ks1 && ts2<ks2)
-    {
-      // STRONG
-      if (signal_strength==1)
-      { 
-        if (ks1>kt1) aux=1;   
-      }
-      // NEUTRAL
-      else if (signal_strength==2)
-      {
-        if (ks1>kb1) aux=1;
-      }
-      // WEAK
-      else if (signal_strength==3)
-      {
-        aux=1;
-      }      
-    }
-    // SELL SIGNAL
-    if (ts1<ks1 && ts2>ks2)
-    {
-      // STRONG
-      if (signal_strength==1)
-      { 
-        if (ts1<kb1) aux=2;   
-      }
-      // NEUTRAL
-      else if (signal_strength==2)
-      {
-        if (ts1<kt1) aux=2;
-      }
-      // WEAK
-      else if (signal_strength==3)
-      {
-        aux=2;
-      }      
-    }
-  }
-  
-  // STRATEGY 2: Kijun Sen Cross
-  if (strategy==2)
-  {
-    // BUY SIGNAL
-    if (close1>ks1 && close2<ks2)
-    {
-      // STRONG
-      if (signal_strength==1)
-      { 
-        if (ks1>kt1) aux=1;   
-      }
-      // NEUTRAL
-      else if (signal_strength==2)
-      {
-        if (ks1>kb1) aux=1;
-      }
-      // WEAK
-      else if (signal_strength==3)
-      {
-        aux=1;
-      }      
-    }  
-    // SELL SIGNAL
-    if (close1<ks1 && close2>ks2)
-    {
-      // STRONG
-      if (signal_strength==1)
-      { 
-        if (ks1<kb1) aux=2;   
-      }
-      // NEUTRAL
-      else if (signal_strength==2)
-      {
-        if (ks1<kt1) aux=2;
-      }
-      // WEAK
-      else if (signal_strength==3)
-      {
-        aux=2;
-      }      
-    }  
-  }
-  
-  // STRATEGY 3: Kumo Breakout
-  if (strategy==3)
-  {
-    // BUY SIGNAL
-    if (close1>kt1 && close2<kt2)
-    {
-      aux=1;
-    }  
-    // SELL SIGNAL
-    if (close1<kb1 && close2>kb2)
-    {
-      aux=2;
-    }    
-    // if (close1>kb1 && close1<kt1) aux=3; 
-  }
+  if (PRICE_VS_KUMO==1 && CHINKOU_VS_KUMO==1 && CHINKOU_VS_PRICE==1) aux=1;
+  if (PRICE_VS_KUMO==-1 && CHINKOU_VS_KUMO==-1 && CHINKOU_VS_PRICE==-1) aux=2;
    
   return(aux);  
 }
