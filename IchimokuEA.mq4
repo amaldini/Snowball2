@@ -22,7 +22,7 @@ extern int signal_strength = 1; // 1=strong | 2: neutral | 3: weak
 extern string MoneyManagementSettings = "---------------------------------------------";
 // Money Management
 //extern int money_management = 1;
-extern double min_lots = 0.10;
+extern double min_lots = 0.01;
 //extern int risk=1;
 // extern int progression = 2; // 0=none | 1:ascending | 2:martingale
 // Indicator
@@ -128,14 +128,14 @@ int start()
     while (i<=100 && encontrada==FALSE)
     { 
       n = OrdersHistoryTotal()-i;
+      
       if(OrderSelect(n,SELECT_BY_POS,MODE_HISTORY)==TRUE)
       {
-        
+         if (Symbol()==OrderSymbol()) {
           encontrada=TRUE;
           last_order_profit=OrderProfit();
           last_order_lots=OrderLots();
-        
-        
+        }
       }
       i++;
     }
