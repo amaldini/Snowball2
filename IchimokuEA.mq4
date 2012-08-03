@@ -111,7 +111,17 @@ int start()
     Comment(StringConcatenate("\nCopyright � 2011, www.lifesdream.org\nIchimoku EA v1.3 is running.",
                               "\nNext order lots (: ",CalcularVolumen(),
                               "\nLast consecutive losses:"+nLastConsecutiveLosses,
-                              "\nNumCycles:"+numCycles
+                              "\nNumCycles:"+numCycles,
+                              "\nCHINKOU_VS_KUMO:"+CHINKOU_VS_KUMO,
+                              "\nPRICE_VS_KUMO:"+PRICE_VS_KUMO,
+                              "\nTENKAN_VS_KIJOUN:"+TENKAN_VS_KIJOUN,
+                              "\nCHINKOU_VS_PRICE:"+CHINKOU_VS_PRICE,
+                              "\ntouchedAboveKumo:"+touchedAboveKumo,
+                              "\ntouchedBelowKumo:"+touchedBelowKumo,
+                              "\ntouchedInsideKumo:"+touchedInsideKumo
+                              
+                              
+                              
                              )
            );
   
