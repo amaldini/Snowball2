@@ -58,6 +58,7 @@ int PRICE_VS_KUMO=0;    // -1 below, 0 inside, 1 above
 int TENKAN_VS_KIJOUN=0; // -1 below, 0 neutral, 1 above
 int CHINKOU_VS_PRICE=0; // -1 below, 0 neutral, 1 above
 int PRICE_VS_KIJOUN = 0; // -1 below, 0 neutral, 1 above
+int PRICE_VS_TENKAN = 0; // -1 below, 0 neutral, 1 above
 
 bool touchedAboveKumo=false;
 bool touchedBelowKumo=false;
@@ -65,6 +66,9 @@ bool touchedInsideKumo=false;
 
 bool touchedAboveKijoun=false;
 bool touchedBelowKijoun=false;
+
+bool touchedAboveTenkan=false;
+bool touchedBelowTenkan=false;
 
 // Cantidad de ordenes;
 int orders1 = 0;
@@ -119,7 +123,9 @@ int start()
                               "\nTENKAN_VS_KIJOUN:"+TENKAN_VS_KIJOUN,
                               "\nPRICE_VS_KIJOUN:"+PRICE_VS_KIJOUN,
                               "\ntouchedAboveKijoun:"+touchedAboveKijoun,
-                              "\ntouchedBelowKijoun:"+touchedBelowKijoun
+                              "\ntouchedBelowKijoun:"+touchedBelowKijoun,
+                              "\ntouchedAboveTenkan:"+touchedAboveTenkan,
+                              "\ntouchedBelowTenkan:"+touchedBelowTenkan
                               
                               
                               
@@ -331,6 +337,10 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
   if (close1 > ks1) PRICE_VS_KIJOUN = 1;
   if (close1 < ks1) PRICE_VS_KIJOUN = -1;
   
+  PRICE_VS_TENKAN = 0;
+  if (close1 > ts1) PRICE_VS_TENKAN = 1;
+  if (close1 < ts1) PRICE_VS_TENKAN = -1;
+  
    // int CHINKOU_VS_KUMO=0;  // -1 below, 0 inside 1 above
    // int PRICE_VS_KUMO=0;    // -1 below, 0 inside, 1 above
    // int TENKAN_VS_KIJOUN=0; // -1 below, 0 inside, 1 above
@@ -345,13 +355,21 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
   // if (touchedAboveKumo || touchedInsideKumo) {
       // if (PRICE_VS_KUMO==-1 && CHINKOU_VS_KUMO==-1 && CHINKOU_VS_PRICE==-1) aux=2;
   // }
-  
+  /*
   if (touchedBelowKijoun) {
       if (PRICE_VS_KIJOUN==1) aux = 1;
   }
   
   if (touchedAboveKijoun) {
       if (PRICE_VS_KIJOUN==-1) aux = 2;
+  } */
+  
+  if (touchedBelowTenkan) {
+      if (PRICE_VS_TENKAN==1) aux = 1;
+  }
+  
+  if (touchedAboveTenkan) {
+      if (PRICE_VS_TENKAN==-1) aux = 2;
   }
   
    if (PRICE_VS_KUMO==1) touchedAboveKumo=true;
@@ -360,6 +378,9 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
    
    if (PRICE_VS_KIJOUN==1) touchedAboveKijoun = true;
    if (PRICE_VS_KIJOUN==-1) touchedBelowKijoun = true;
+   
+   if (PRICE_VS_TENKAN==1) touchedAboveTenkan = true;
+   if (PRICE_VS_TENKAN==-1) touchedBelowTenkan = true;
    // bool touchedAboveKumo=false;
    // bool touchedBelowKumo=false;
    // bool touchedInsideKumo=false;
@@ -389,7 +410,7 @@ double CalcularVolumen()
 { 
    int myfib = fib(nLastConsecutiveLosses);
    if (myfib==0) myfib = 1;
-   // return (min_lots);
+   //return (min_lots*20);
    return (min_lots*myfib);    
 }
 // ------------------------------------------------------------------------------------------------
