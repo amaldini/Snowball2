@@ -368,8 +368,8 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
       touchedBelowKumo=false;
       touchedInsideKumo=false;  
       
-      touchedAboveKijoun = false;
-      touchedBelowKijoun = false;  
+      // touchedAboveKijoun = false;
+      // touchedBelowKijoun = false;  
   }
   
   return(aux);  
