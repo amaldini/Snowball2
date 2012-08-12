@@ -207,8 +207,15 @@ int start()
   if (strategy2==1) Robot2();
   */
   
-  Robot3();
+  double spread = MathAbs(Ask-Bid)/pip;
+  if (spread>1.2) {
+      Comment("Spread: "+DoubleToStr(spread,2)+" too big!!!");
+  } else {
+      Robot3();    
+  }
+  
   TrailStops();
+  
   
   return(0);
 }
