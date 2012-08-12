@@ -70,6 +70,9 @@ bool touchedBelowKijoun=false;
 bool touchedAboveTenkan=false;
 bool touchedBelowTenkan=false;
 
+bool touchedAbovePA = false;
+bool touchedBelowPA = false;
+
 // Cantidad de ordenes;
 int orders1 = 0;
 int direction1= 0;
@@ -168,11 +171,9 @@ int start()
                               "\ntouchedAboveKijoun:"+touchedAboveKijoun,
                               "\ntouchedBelowKijoun:"+touchedBelowKijoun,
                               "\ntouchedAboveTenkan:"+touchedAboveTenkan,
-                              "\ntouchedBelowTenkan:"+touchedBelowTenkan
-                              
-                              
-                              
-                              
+                              "\ntouchedBelowTenkan:"+touchedBelowTenkan,
+                              "\ntouchedAbovePA:"+touchedAbovePA,
+                              "\ntouchedBelowPA:"+touchedBelowPA
                              )
            );
   
@@ -353,8 +354,14 @@ int CalculateSignal() {
    double cMA = CLOSE_MA(1,5);
    double close1 = iClose(NULL,0,1);
    
-   if (close1>cMA && cMA>hMA) aux = 1;
-   if (close1<cMA && cMA<lMA) aux = 2;
+   if (close1>cMA && cMA>hMA && touchedBelowPA) aux = 1;
+   if (close1<cMA && cMA<lMA && touchedAbovePA) aux = 2;
+   
+   if (close1>hMA) touchedAbovePA=true;
+   if (close1<lMA) touchedBelowPA=true;
+   
+   if (aux == 1) touchedBelowPA = false;
+   if (aux == 2) touchedAbovePA = false;
    
    return (aux);
 }
