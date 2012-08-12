@@ -91,6 +91,49 @@ string OrderReliable_Fname = "OrderReliable fname unset";
 static int _OR_err = 0;
 string OrderReliableVersion = "V1_1_1"; 
 
+double TRAILSTOP_PIPS = 3;
+
+// ---- Trailing Stops
+void TrailStops()
+{        
+   int digit  = MarketInfo(Symbol(),MODE_DIGITS);
+   
+   double spread = MathAbs(Bid-Ask);
+   double lastCandleClose= iClose(NULL,0,1);
+
+    int total=OrdersTotal();
+    for (int cnt=0;cnt<total;cnt++)
+    { 
+     OrderSelect(cnt, SELECT_BY_POS);   
+     int mode=OrderType();    
+        if ( OrderSymbol()==Symbol() ) 
+        {
+            if ( mode==OP_BUY )
+            {  
+               double BuyStop = lastCandleClose-(spread+pip*TRAILSTOP_PIPS);
+               
+               if (OrderStopLoss()<BuyStop || OrderStopLoss()==0) {
+                  OrderModify(OrderTicket(),OrderOpenPrice(),
+                              NormalizeDouble(BuyStop, digit),
+                              OrderTakeProfit(),0,LightGreen);
+               }
+			      
+			   }
+            if ( mode==OP_SELL )
+            {
+               double SellStop = lastCandleClose+(spread+pip*TRAILSTOP_PIPS);
+               if (OrderStopLoss()>SellStop || OrderStopLoss()==0) {
+                  OrderModify(OrderTicket(),OrderOpenPrice(),
+   		                  NormalizeDouble(SellStop, digit),
+   		                  OrderTakeProfit(),0,Yellow);	 
+   		      }   
+                 
+            }
+         }   
+      } 
+}
+
+
 // ------------------------------------------------------------------------------------------------
 // START
 // ------------------------------------------------------------------------------------------------
@@ -165,6 +208,7 @@ int start()
   */
   
   Robot3();
+  TrailStops();
   
   return(0);
 }
@@ -281,6 +325,33 @@ double CalculaValorPip(double lotes)
    return(aux_mm_valor);
 }
 
+
+double LOWER_MA(int shift, int period) {
+   return (iMA(NULL,0,period,0,MODE_SMA, PRICE_LOW, shift));
+}
+
+double HIGHER_MA(int shift, int period) {
+   return (iMA(NULL,0,period,0,MODE_SMA, PRICE_HIGH, shift));
+}
+
+double CLOSE_MA(int shift, int period) {
+   return (iMA(NULL,0,period,0,MODE_SMA, PRICE_CLOSE, shift));
+}
+
+int CalculateSignal() {
+   int aux=0;
+
+   double hMA = HIGHER_MA(2,6);
+   double lMA = LOWER_MA(2,6);
+   double cMA = CLOSE_MA(1,5);
+   double close1 = iClose(NULL,0,1);
+   
+   if (close1>cMA && cMA>hMA) aux = 1;
+   if (close1<cMA && cMA<lMA) aux = 2;
+   
+   return (aux);
+}
+
 // ------------------------------------------------------------------------------------------------
 // CALCULA SIGNAL 
 // ------------------------------------------------------------------------------------------------
@@ -350,20 +421,20 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
   // 1. Compra
   // 2. Venta
   // if (touchedBelowKumo || touchedInsideKumo) {
-      // if (PRICE_VS_KUMO==1 && CHINKOU_VS_KUMO==1 && CHINKOU_VS_PRICE==1) aux=1;
+  //    if (PRICE_VS_KUMO==1 && CHINKOU_VS_KUMO==1 && CHINKOU_VS_PRICE==1) aux=1;
   // }
   // if (touchedAboveKumo || touchedInsideKumo) {
       // if (PRICE_VS_KUMO==-1 && CHINKOU_VS_KUMO==-1 && CHINKOU_VS_PRICE==-1) aux=2;
   // }
-  /*
+  
   if (touchedBelowKijoun) {
       if (PRICE_VS_KIJOUN==1) aux = 1;
   }
   
   if (touchedAboveKijoun) {
       if (PRICE_VS_KIJOUN==-1) aux = 2;
-  } */
-  
+  } 
+  /*
   if (touchedBelowTenkan) {
       if (PRICE_VS_TENKAN==1) aux = 1;
   }
@@ -371,7 +442,7 @@ int CalculaSignal(int strategy,int aux_tenkan_sen, double aux_kijun_sen, double 
   if (touchedAboveTenkan) {
       if (PRICE_VS_TENKAN==-1) aux = 2;
   }
-  
+  */
    if (PRICE_VS_KUMO==1) touchedAboveKumo=true;
    if (PRICE_VS_KUMO==-1) touchedBelowKumo=true;
    if (PRICE_VS_KUMO==0) touchedInsideKumo=true;
@@ -408,10 +479,10 @@ int init() {
 // ------------------------------------------------------------------------------------------------
 double CalcularVolumen()
 { 
-   int myfib = fib(nLastConsecutiveLosses);
-   if (myfib==0) myfib = 1;
-   //return (min_lots*20);
-   return (min_lots*myfib);    
+   // int myfib = fib(nLastConsecutiveLosses);
+   // if (myfib==0) myfib = 1;
+   return (min_lots);
+   // return (min_lots*myfib);    
 }
 // ------------------------------------------------------------------------------------------------
 // ROBOT 3
@@ -421,7 +492,9 @@ void Robot3()
   int ticket=-1, i;
   bool cerrada=FALSE;  
   
-  signal1 = CalculaSignal(3,tenkan_sen,kijun_sen,senkou_span,shift);
+  // signal1 = CalculaSignal(3,tenkan_sen,kijun_sen,senkou_span,shift);
+  
+  signal1 = CalculateSignal();
   
   bool bToClose=FALSE;
   if (orders1>0) {
