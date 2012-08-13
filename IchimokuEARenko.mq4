@@ -22,7 +22,7 @@ extern int signal_strength = 1; // 1=strong | 2: neutral | 3: weak
 extern string MoneyManagementSettings = "---------------------------------------------";
 // Money Management
 //extern int money_management = 1;
-extern double min_lots = 0.01;
+extern double min_lots = 0.1;
 //extern int risk=1;
 // extern int progression = 2; // 0=none | 1:ascending | 2:martingale
 // Indicator
@@ -94,7 +94,7 @@ string OrderReliable_Fname = "OrderReliable fname unset";
 static int _OR_err = 0;
 string OrderReliableVersion = "V1_1_1"; 
 
-double TRAILSTOP_PIPS = 3;
+double TRAILSTOP_PIPS = 4;
 
 // ---- Trailing Stops
 void TrailStops()
@@ -215,7 +215,7 @@ int start()
       Robot3();    
   }
   
-  TrailStops();
+  // TrailStops();
   
   
   return(0);
@@ -354,8 +354,8 @@ int CalculateSignal() {
    double cMA = CLOSE_MA(1,5);
    double close1 = iClose(NULL,0,1);
    
-   if (close1>cMA && cMA>hMA && touchedBelowPA) aux = 1;
-   if (close1<cMA && cMA<lMA && touchedAbovePA) aux = 2;
+   if (close1>cMA && touchedBelowPA) aux = 1;
+   if (close1<cMA && touchedAbovePA) aux = 2;
    
    if (close1>hMA) touchedAbovePA=true;
    if (close1<lMA) touchedBelowPA=true;
