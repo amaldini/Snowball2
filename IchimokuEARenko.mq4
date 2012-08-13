@@ -209,7 +209,7 @@ int start()
   */
   
   double spread = MathAbs(Ask-Bid)/pip;
-  if (spread>1.2) {
+  if (spread>1.21) {
       Comment("Spread: "+DoubleToStr(spread,2)+" too big!!!");
   } else {
       Robot3();    
