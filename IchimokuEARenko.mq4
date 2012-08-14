@@ -22,7 +22,6 @@ extern int signal_strength = 1; // 1=strong | 2: neutral | 3: weak
 extern string MoneyManagementSettings = "---------------------------------------------";
 // Money Management
 //extern int money_management = 1;
-extern double min_lots = 0.1;
 //extern int risk=1;
 // extern int progression = 2; // 0=none | 1:ascending | 2:martingale
 // Indicator
@@ -493,9 +492,13 @@ int init() {
 // ------------------------------------------------------------------------------------------------
 double CalcularVolumen()
 { 
+   double availableVolume = AccountEquity()*AccountLeverage()/4*3 / Ask / 100000;
+   double lots = MathFloor(availableVolume*100)/100;
+   return (lots);
+
    // int myfib = fib(nLastConsecutiveLosses);
    // if (myfib==0) myfib = 1;
-   return (min_lots);
+   // return (min_lots);
    // return (min_lots*myfib);    
 }
 // ------------------------------------------------------------------------------------------------
