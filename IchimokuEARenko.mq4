@@ -492,7 +492,7 @@ int init() {
 // ------------------------------------------------------------------------------------------------
 double CalcularVolumen()
 { 
-   double availableVolume = AccountEquity()*AccountLeverage()/4*3 / Ask / 100000;
+   double availableVolume = AccountEquity()*AccountLeverage()/4*1 / Ask / 100000;
    double lots = MathFloor(availableVolume*100)/100;
    return (lots);
 
