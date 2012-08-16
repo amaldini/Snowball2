@@ -348,16 +348,16 @@ double CLOSE_MA(int shift, int period) {
 int CalculateSignal() {
    int aux=0;
 
-   // double hMA = HIGHER_MA(2,6);
-   // double lMA = LOWER_MA(2,6);
-   double cMA = CLOSE_MA(1,5);
+   double hMA = HIGHER_MA(2,6);
+   double lMA = LOWER_MA(2,6);
+   // double cMA = CLOSE_MA(1,5);
    double close1 = iClose(NULL,0,1);
    
-   if (close1>cMA && touchedBelowPA) aux = 1;
-   if (close1<cMA && touchedAbovePA) aux = 2;
+   if (close1>hMA && touchedBelowPA) aux = 1;
+   if (close1<lMA && touchedAbovePA) aux = 2;
    
-   if (close1>cMA) touchedAbovePA=true;
-   if (close1<cMA) touchedBelowPA=true;
+   if (close1>hMA) touchedAbovePA=true;
+   if (close1<lMA) touchedBelowPA=true;
    
    if (aux == 1) touchedBelowPA = false;
    if (aux == 2) touchedAbovePA = false;
