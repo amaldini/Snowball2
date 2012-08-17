@@ -144,9 +144,6 @@ void TrailStops()
 // ------------------------------------------------------------------------------------------------
 int start()
 {  
-  int ticket, i, n;
-  double price;
-  bool cerrada, encontrada;
 
   if (MarketInfo(Symbol(),MODE_DIGITS)==4)
   {
@@ -177,67 +174,6 @@ int start()
   // Actualizamos el estado actual
   InicializarVariables();
   ActualizarOrdenes();
-  
-  encontrada=FALSE;
-  if (OrdersHistoryTotal()>0)
-  {
-    i=1;
-    
-    while (i<=100 && encontrada==FALSE)
-    { 
-      n = OrdersHistoryTotal()-i;
-      
-      if(OrderSelect(n,SELECT_BY_POS,MODE_HISTORY)==TRUE)
-      {
-         if (Symbol()==OrderSymbol()) {
-          encontrada=TRUE;
-          last_order_profit=OrderProfit();
-          last_order_lots=OrderLots();
-  
-          
-          double midPoint=0;
-          double r,s;
-          if (last_order_profit<0) {        
-            midPoint = (OrderOpenPrice()+OrderClosePrice())/2;
-            r = midPoint+MathAbs(OrderOpenPrice()-OrderClosePrice());
-            s = midPoint-MathAbs(OrderOpenPrice()-OrderClosePrice());
-            
-            if (resistance>0) {
-               // resistance = MathMax(resistance,r);
-               resistance = r;
-            } else { resistance = r; }
-            
-            if (support>0) {
-               //   support = MathMin(support,s);
-               support = s;
-            } else { support = s; }
-            
-            if (resistance>0) {
-               horizLine("resistance",resistance,LightSalmon,"resistance");   
-            }  
-            
-            if (support>0) {
-               horizLine("support",support,LightSalmon, "support");
-            } 
-            
-          } else {
-            
-            resistance=0;
-            support=0;  
-            
-            ObjectDelete("resistance");
-            ObjectDelete("support");
-          }
-        }
-      }
-      i++;
-    }
-  }
-  
-  /*
-  if (strategy1==1) Robot1();
-  if (strategy2==1) Robot2();
-  */
   
   double spread = MathAbs(Ask-Bid)/pip;
   if (spread>1.21) {
@@ -580,6 +516,8 @@ void Robot3()
       if (order_profit1>10) { nLastConsecutiveLosses=0; numCycles++; }   
   } 
   
+  calcSupportAndResistance();
+  
   if (orders1==0 && direction1==0)
   {     
     
@@ -608,6 +546,64 @@ void Robot3()
     // Los arrays se actualizar�n en la siguiente ejecuci�n de start() con ActualizarOrdenes()       
   }  
     
+}
+
+void calcSupportAndResistance() {
+  bool encontrada=FALSE;
+  if (OrdersHistoryTotal()>0)
+  {
+    int i=1;
+    
+    while (i<=100 && encontrada==FALSE)
+    { 
+      int n = OrdersHistoryTotal()-i;
+      
+      if(OrderSelect(n,SELECT_BY_POS,MODE_HISTORY)==TRUE)
+      {
+         if (Symbol()==OrderSymbol()) {
+          encontrada=TRUE;
+          last_order_profit=OrderProfit();
+          last_order_lots=OrderLots();
+  
+          
+          double midPoint=0;
+          double r,s;
+          if (last_order_profit<0) {        
+            midPoint = (OrderOpenPrice()+OrderClosePrice())/2;
+            r = midPoint+MathAbs(OrderOpenPrice()-OrderClosePrice());
+            s = midPoint-MathAbs(OrderOpenPrice()-OrderClosePrice());
+            
+            if (resistance>0) {
+               // resistance = MathMax(resistance,r);
+               resistance = r;
+            } else { resistance = r; }
+            
+            if (support>0) {
+               //   support = MathMin(support,s);
+               support = s;
+            } else { support = s; }
+            
+            if (resistance>0) {
+               horizLine("resistance",resistance,LightSalmon,"resistance");   
+            }  
+            
+            if (support>0) {
+               horizLine("support",support,LightSalmon, "support");
+            } 
+            
+          } else {
+            
+            resistance=0;
+            support=0;  
+            
+            ObjectDelete("resistance");
+            ObjectDelete("support");
+          }
+        }
+      }
+      i++;
+    } 
+}
 }
 
 
