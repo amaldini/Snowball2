@@ -93,6 +93,9 @@ string OrderReliable_Fname = "OrderReliable fname unset";
 static int _OR_err = 0;
 string OrderReliableVersion = "V1_1_1"; 
 
+double resistance=0;
+double support=0;
+
 double TRAILSTOP_PIPS = 4;
 
 // ---- Trailing Stops
@@ -156,21 +159,15 @@ int start()
   
   if(IsTradeAllowed() == false) 
   {
-    Comment("Copyright � 2011, www.lifesdream.org\nTrade not allowed.");
+    Comment("Trade not allowed.");
     return;  
   }
   
   
-    Comment(StringConcatenate("\nCopyright � 2011, www.lifesdream.org\nIchimoku EA v1.3 is running.",
+    Comment(StringConcatenate("\nRenko Price Action EA running.",
                               "\nNext order lots (: ",CalcularVolumen(),
                               "\nLast consecutive losses:"+nLastConsecutiveLosses,
                               "\nNumCycles:"+numCycles,
-                              "\nTENKAN_VS_KIJOUN:"+TENKAN_VS_KIJOUN,
-                              "\nPRICE_VS_KIJOUN:"+PRICE_VS_KIJOUN,
-                              "\ntouchedAboveKijoun:"+touchedAboveKijoun,
-                              "\ntouchedBelowKijoun:"+touchedBelowKijoun,
-                              "\ntouchedAboveTenkan:"+touchedAboveTenkan,
-                              "\ntouchedBelowTenkan:"+touchedBelowTenkan,
                               "\ntouchedAbovePA:"+touchedAbovePA,
                               "\ntouchedBelowPA:"+touchedBelowPA
                              )
@@ -196,6 +193,41 @@ int start()
           encontrada=TRUE;
           last_order_profit=OrderProfit();
           last_order_lots=OrderLots();
+  
+          
+          double midPoint=0;
+          double r,s;
+          if (last_order_profit<0) {        
+            midPoint = (OrderOpenPrice()+OrderClosePrice())/2;
+            r = midPoint+2*MathAbs(OrderOpenPrice()-OrderClosePrice());
+            s = midPoint-2*MathAbs(OrderOpenPrice()-OrderClosePrice());
+            
+            if (resistance>0) {
+               // resistance = MathMax(resistance,r);
+               resistance = r;
+            } else { resistance = r; }
+            
+            if (support>0) {
+               //   support = MathMin(support,s);
+               support = s;
+            } else { support = s; }
+            
+            if (resistance>0) {
+               horizLine("resistance",resistance,LightSalmon,"resistance");   
+            }  
+            
+            if (support>0) {
+               horizLine("support",support,LightSalmon, "support");
+            } 
+            
+          } else {
+            
+            resistance=0;
+            support=0;  
+            
+            ObjectDelete("resistance");
+            ObjectDelete("support");
+          }
         }
       }
       i++;
@@ -350,17 +382,17 @@ int CalculateSignal() {
 
    double hMA = HIGHER_MA(2,6);
    double lMA = LOWER_MA(2,6);
-   // double cMA = CLOSE_MA(1,5);
+   double cMA = CLOSE_MA(2,6);
    double close1 = iClose(NULL,0,1);
    
-   if (close1>hMA && touchedBelowPA) aux = 1;
-   if (close1<lMA && touchedAbovePA) aux = 2;
+   if (close1>cMA && touchedBelowPA) aux = 1;
+   if (close1<cMA && touchedAbovePA) aux = 2;
    
-   if (close1>hMA) touchedAbovePA=true;
-   if (close1<lMA) touchedBelowPA=true;
+   if (close1>cMA) touchedAbovePA=true;
+   if (close1<cMA) touchedBelowPA=true;
    
-   if (aux == 1) touchedBelowPA = false;
-   if (aux == 2) touchedAbovePA = false;
+   // if (aux == 1) touchedBelowPA = false;
+   // if (aux == 2) touchedAbovePA = false;
    
    return (aux);
 }
@@ -552,16 +584,24 @@ void Robot3()
     // ----------
     // COMPRA
     // ----------
-    if (signal1==1)
-      ticket = OrderSendReliable(Symbol(),OP_BUY,CalcularVolumen(),MarketInfo(Symbol(),MODE_ASK),slippage,0,0,key3,"",0,Blue); 
+    if (signal1==1) {
+      if (MarketInfo(Symbol(),MODE_ASK)>resistance || resistance==0) { 
+         ticket = OrderSendReliable(Symbol(),OP_BUY,CalcularVolumen(),MarketInfo(Symbol(),MODE_ASK),slippage,0,0,key3,"",0,Blue); 
+         touchedBelowPA = false;
+      }
+    }
     // En este punto hemos ejecutado correctamente la orden de compra
     // Los arrays se actualizar�n en la siguiente ejecuci�n de start() con ActualizarOrdenes()
      
     // ----------
     // VENTA
     // ----------
-    if (signal1==2)
-      ticket = OrderSendReliable(Symbol(),OP_SELL,CalcularVolumen(),MarketInfo(Symbol(),MODE_BID),slippage,0,0,key3,"",0,Red);         
+    if (signal1==2) {
+      if (MarketInfo(Symbol(),MODE_BID)<support || support==0) {
+         ticket = OrderSendReliable(Symbol(),OP_SELL,CalcularVolumen(),MarketInfo(Symbol(),MODE_BID),slippage,0,0,key3,"",0,Red);         
+         touchedAbovePA = false;
+      }
+    }
     // En este punto hemos ejecutado correctamente la orden de venta
     // Los arrays se actualizar�n en la siguiente ejecuci�n de start() con ActualizarOrdenes()       
   }  
