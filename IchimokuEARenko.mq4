@@ -199,8 +199,8 @@ int start()
           double r,s;
           if (last_order_profit<0) {        
             midPoint = (OrderOpenPrice()+OrderClosePrice())/2;
-            r = midPoint+2*MathAbs(OrderOpenPrice()-OrderClosePrice());
-            s = midPoint-2*MathAbs(OrderOpenPrice()-OrderClosePrice());
+            r = midPoint+MathAbs(OrderOpenPrice()-OrderClosePrice());
+            s = midPoint-MathAbs(OrderOpenPrice()-OrderClosePrice());
             
             if (resistance>0) {
                // resistance = MathMax(resistance,r);
@@ -377,13 +377,15 @@ double CLOSE_MA(int shift, int period) {
    return (iMA(NULL,0,period,0,MODE_SMA, PRICE_CLOSE, shift));
 }
 
+double close1;
+
 int CalculateSignal() {
    int aux=0;
 
    double hMA = HIGHER_MA(2,6);
    double lMA = LOWER_MA(2,6);
    double cMA = CLOSE_MA(2,6);
-   double close1 = iClose(NULL,0,1);
+   close1 = iClose(NULL,0,1);
    
    if (close1>cMA && touchedBelowPA) aux = 1;
    if (close1<cMA && touchedAbovePA) aux = 2;
@@ -585,7 +587,7 @@ void Robot3()
     // COMPRA
     // ----------
     if (signal1==1) {
-      if (MarketInfo(Symbol(),MODE_ASK)>resistance || resistance==0) { 
+      if (close1>resistance || resistance==0) { 
          ticket = OrderSendReliable(Symbol(),OP_BUY,CalcularVolumen(),MarketInfo(Symbol(),MODE_ASK),slippage,0,0,key3,"",0,Blue); 
          touchedBelowPA = false;
       }
@@ -597,7 +599,7 @@ void Robot3()
     // VENTA
     // ----------
     if (signal1==2) {
-      if (MarketInfo(Symbol(),MODE_BID)<support || support==0) {
+      if (close1<support || support==0) {
          ticket = OrderSendReliable(Symbol(),OP_SELL,CalcularVolumen(),MarketInfo(Symbol(),MODE_BID),slippage,0,0,key3,"",0,Red);         
          touchedAbovePA = false;
       }
