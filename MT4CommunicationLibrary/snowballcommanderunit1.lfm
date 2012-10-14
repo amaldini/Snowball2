@@ -1,0 +1,62 @@
+object Form1: TForm1
+  Left = 312
+  Height = 193
+  Top = 238
+  Width = 383
+  Caption = 'Snowball commander'
+  ClientHeight = 193
+  ClientWidth = 383
+  LCLVersion = '0.9.30.4'
+  object RadioButton1: TRadioButton
+    Left = 16
+    Height = 17
+    Top = 40
+    Width = 149
+    Caption = 'Higher Highs && Higher Lows'
+    OnChange = RadioButton1Change
+    TabOrder = 0
+  end
+  object RadioButton2: TRadioButton
+    Left = 16
+    Height = 17
+    Top = 88
+    Width = 145
+    Caption = 'Lower Highs && Lower Lows'
+    OnChange = RadioButton1Change
+    TabOrder = 1
+  end
+  object RadioButton3: TRadioButton
+    Left = 16
+    Height = 17
+    Top = 64
+    Width = 86
+    Caption = 'Pause (range)'
+    OnChange = RadioButton1Change
+    TabOrder = 2
+  end
+  object Button1: TButton
+    Left = 16
+    Height = 25
+    Top = 120
+    Width = 149
+    Caption = 'SEND COMMAND'
+    TabOrder = 3
+  end
+  object ListBox1: TListBox
+    Left = 217
+    Height = 108
+    Top = 40
+    Width = 100
+    Items.Strings = (
+      'AUDCAD'
+      'AUDJPY'
+      'AUDUSD'
+      'EURJPY'
+      'EURUSD'
+      'GBPUSD'
+      'USDJPY'
+    )
+    ItemHeight = 13
+    TabOrder = 4
+  end
+end
