@@ -8,6 +8,10 @@
 #include <common_functions.mqh>
 #include <offline_charts.mqh> 
 //#include <oanda.mqh> 
+#import "MT4Library.dll"
+
+bool setCmd(string symbolName,int isMaster,string cmd);
+string getCmd(string symbolName,int isMaster); 
 
 extern double lots = 0.01; // lots to use per trade
 //extern double oanda_factor = 25000;
@@ -159,6 +163,44 @@ void onTick(){
       plotNewOpenTrades(magic);
       plotNewClosedTrades(magic);
    }
+   checkDirection();
+}
+
+void checkDirection() {
+   /*
+   double maValue1 = iMA(NULL,0,20,1,MODE_LWMA,PRICE_TYPICAL,1);
+   double maValue2 = iMA(NULL,0,20,5,MODE_LWMA,PRICE_HIGH,1);
+   double maValue3 = iMA(NULL,0,20,5,MODE_LWMA,PRICE_LOW,1);
+   */
+   /*
+   if (maValue1>maValue2) {
+      if (direction==2) {
+         pause();
+         go(1);
+      }
+   }
+   if (maValue1<maValue3) {
+      if (direction==1) {
+         pause();
+         go(2);
+      }  
+   }
+   */
+   string cmd = getCmd(Symbol6(),0); 
+   if (cmd=="LONG") {
+      if (running && (direction!=LONG)) pause();
+      if (!running) go(LONG);
+   }
+   if (cmd=="SHORT") {
+      if (running && (direction!=SHORT)) pause();
+      if (!running) go(SHORT);
+   }
+   if (cmd=="PAUSE" && running) {
+      pause();
+   }
+   if (cmd!="") {
+      setCmd(Symbol6(),0,"");
+   }
 }
 
 void onOpen(){
@@ -211,6 +253,7 @@ void endArrow(){
 }
 
 void stop(){
+   int lastDirection = direction;
    endArrow();
    deleteStopButtons();
    closeOpenOrders(-1, magic);
@@ -221,6 +264,7 @@ void stop(){
    if (sound_stop_all != ""){
       PlaySound(sound_stop_all);
    }
+   if (IsTesting()) go(lastDirection);
 }
 
 void closeTrades() {
@@ -791,7 +835,7 @@ void plotBreakEven(){
       }
       be = base + getBreakEven(loss);
       plotBreakEvenArrow("breakeven_long", be);
-      print("plotBreakEven plotted!");
+      // print("plotBreakEven plotted!");
       auto_tp_price = be + pip * stop_distance * auto_tp;
       auto_tp_profit = getTheoreticProfit(MathAbs(auto_tp_price - base)) - loss;
    }
@@ -802,7 +846,7 @@ void plotBreakEven(){
       }
       be = base - getBreakEven(loss);
       plotBreakEvenArrow("breakeven_short", be);
-      print("plotBreakEven plotted!");
+      /// print("plotBreakEven plotted!");
       auto_tp_price = be - pip * stop_distance * auto_tp;
       auto_tp_profit = getTheoreticProfit(MathAbs(auto_tp_price - base)) - loss;
    }

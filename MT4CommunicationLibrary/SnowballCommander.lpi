@@ -34,11 +34,14 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="4">
+    <Units Count="5">
       <Unit0>
         <Filename Value="SnowballCommander.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="SnowballCommander"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="1" Y="15"/>
         <UsageCount Value="30"/>
       </Unit0>
       <Unit1>
@@ -50,8 +53,8 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="30"/>
-        <CursorPos X="31" Y="52"/>
+        <TopLine Value="33"/>
+        <CursorPos X="6" Y="60"/>
         <UsageCount Value="30"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -59,25 +62,29 @@
       <Unit2>
         <Filename Value="mt4communication.pas"/>
         <UnitName Value="MT4Communication"/>
-        <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="1" Y="1"/>
         <UsageCount Value="15"/>
-        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="controlpanel.pas"/>
         <UnitName Value="ControlPanel"/>
-        <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
         <TopLine Value="94"/>
         <CursorPos X="1" Y="1"/>
         <UsageCount Value="15"/>
-        <Loaded Value="True"/>
       </Unit3>
+      <Unit4>
+        <Filename Value="C:\lazarus\lcl\lcltype.pp"/>
+        <UnitName Value="LCLType"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="3114"/>
+        <CursorPos X="1" Y="3174"/>
+        <UsageCount Value="10"/>
+      </Unit4>
     </Units>
-    <JumpHistory Count="20" HistoryIndex="19">
+    <JumpHistory Count="23" HistoryIndex="22">
       <Position1>
         <Filename Value="snowballcommanderunit1.pas"/>
         <Caret Line="36" Column="1" TopLine="6"/>
@@ -158,6 +165,18 @@
         <Filename Value="snowballcommanderunit1.pas"/>
         <Caret Line="52" Column="1" TopLine="30"/>
       </Position20>
+      <Position21>
+        <Filename Value="snowballcommanderunit1.pas"/>
+        <Caret Line="60" Column="33" TopLine="32"/>
+      </Position21>
+      <Position22>
+        <Filename Value="snowballcommanderunit1.pas"/>
+        <Caret Line="56" Column="25" TopLine="33"/>
+      </Position22>
+      <Position23>
+        <Filename Value="snowballcommanderunit1.pas"/>
+        <Caret Line="60" Column="6" TopLine="33"/>
+      </Position23>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
