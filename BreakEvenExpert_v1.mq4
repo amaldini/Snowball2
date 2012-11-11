@@ -4,8 +4,8 @@
 //|                         Written by IgorAD,igorad2003@yahoo.co.uk |   
 //|            http://finance.groups.yahoo.com/group/TrendLaboratory |                                      
 //+------------------------------------------------------------------+
-#property copyright "Copyright © 2006, Forex-TSD.com "
-#property link      "http://www.forex-tsd.com/"
+#property copyright "Copyright © 2012, Andrea Maldini"
+// #property link      ""
 
 #include <common_functions.mqh>
 
@@ -21,6 +21,11 @@ extern double     LockGainPips2 = 6;
 int      digit=0;
 int      pointsPerPip=0;
 double   pip=0;
+int magic = 0;
+
+extern double riskmultiplier = 1; // per testare sabato e domenica
+
+extern double lots = 2;
 
 //+------------------------------------------------------------------+
 //| expert initialization function                                   |
@@ -122,22 +127,40 @@ int start()
 {
    if (pointsPerPip==0) {
       pointsPerPip = pointsPerPip();
-      pip = Point*pointsPerPip;
+      pip = Point*pointsPerPip*riskmultiplier;
    }
    digit  = MarketInfo(Symbol(),MODE_DIGITS);
    Comment("Digit: "+digit+" Point: "+Point+ " PointsPerPip:"+pointsPerPip);
+   Comment("Andrea Maldini - Trend Line Trader with breakeven protection - for 1 minute charts trading \nSupported trend line descriptions: buy,sell,stop");
    
+   if (ScanTrades()>0 && BreakEven>0) TrailStops(); 
    
-   
-   if (ScanTrades()<1) return(0);
-   else
-   if (BreakEven>0) TrailStops(); 
+   checkLines();
    
  return(0);
 }//int start
 //+------------------------------------------------------------------+
 
+void checkLines(){
 
+   double sl;
+
+   if (crossedLine("stop")){
+      closeOpenOrders(OP_BUY,magic);
+      closeOpenOrders(OP_SELL,magic);
+   }
+   if (crossedLine("sell")){
+      closeOpenOrders(OP_BUY,magic);
+      sl = Ask + pip * autoSLPips;
+      sell(lots, sl, 0, magic, "");
+   }
+   if (crossedLine("buy")){
+      closeOpenOrders(OP_SELL,magic);
+      sl = Bid - pip * autoSLPips;
+      buy(lots, sl, 0, magic, "");
+   }   
+   
+}
 
 
 
