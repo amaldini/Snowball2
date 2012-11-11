@@ -17,6 +17,8 @@ extern double     autoSLPips = 6;
 extern double     BreakEven2    = 12;
 extern double     LockGainPips2 = 6;
 
+extern double     MAX_SPREAD_PIPS = 2.5;
+
 int      digit=0;
 int      pointsPerPip=0;
 double   pip=0;
@@ -140,9 +142,29 @@ int start()
 }//int start
 //+------------------------------------------------------------------+
 
+bool checkSpread() {
+   double spread = MarketInfo(Symbol6(),MODE_SPREAD)/pointsPerPip;
+   
+   string text = "Spread: "+DoubleToStr(spread,1);
+   label("lblSpread", 50, 20, 2, text, Gray); 
+   ObjectSet("lblSpread", OBJPROP_FONTSIZE, 20);
+   bool spreadTooBig = false;
+   
+   if (spread>MAX_SPREAD_PIPS) {
+      // closeOpenOrders(OP_SELLSTOP,magic);
+      // closeOpenOrders(OP_BUYSTOP,magic);
+      spreadTooBig = true;
+      ObjectSet("lblSpread",OBJPROP_COLOR,Red);
+   }
+   
+   return (spreadTooBig);
+}
+
 void checkLines(){
 
    double sl;
+
+   if (checkSpread()) return;
 
    if (crossedLine("stop")){
       closeOpenOrders(OP_BUY,magic);
