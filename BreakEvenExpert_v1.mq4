@@ -11,12 +11,12 @@
 
 //---- input parameters
 
-extern double     BreakEven       = 2;    // Profit Lock in pips  
-extern double     LockGainPips        = 1; 
+extern double     BreakEven       = 6;    // Profit Lock in pips  
+extern double     LockGainPips        = 0.1; 
 extern double     autoSLPips = 6;
 
-extern double     BreakEven2    = 6;
-extern double     LockGainPips2 = 5;
+extern double     BreakEven2    = 12;
+extern double     LockGainPips2 = 6;
 
 int      digit=0;
 int      pointsPerPip=0;
