@@ -11,9 +11,12 @@
 
 //---- input parameters
 
-extern double     BreakEven       = 2;    // Profit Lock in pips  
-extern double     LockGainPips        = 1; 
+extern double     BreakEven       = 6;    // Profit Lock in pips  
+extern double     LockGainPips        = 0.1; 
 extern double     autoSLPips = 6;
+
+extern double     BreakEven2    = 12;
+extern double     LockGainPips2 = 6;
 
 int      digit=0;
 int      pointsPerPip=0;
@@ -50,6 +53,9 @@ void TrailStops()
                {
                   BuyStop = OrderOpenPrice()+pip*LockGainPips;
                }
+               if ( BreakEven2>BreakEven && ((Bid-OrderOpenPrice())>pip*BreakEven2)) {
+                  BuyStop = OrderOpenPrice()+pip*LockGainPips2;
+               }
                
                if (OrderStopLoss()<BuyStop || OrderStopLoss()==0) {
                   OrderModify(OrderTicket(),OrderOpenPrice(),
@@ -68,6 +74,9 @@ void TrailStops()
                if ( OrderOpenPrice()-Ask>pip*BreakEven ) 
                {
                   SellStop = OrderOpenPrice()-pip*LockGainPips;
+               }
+               if ( BreakEven2>BreakEven && ((OrderOpenPrice()-Ask)>pip*BreakEven2)) {
+                  SellStop = OrderOpenPrice()-pip*LockGainPips2;
                }
                if (OrderStopLoss()>SellStop || OrderStopLoss()==0) {
                   OrderModify(OrderTicket(),OrderOpenPrice(),
