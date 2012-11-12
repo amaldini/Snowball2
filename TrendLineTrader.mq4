@@ -33,7 +33,7 @@ extern double lots = 2;
 //+------------------------------------------------------------------+
 int init()
   {
-
+   IS_ECN_BROKER = true; // different market order procedure
 //----
    return(0);
   }
@@ -180,6 +180,9 @@ void checkLines(){
       sl = NormalizeDouble(Bid - pip * autoSLPips,digit);
       buy(lots, sl, 0, magic, "");
    }   
+   if (crossedLine("test")){
+      Comment("TEST!");
+   }
    
 }
 
