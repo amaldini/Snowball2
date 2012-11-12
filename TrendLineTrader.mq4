@@ -172,12 +172,12 @@ void checkLines(){
    }
    if (crossedLine("sell")){
       closeOpenOrders(OP_BUY,magic);
-      sl = Ask + pip * autoSLPips;
+      sl = NormalizeDouble(Ask + pip * autoSLPips,digit);
       sell(lots, sl, 0, magic, "");
    }
    if (crossedLine("buy")){
       closeOpenOrders(OP_SELL,magic);
-      sl = Bid - pip * autoSLPips;
+      sl = NormalizeDouble(Bid - pip * autoSLPips,digit);
       buy(lots, sl, 0, magic, "");
    }   
    
