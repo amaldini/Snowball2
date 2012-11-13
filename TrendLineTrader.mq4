@@ -182,8 +182,6 @@ bool checkSpread() {
 
 void checkLines(){
 
-   double sl;
-
    if (checkSpread()) return;
 
    if (crossedLine("stop")){
@@ -192,45 +190,57 @@ void checkLines(){
       closeOpenOrders(OP_SELL,magic);
    }
    if (crossedLine("sell")){
-      closeOpenOrders(OP_BUY,magic);
-      sl = NormalizeDouble(Ask + pip * autoSLPips,digit);
-      sell(lots, sl, 0, magic, "");
+      go(-1);
    }
    if (crossedLine("buy")){
-      closeOpenOrders(OP_SELL,magic);
-      sl = NormalizeDouble(Bid - pip * autoSLPips,digit);
-      buy(lots, sl, 0, magic, "");
+      go(1);
    }   
    if (crossedLine("MA")){
-      Comment("MA not yet implemented!");
       maON = true;
    }
    
 }
 
+void go(int dir) {
+   double sl;
+   if (dir>0) {
+      closeOpenOrders(OP_SELL,magic);
+      sl = NormalizeDouble(Bid - pip * autoSLPips,digit);
+      buy(lots, sl, 0, magic, "");        
+   }
+   if (dir<0) {
+      closeOpenOrders(OP_BUY,magic);
+      sl = NormalizeDouble(Ask + pip * autoSLPips,digit);
+      sell(lots, sl, 0, magic, "");
+   }
+}
+
 void checkMA() {
 
-  if (!maON) return(0);
+   if (!maON) return(0);
    
-   double ma=iMA(NULL,0,14,0,MODE_EMA,PRICE_MEDIAN,0);
-   double ma1=iMA(NULL,0,14,0,MODE_EMA,PRICE_MEDIAN,1);
-   double ma2=iMA(NULL,0,14,0,MODE_EMA,PRICE_MEDIAN,2);
+   double ma=iMA(NULL,0,14,0,MODE_EMA,PRICE_MEDIAN,1);
+   double ma1=iMA(NULL,0,14,0,MODE_EMA,PRICE_MEDIAN,2);
+   double ma2=iMA(NULL,0,14,0,MODE_EMA,PRICE_MEDIAN,3);
    
    int dir = 0;
    
    if (ma>ma1 && ma1>ma2) dir =  1;
    if (ma<ma1 && ma1<ma2) dir = -1;
    
-   // se attuale trade in perdita, aspetto SL
    if (direction!=0) {
-      if (direction!=0 && dir!=0 && direction!=dir) {
-            if (profit<0) return;
+      if (dir!=0) { 
+         if (direction!=dir) {
+            if (profit<0) return; // se attuale trade in perdita, aspetto SL
+            // if (profit>0) {
+            // go(dir);
+            // }
+            closeOpenOrders(OP_SELL,magic);
+            closeOpenOrders(OP_BUY,magic);
+         }
       }
-   }
+   } // else if (dir!=0) go(dir);
    
-   
-   // se non c'e' attuale trade , apro posizione
-   // se attuale trade in profitto, con direzione opposta,chiudo
 }
 
 
