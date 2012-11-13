@@ -24,6 +24,11 @@ int      pointsPerPip=0;
 double   pip=0;
 int magic = 0;
 
+int direction = 0;
+
+bool maON = false;
+double profit = 0;
+
 extern double riskmultiplier = 1; // per testare sabato e domenica
 
 extern double lots = 2;
@@ -100,12 +105,17 @@ int ScanTrades()
 {   
    int total = OrdersTotal();
    int numords = 0;
-      
+   
+   direction = 0;
+   profit = 0;
    for(int cnt=0; cnt<total; cnt++) 
    {        
    OrderSelect(cnt, SELECT_BY_POS);            
    if(OrderSymbol() == Symbol() && OrderType()<=OP_SELL) 
-   numords++;
+      numords++;
+      if (OrderType()==OP_SELL) direction = -1;
+      if (OrderType()==OP_BUY) direction = 1;
+      profit+=OrderProfit();
    }
    return(numords);
 }
@@ -134,9 +144,19 @@ int start()
    Comment("Digit: "+digit+" Point: "+Point+ " PointsPerPip:"+pointsPerPip);
    Comment("Andrea Maldini - Trend Line Trader with breakeven protection - for 1 minute charts trading \nSupported trend line descriptions: buy,sell,stop");
    
+   /*RefreshRates();
+   int MinStopDist = MarketInfo(Symbol(),MODE_STOPLEVEL);
+   Comment("MinStopDist: "+MinStopDist);
+   */
+   
    if (ScanTrades()>0 && BreakEven>0) TrailStops(); 
    
+   // double sl = NormalizeDouble(Ask + pip * autoSLPips,digit);
+   // Comment("SL example for sell: "+sl);
+   
    checkLines();
+   
+   checkMA();
    
  return(0);
 }//int start
@@ -167,6 +187,7 @@ void checkLines(){
    if (checkSpread()) return;
 
    if (crossedLine("stop")){
+      maON = false;
       closeOpenOrders(OP_BUY,magic);
       closeOpenOrders(OP_SELL,magic);
    }
@@ -180,10 +201,36 @@ void checkLines(){
       sl = NormalizeDouble(Bid - pip * autoSLPips,digit);
       buy(lots, sl, 0, magic, "");
    }   
-   if (crossedLine("test")){
-      Comment("TEST!");
+   if (crossedLine("MA")){
+      Comment("MA not yet implemented!");
+      maON = true;
    }
    
+}
+
+void checkMA() {
+
+  if (!maON) return(0);
+   
+   double ma=iMA(NULL,0,14,0,MODE_EMA,PRICE_MEDIAN,0);
+   double ma1=iMA(NULL,0,14,0,MODE_EMA,PRICE_MEDIAN,1);
+   double ma2=iMA(NULL,0,14,0,MODE_EMA,PRICE_MEDIAN,2);
+   
+   int dir = 0;
+   
+   if (ma>ma1 && ma1>ma2) dir =  1;
+   if (ma<ma1 && ma1<ma2) dir = -1;
+   
+   // se attuale trade in perdita, aspetto SL
+   if (direction!=0) {
+      if (direction!=0 && dir!=0 && direction!=dir) {
+            if (profit<0) return;
+      }
+   }
+   
+   
+   // se non c'e' attuale trade , apro posizione
+   // se attuale trade in profitto, con direzione opposta,chiudo
 }
 
 
