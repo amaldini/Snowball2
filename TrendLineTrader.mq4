@@ -17,6 +17,12 @@ extern double     autoSLPips = 6;
 extern double     BreakEven2    = 12;
 extern double     LockGainPips2 = 6;
 
+extern bool       enable50percentStop = false;
+
+double            currentPivot = 0;
+
+extern double     pipsFromPivot = 5;
+
 extern double     MAX_SPREAD_PIPS = 2.5;
 
 int      digit=0;
@@ -27,11 +33,12 @@ int magic = 0;
 int direction = 0;
 
 bool maON = false;
+extern bool pivotON = false;
 double profit = 0;
 
 extern double riskmultiplier = 1; // per testare sabato e domenica
 
-extern double lots = 2;
+extern double lots = 0.1;
 
 //+------------------------------------------------------------------+
 //| expert initialization function                                   |
@@ -116,7 +123,11 @@ int ScanTrades()
       if (OrderType()==OP_SELL) direction = -1;
       if (OrderType()==OP_BUY) direction = 1;
       profit+=OrderProfit();
+      
    }
+   
+   if (currentPivot==0) currentPivot = (Ask+Bid)/2;
+   
    return(numords);
 }
 
@@ -141,13 +152,16 @@ int start()
       pip = Point*pointsPerPip*riskmultiplier;
    }
    digit  = MarketInfo(Symbol(),MODE_DIGITS);
-   Comment("Digit: "+digit+" Point: "+Point+ " PointsPerPip:"+pointsPerPip);
-   Comment("Andrea Maldini - Trend Line Trader with breakeven protection - for 1 minute charts trading \nSupported trend line descriptions: buy,sell,stop");
+   Comment("Digit: "+digit+" Point: "+Point+ " PointsPerPip:"+pointsPerPip+"/n"+
+   "Andrea Maldini - Trend Line Trader with breakeven protection - for 1 minute charts trading \nSupported trend line descriptions: buy,sell,stop"+
+   "\nCurrent Pivot:"+currentPivot+" pivotON:"+pivotON);
    
    /*RefreshRates();
    int MinStopDist = MarketInfo(Symbol(),MODE_STOPLEVEL);
    Comment("MinStopDist: "+MinStopDist);
    */
+   
+   if (checkSpread()) return;
    
    if (ScanTrades()>0 && BreakEven>0) TrailStops(); 
    
@@ -158,9 +172,43 @@ int start()
    
    checkMA();
    
+   checkPivot();
+   
  return(0);
 }//int start
 //+------------------------------------------------------------------+
+int lastDirection = 0;
+void checkPivot() {
+   
+   if (!pivotON) return (0);
+
+   if (pipsFromPivot<5) {
+      Print("pipsFromPivot<5!!! INVALID!!!");
+      return (0);
+   }
+
+   if (direction==0) {
+      
+      // currentPivot = (Ask+Bid)/2;
+      double price=(Ask+Bid)/2;
+      if (lastDirection!=0 || (currentPivot==0) ) {
+         currentPivot = price;
+         lastDirection = 0;
+      }
+      if ((MathAbs(price-currentPivot)/pip)>pipsFromPivot) {
+         if (price<currentPivot) {
+            go(-1);
+            currentPivot = price+pipsFromPivot*pip;
+         }
+         if (price>currentPivot) {
+            go(1);
+            currentPivot = price-pipsFromPivot*pip;
+         }
+      }
+   } else {
+      lastDirection = direction;
+   }
+}
 
 bool checkSpread() {
    double spread = MarketInfo(Symbol6(),MODE_SPREAD)/pointsPerPip;
@@ -181,8 +229,6 @@ bool checkSpread() {
 }
 
 void checkLines(){
-
-   if (checkSpread()) return;
 
    if (crossedLine("stop")){
       maON = false;
