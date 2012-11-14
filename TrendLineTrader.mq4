@@ -182,8 +182,8 @@ void checkPivot() {
    
    if (!pivotON) return (0);
 
-   if (pipsFromPivot<5) {
-      Print("pipsFromPivot<5!!! INVALID!!!");
+   if (pipsFromPivot<2) {
+      Print("pipsFromPivot<2!!! INVALID!!!");
       return (0);
    }
 
