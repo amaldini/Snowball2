@@ -17,7 +17,7 @@ extern double     autoSLPips = 6;
 extern double     BreakEven2    = 12;
 extern double     LockGainPips2 = 6;
 
-extern bool       enable50percentStop = false;
+extern bool       autoActivateTrendLines = false;
 
 double            currentPivot = 0;
 
@@ -153,7 +153,7 @@ int start()
    }
    digit  = MarketInfo(Symbol(),MODE_DIGITS);
    Comment("Digit: "+digit+" Point: "+Point+ " PointsPerPip:"+pointsPerPip+"/n"+
-   "Andrea Maldini - Trend Line Trader with breakeven protection - for 1 minute charts trading \nSupported trend line descriptions: buy,sell,stop"+
+   "Andrea Maldini - Trend Line Trader with breakeven protection - for 1 minute charts trading \nSupported trend line descriptions: bb,ss,stop"+
    "\nCurrent Pivot:"+currentPivot+" pivotON:"+pivotON);
    
    /*RefreshRates();
@@ -161,7 +161,7 @@ int start()
    Comment("MinStopDist: "+MinStopDist);
    */
    
-   if (checkSpread()) return;
+   // if (checkSpread()) return;
    
    if (ScanTrades()>0 && BreakEven>0) TrailStops(); 
    
@@ -235,16 +235,56 @@ void checkLines(){
       closeOpenOrders(OP_BUY,magic);
       closeOpenOrders(OP_SELL,magic);
    }
-   if (crossedLine("sell")){
+   if (crossedLine("ss")){
       go(-1);
    }
-   if (crossedLine("buy")){
+   if (crossedLine("bb")){
       go(1);
    }   
    if (crossedLine("MA")){
       maON = true;
    }
+
+   checkLines2();
    
+}
+
+void checkLines2() {
+
+   if (!autoActivateTrendLines) return(0);
+   
+   int i;
+   double price;
+   string name;
+   string command_line;
+   string command_argument;
+   int type;
+
+   for (i = 0; i < ObjectsTotal(); i++) {
+      name = ObjectName(i);
+
+      // is this an object without description (newly created by the user)?
+      if (ObjectDescription(name) == "" && ObjectType(name)==OBJ_TREND ) {
+         
+         double price1 = ObjectGet(name, OBJPROP_PRICE1);
+         double price2 = ObjectGet(name, OBJPROP_PRICE2);
+         
+         datetime t2 = ObjectGet(name,OBJPROP_TIME2);
+         
+         if (t2>TimeCurrent()) { 
+         
+            if (price1>price2) {
+               ObjectSetText(name, "bb");
+            }
+            if (price1<price2) {
+               ObjectSetText(name, "ss");
+            }
+         
+         }
+         
+      }
+
+   }
 }
 
 void go(int dir) {
