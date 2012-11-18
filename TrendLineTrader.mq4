@@ -235,10 +235,10 @@ void checkLines(){
       closeOpenOrders(OP_BUY,magic);
       closeOpenOrders(OP_SELL,magic);
    }
-   if (crossedLine("ss")){
+   if (crossedLine("ss") && (direction!=-1)){
       go(-1);
    }
-   if (crossedLine("bb")){
+   if (crossedLine("bb") && (direction!=1)){
       go(1);
    }   
    if (crossedLine("MA")){
