@@ -21,7 +21,7 @@ extern bool       autoActivateTrendLines = false;
 
 double            currentPivot = 0;
 
-extern double     pipsFromPivot = 5;
+extern double     pipsFromPivot = 6;
 
 extern double     MAX_SPREAD_PIPS = 2.5;
 
@@ -161,7 +161,7 @@ int start()
    Comment("MinStopDist: "+MinStopDist);
    */
    
-   // if (checkSpread()) return;
+   if (checkSpread()) return;
    
    if (ScanTrades()>0 && BreakEven>0) TrailStops(); 
    
