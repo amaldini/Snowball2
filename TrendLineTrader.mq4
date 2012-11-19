@@ -126,7 +126,7 @@ int ScanTrades()
       
    }
    
-   if (currentPivot==0) currentPivot = (Ask+Bid)/2;
+   if (currentPivot==0) setPivot((Ask+Bid)/2);
    
    return(numords);
 }
@@ -192,22 +192,27 @@ void checkPivot() {
       // currentPivot = (Ask+Bid)/2;
       double price=(Ask+Bid)/2;
       if (lastDirection!=0 || (currentPivot==0) ) {
-         currentPivot = price;
+         setPivot(price);
          lastDirection = 0;
       }
       if ((MathAbs(price-currentPivot)/pip)>pipsFromPivot) {
          if (price<currentPivot) {
             go(-1);
-            currentPivot = price+pipsFromPivot*pip;
+            setPivot(price+pipsFromPivot*pip);
          }
          if (price>currentPivot) {
             go(1);
-            currentPivot = price-pipsFromPivot*pip;
+            setPivot( price-pipsFromPivot*pip);
          }
       }
    } else {
       lastDirection = direction;
    }
+}
+
+void setPivot(double price) {
+   currentPivot = price;
+   horizLine("madoxPivot", price, Red, "current pivot");
 }
 
 bool checkSpread() {
