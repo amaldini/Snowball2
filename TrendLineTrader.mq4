@@ -213,6 +213,8 @@ void checkPivot() {
 void setPivot(double price) {
    currentPivot = price;
    horizLine("madoxPivot", price, Red, "current pivot");
+   horizLine("madoxPivotUp", price + pipsFromPivot*pip, Green);
+   horizLine("madoxPivotDown", price - pipsFromPivot*pip, Green);
 }
 
 bool checkSpread() {
