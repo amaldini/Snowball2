@@ -177,6 +177,7 @@ int start()
  return(0);
 }//int start
 //+------------------------------------------------------------------+
+
 int lastDirection = 0;
 void checkPivot() {
    
@@ -191,23 +192,27 @@ void checkPivot() {
       
       // currentPivot = (Ask+Bid)/2;
       double price=(Ask+Bid)/2;
-      if (lastDirection!=0 || (currentPivot==0) ) {
-         setPivot(price);
-         lastDirection = 0;
-      }
+      
       if ((MathAbs(price-currentPivot)/pip)>pipsFromPivot) {
-         if (price<currentPivot) {
-            go(-1);
-            setPivot(price+pipsFromPivot*pip);
-         }
-         if (price>currentPivot) {
-            go(1);
-            setPivot( price-pipsFromPivot*pip);
+      
+         if (lastDirection!=0) {
+            setPivot(price);
+         } else {
+      
+            if (price<currentPivot) {
+               go(-1);
+               setPivot(price+pipsFromPivot*pip);
+            }
+            if (price>currentPivot) {
+               go(1);
+               setPivot( price-pipsFromPivot*pip);
+            }
+         
          }
       }
-   } else {
-      lastDirection = direction;
-   }
+   } 
+   
+   lastDirection = direction;
 }
 
 void setPivot(double price) {
