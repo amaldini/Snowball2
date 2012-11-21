@@ -10,12 +10,12 @@
 
 //---- input parameters
 
-extern double     BreakEven       = 6;    // Profit Lock in pips  
-extern double     LockGainPips        = 0.1; 
+extern double     BreakEven       = 25;    // Profit Lock in pips  
+extern double     LockGainPips        = 5; 
 extern double     autoSLPips = 6;
 
-extern double     BreakEven2    = 12;
-extern double     LockGainPips2 = 6;
+extern double     BreakEven2    = 50;
+extern double     LockGainPips2 = 30;
 
 extern bool       autoActivateTrendLines = false;
 
