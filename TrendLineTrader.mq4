@@ -197,7 +197,12 @@ void checkPivot() {
       
       if ((MathAbs(price-currentPivot)/pip)>pipsFromPivot) {
       
-         if (lastDirection!=0) {
+         bool movePivot = false;
+         if (lastDirection!=0 && (MathAbs(price-currentPivot)/pip>pipsFromPivot*2)) {
+            movePivot = true;
+         }
+      
+         if (movePivot) {
             setPivot(price);
          } else {
       
