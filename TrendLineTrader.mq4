@@ -12,7 +12,7 @@
 
 extern double     BreakEven       = 25;    // Profit Lock in pips  
 extern double     LockGainPips        = 5; 
-extern double     autoSLPips = 6;
+extern double     autoSLPips = 2;
 
 extern double     BreakEven2    = 50;
 extern double     LockGainPips2 = 30;
@@ -21,7 +21,7 @@ extern bool       autoActivateTrendLines = false;
 
 double            currentPivot = 0;
 
-extern double     pipsFromPivot = 6;
+extern double     pipsFromPivot = 1;
 
 extern double     MAX_SPREAD_PIPS = 2.5;
 
@@ -33,12 +33,14 @@ int magic = 0;
 int direction = 0;
 
 bool maON = false;
-extern bool pivotON = false;
+extern bool pivotON = true;
+extern bool trailPivot = false;
 double profit = 0;
 
 extern double riskmultiplier = 1; // per testare sabato e domenica
 
 extern double lots = 0.1;
+datetime last_t;
 
 //+------------------------------------------------------------------+
 //| expert initialization function                                   |
@@ -183,8 +185,8 @@ void checkPivot() {
    
    if (!pivotON) return (0);
 
-   if (pipsFromPivot<2) {
-      Print("pipsFromPivot<2!!! INVALID!!!");
+   if (pipsFromPivot<1) {
+      Print("pipsFromPivot<1!!! INVALID!!!");
       return (0);
    }
 
@@ -201,15 +203,17 @@ void checkPivot() {
       
             if (price<currentPivot) {
                go(-1);
-               setPivot(price+pipsFromPivot*pip);
+               // setPivot(price+pipsFromPivot*pip);
             }
             if (price>currentPivot) {
                go(1);
-               setPivot( price-pipsFromPivot*pip);
+               // setPivot( price-pipsFromPivot*pip);
             }
          
          }
       }
+      
+      checkTrailPivot();
    } 
    
    lastDirection = direction;
@@ -217,6 +221,7 @@ void checkPivot() {
 
 void setPivot(double price) {
    currentPivot = price;
+   last_t = TimeLocal();
    horizLine("madoxPivot", price, Red, "current pivot");
    horizLine("madoxPivotUp", price + pipsFromPivot*pip, Green);
    horizLine("madoxPivotDown", price - pipsFromPivot*pip, Green);
@@ -339,6 +344,16 @@ void checkMA() {
       }
    } // else if (dir!=0) go(dir);
    
+}
+
+void checkTrailPivot() {
+
+   if (!trailPivot) return(0);
+
+   datetime t = TimeLocal();
+   if ((t-last_t)>60) {
+      setPivot((Bid+Ask)/2); 
+   }
 }
 
 
