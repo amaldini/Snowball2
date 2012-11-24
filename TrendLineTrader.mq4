@@ -13,6 +13,7 @@
 extern double     BreakEven       = 25;    // Profit Lock in pips  
 extern double     LockGainPips        = 5; 
 extern double     autoSLPips = 2;
+extern double     autoTPPips = 30;
 
 extern double     BreakEven2    = 50;
 extern double     LockGainPips2 = 30;
@@ -294,13 +295,15 @@ void checkLines2() {
          datetime t2 = ObjectGet(name,OBJPROP_TIME2);
          
          if (t2>TimeCurrent()) { 
-         
-            if (price1>price2) {
+            if (pivotON) {
+               ObjectSetText(name,"stop");
+            } else if (price1>price2) {
                ObjectSetText(name, "bb");
-            }
-            if (price1<price2) {
+            } else if (price1<price2) {
                ObjectSetText(name, "ss");
             }
+            
+            
          
          }
          
@@ -310,16 +313,18 @@ void checkLines2() {
 }
 
 void go(int dir) {
-   double sl;
+   double sl,tp;
    if (dir>0) {
       closeOpenOrders(OP_SELL,magic);
       sl = NormalizeDouble(Bid - pip * autoSLPips,digit);
-      buy(lots, sl, 0, magic, "");        
+      tp = NormalizeDouble(Bid + pip * autoTPPips,digit); 
+      buy(lots, sl, tp, magic, "");        
    }
    if (dir<0) {
       closeOpenOrders(OP_BUY,magic);
       sl = NormalizeDouble(Ask + pip * autoSLPips,digit);
-      sell(lots, sl, 0, magic, "");
+      tp = NormalizeDouble(Ask - pip * autoTPPips,digit); 
+      sell(lots, sl, tp, magic, "");
    }
 }
 
