@@ -186,6 +186,8 @@ void checkPivot() {
    
    if (!pivotON) return (0);
 
+   checkPivotLineMoved(); // pivot line can be moved manually
+
    if (pipsFromPivot<1) {
       Print("pipsFromPivot<1!!! INVALID!!!");
       return (0);
@@ -217,20 +219,42 @@ void checkPivot() {
             }
          
          }
+     
       }
       
       checkTrailPivot();
    } 
    
    lastDirection = direction;
+
+   updatePivotLines();
+}
+
+void checkPivotLineMoved() {
+   double pl = getPivotLine();
+   
+   if (pl==0) return(0);
+   
+   if (MathAbs(pl-currentPivot)>0.1*pip) {
+      setPivot(pl);
+   } 
+}
+
+double getPivotLine(){
+   double price = ObjectGet("madoxPivot", OBJPROP_PRICE1);
+   return(price);
 }
 
 void setPivot(double price) {
    currentPivot = price;
    last_t = TimeLocal();
-   horizLine("madoxPivot", price, Red, "current pivot");
-   horizLine("madoxPivotUp", price + pipsFromPivot*pip, Green);
-   horizLine("madoxPivotDown", price - pipsFromPivot*pip, Green);
+   updatePivotLines();
+}
+
+void updatePivotLines() {
+   horizLine("madoxPivot", currentPivot, Red, "current pivot");
+   horizLine("madoxPivotUp", currentPivot + pipsFromPivot*pip, Green);
+   horizLine("madoxPivotDown", currentPivot - pipsFromPivot*pip, Green);
 }
 
 bool checkSpread() {
