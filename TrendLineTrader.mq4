@@ -12,19 +12,26 @@
 
 extern double     BreakEven       = 25;    // Profit Lock in pips  
 extern double     LockGainPips        = 5; 
-extern double     autoSLPips = 2;
-extern double     autoTPPips = 30;
 
 extern double     BreakEven2    = 50;
-extern double     LockGainPips2 = 30;
+extern double     LockGainPips2 = 10;
+
+extern double     autoSLPips = 20;
+extern double     autoTPPips = 200;
+
+extern double     pipsFromPivot = 10;
+extern double     MAX_SPREAD_PIPS = 2.5;
+
+extern double     lots = 0.5;
 
 extern bool       autoActivateTrendLines = false;
 
+extern bool pivotON = true;
+extern bool trailPivot = false;
+
+
+
 double            currentPivot = 0;
-
-extern double     pipsFromPivot = 1;
-
-extern double     MAX_SPREAD_PIPS = 2.5;
 
 int      digit=0;
 int      pointsPerPip=0;
@@ -34,13 +41,12 @@ int magic = 0;
 int direction = 0;
 
 bool maON = false;
-extern bool pivotON = true;
-extern bool trailPivot = false;
+
 double profit = 0;
 
 extern double riskmultiplier = 1; // per testare sabato e domenica
 
-extern double lots = 0.1;
+
 datetime last_t;
 
 //+------------------------------------------------------------------+
