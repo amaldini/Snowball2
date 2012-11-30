@@ -66,10 +66,12 @@ void TrailStops()
             if ( mode==OP_BUY )
             {  
                double BuyStop = OrderOpenPrice()-pip*autoSLPips;
+               /*
                Comment("Digit: "+digit+" Point: "+Point+ " PointsPerPip:"+pointsPerPip+"\n"+
                "OrderOpenPrice:"+OrderOpenPrice()+"\n"+
                "Stop loss will be at: "+(OrderOpenPrice()+pip*LockGainPips)+
                "BreakEven trigger will be at: "+(OrderOpenPrice()+pip*BreakEven));
+               */
                if ( Bid-OrderOpenPrice()>pip*BreakEven ) 
                {
                   BuyStop = OrderOpenPrice()+pip*LockGainPips;
