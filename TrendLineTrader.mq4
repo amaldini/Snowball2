@@ -10,6 +10,9 @@
 
 //---- input parameters
 
+
+extern double targetEquity = 4000;
+
 extern double     BreakEven       = 25;    // Profit Lock in pips  
 extern double     LockGainPips        = 5; 
 
@@ -28,6 +31,9 @@ extern bool       autoActivateTrendLines = false;
 
 extern bool pivotON = true;
 extern bool trailPivot = false;
+
+extern bool channelBreakout = true;
+extern int channelBreakoutMinutes = 120;
 
 
 
@@ -62,6 +68,9 @@ int init()
 // ---- Trailing Stops
 void TrailStops()
 {        
+
+    Comment("Equity:"+AccountEquity());
+
     int total=OrdersTotal();
     for (int cnt=0;cnt<total;cnt++)
     { 
@@ -96,10 +105,11 @@ void TrailStops()
             if ( mode==OP_SELL )
             {
                double SellStop = OrderOpenPrice()+pip*autoSLPips;
-               Comment("Digit: "+digit+" Point: "+Point+ " PointsPerPip:"+pointsPerPip+"\n"+
+               /*Comment("Digit: "+digit+" Point: "+Point+ " PointsPerPip:"+pointsPerPip+"\n"+
                "OrderOpenPrice:"+OrderOpenPrice()+"\n"+
                "Stop loss will be at: "+(OrderOpenPrice()-pip*LockGainPips)+
                "BreakEven trigger will be at: "+(OrderOpenPrice()-pip*BreakEven));
+               */
                if ( OrderOpenPrice()-Ask>pip*BreakEven ) 
                {
                   SellStop = OrderOpenPrice()-pip*LockGainPips;
@@ -196,8 +206,28 @@ void checkPivot() {
 
    checkPivotLineMoved(); // pivot line can be moved manually
 
+   double highest = 0;
+   double lowest = 100000;
+
+   if (channelBreakoutMinutes!=0) {
+      int i;
+      for (i=1;i<=channelBreakoutMinutes;i++) {
+         if (High[i]>highest) highest = High[i];
+         if (Low[i]<lowest) lowest = Low[i];
+      }
+   }
+
    if (pipsFromPivot<1) {
       Print("pipsFromPivot<1!!! INVALID!!!");
+      return (0);
+   }
+
+   if ((targetEquity>0) && (AccountEquity()>targetEquity)) {
+      Comment("Target equity reached:" +AccountEquity());
+      if (direction!=0) {
+         closeOpenOrders(OP_BUY,magic);
+         closeOpenOrders(OP_SELL,magic);   
+      }
       return (0);
    }
 
@@ -206,7 +236,14 @@ void checkPivot() {
       // currentPivot = (Ask+Bid)/2;
       double price=(Ask+Bid)/2;
       
-      if ((MathAbs(price-currentPivot)/pip)>pipsFromPivot) {
+      bool channkelBreakoutOk;
+      if (channelBreakout) {
+         channkelBreakoutOk = (price<lowest || price>highest);
+      } else {
+         channkelBreakoutOk = true;
+      }
+      
+      if (channkelBreakoutOk && ((MathAbs(price-currentPivot)/pip)>pipsFromPivot)) {
       
          bool movePivot = false;
          if (lastDirection!=0 && (MathAbs(price-currentPivot)/pip>pipsFromPivot*2)) {
@@ -230,7 +267,7 @@ void checkPivot() {
      
       }
       
-      checkTrailPivot();
+      checkTrailPivot(); 
    } 
    
    lastDirection = direction;
