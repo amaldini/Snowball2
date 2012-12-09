@@ -98,6 +98,8 @@ void deinit()
    }
 }
 
+int waitCounter = 0;
+
 void start()
 {
    RefreshRates();
@@ -141,11 +143,16 @@ void start()
                if (useFixedRiskInEuro && (oStopLoss>0)) {
                   double calculatedLots = calculateLotSize(oOpenPrice,oStopLoss,fixedRiskInEuro);
                   if (MathAbs(calculatedLots-oLots)>0.001) {
-                     if (calculatedLots<0.01) calculatedLots = 0.01;
-                     oLots = calculatedLots;
-                     OrderDelete(oTicket);
-                     orderSendReliable(Symbol(), oType, oLots, oOpenPrice, 1, oStopLoss, oTakeProfit, "", magicNumber, oExpiration, CLR_NONE, "changeLots");
-                     return(0);
+                     if (waitCounter<5) {
+                        waitCounter++;
+                     } else {
+                        waitCounter = 0;
+                        if (calculatedLots<0.01) calculatedLots = 0.01;
+                        oLots = calculatedLots;
+                        OrderDelete(oTicket);
+                        orderSendReliable(Symbol(), oType, oLots, oOpenPrice, 1, oStopLoss, oTakeProfit, "", magicNumber, oExpiration, CLR_NONE, "changeLots");
+                        return(0);
+                     }
                   }
                }
             }
