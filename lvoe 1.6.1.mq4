@@ -27,7 +27,7 @@ extern int    sl_style              = STYLE_DASH;
 
 extern string _________FIXED_RISK_EURO          ;
 extern double fixedRiskInEuro       = 20        ;
-extern double useFixedRiskInEuro    = true      ;
+extern bool useFixedRiskInEuro    = true      ;
 
 extern string ________TAKE_PROFIT               ;
 extern int    default_tp_level      = 120       ;
