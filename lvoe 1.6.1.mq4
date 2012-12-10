@@ -20,14 +20,15 @@ extern bool   use_timer             = true      ;
 extern bool   delete_on_deinit      = true      ;
 
 extern string ________STOP_LOSS                 ;
-extern int    default_sl_level      = 20        ;
+extern int    default_sl_level      = 150       ;
 extern int    default_trailing_stop = 0         ;
 extern color  sl_color              = Orange    ;
 extern int    sl_style              = STYLE_DASH;
 
 extern string _________FIXED_RISK_EURO          ;
 extern double fixedRiskInEuro       = 20        ;
-extern bool useFixedRiskInEuro    = true      ;
+extern bool useFixedRiskInEuro    = true        ;
+extern double rewardToRisk        = 2           ;
 
 extern string ________TAKE_PROFIT               ;
 extern int    default_tp_level      = 120       ;
@@ -142,6 +143,7 @@ void start()
             if (oType == OP_BUYSTOP || oType==OP_SELLLIMIT || oType==OP_SELLSTOP || oType==OP_BUYLIMIT) {
                if (useFixedRiskInEuro && (oStopLoss>0)) {
                   double calculatedLots = calculateLotSize(oOpenPrice,oStopLoss,fixedRiskInEuro);
+                  double calculatedTP = NormalizeDouble(oOpenPrice+(oOpenPrice-oStopLoss)*rewardToRisk,dgts);
                   if (MathAbs(calculatedLots-oLots)>0.001) {
                      if (waitCounter<5) {
                         waitCounter++;
@@ -154,10 +156,20 @@ void start()
                         ObjectDelete("lvoe_tp_" + oTicket);
                         ObjectDelete("lvoe_be_" + oTicket);
                         OrderDelete(oTicket);
-                        orderSendReliable(Symbol(), oType, oLots, oOpenPrice, 1, oStopLoss, oTakeProfit, "", magicNumber, oExpiration, CLR_NONE, "changeLots");
+                        orderSendReliable(Symbol(), oType, oLots, oOpenPrice, 1, oStopLoss, calculatedTP, "", magicNumber, oExpiration, CLR_NONE, "changeLots");
                         return(0);
                      }
                   }
+                  /*
+                  if (calculatedTP!=NormalizeDouble(oTakeProfit,dgts)) {
+                     ObjectDelete("lvoe_tp_" + oTicket);
+                     if(!OrderModify(oTicket,oOpenPrice,oStopLoss,calculatedTP,oExpiration,CLR_NONE)) 
+                     {
+                        errorPrint(StringConcatenate("Modify OL #",oTicket),GetLastError());
+                     }
+                     continue;
+                  }
+                  */
                }
             }
             
