@@ -149,6 +149,10 @@ void start()
                         waitCounter = 0;
                         if (calculatedLots<0.01) calculatedLots = 0.01;
                         oLots = calculatedLots;
+                        ObjectDelete("lvoe_ol_" + oTicket);
+                        ObjectDelete("lvoe_sl_" + oTicket);
+                        ObjectDelete("lvoe_tp_" + oTicket);
+                        ObjectDelete("lvoe_be_" + oTicket);
                         OrderDelete(oTicket);
                         orderSendReliable(Symbol(), oType, oLots, oOpenPrice, 1, oStopLoss, oTakeProfit, "", magicNumber, oExpiration, CLR_NONE, "changeLots");
                         return(0);
