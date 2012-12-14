@@ -101,9 +101,33 @@ void deinit()
 
 int waitCounter = 0;
 
+double calcTP(double openPrice,double stopLossPrice,int dgts) {
+   return (NormalizeDouble(openPrice+(openPrice-stopLossPrice)*rewardToRisk,dgts));
+}
+
 void start()
 {
    RefreshRates();
+   
+   double point   = MarketInfo(Symbol(),MODE_POINT );
+   int    dgts    = MarketInfo(Symbol(),MODE_DIGITS);
+   
+   if (useFixedRiskInEuro) {
+      if (-1 != ObjectFind("MO")) {
+         double marketOrderStop = NormalizeDouble(ObjectGet("MO",OBJPROP_PRICE1),dgts);
+         Comment("marketOrderStop:"+marketOrderStop);
+         ObjectDelete("MO");
+         if (marketOrderStop<Bid) { // buy
+            double calculatedLotsB = calculateLotSize(Bid,marketOrderStop,fixedRiskInEuro);
+            double calculatedTPB = calcTP(Ask,marketOrderStop,dgts); 
+            buy(calculatedLotsB, marketOrderStop, calculatedTPB, 0, "");        
+         } else if (marketOrderStop>Ask) { // sell
+            double calculatedLotsS = calculateLotSize(Ask,marketOrderStop,fixedRiskInEuro);
+            double calculatedTPS = calcTP(Bid,marketOrderStop,dgts);
+            sell(calculatedLotsS, marketOrderStop, calculatedTPS, 0, "");
+         } 
+      }
+   }
    
    for(int i=0; i<OrdersTotal(); i++)
    {
@@ -111,8 +135,7 @@ void start()
       {
          if(OrderSymbol()==Symbol())
          {
-            double point   = MarketInfo(Symbol(),MODE_POINT );
-            int    dgts    = MarketInfo(Symbol(),MODE_DIGITS);
+            
             int    oDir;
             double BidAsk;
             
@@ -143,7 +166,7 @@ void start()
             if (oType == OP_BUYSTOP || oType==OP_SELLLIMIT || oType==OP_SELLSTOP || oType==OP_BUYLIMIT) {
                if (useFixedRiskInEuro && (oStopLoss>0)) {
                   double calculatedLots = calculateLotSize(oOpenPrice,oStopLoss,fixedRiskInEuro);
-                  double calculatedTP = NormalizeDouble(oOpenPrice+(oOpenPrice-oStopLoss)*rewardToRisk,dgts);
+                  double calculatedTP = calcTP(oOpenPrice,oStopLoss,dgts);
                   if (MathAbs(calculatedLots-oLots)>0.001) {
                      if (waitCounter<5) {
                         waitCounter++;
