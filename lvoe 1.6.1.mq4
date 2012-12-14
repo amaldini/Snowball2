@@ -36,7 +36,7 @@ extern color  tp_color              = DarkGray  ;
 extern int    tp_style              = STYLE_DASH;
 
 extern string ________BREAK_EVEN                ;
-extern bool   use_be                = true      ;
+extern bool   use_be                = false     ;
 extern int    default_be_level      = 15        ;
 extern int    be_offset             = 3         ;
 extern color  be_color              = Brown     ;
