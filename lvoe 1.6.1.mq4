@@ -264,7 +264,14 @@ void start()
                else
                {
                   double setTP = NormalizeDouble(ObjectGet("lvoe_tp_" + oTicket,OBJPROP_PRICE1),dgts);
-                  ObjectSet("lvoe_tp_" + oTicket,OBJPROP_PRICE1,setTP);                  
+                  ObjectSet("lvoe_tp_" + oTicket,OBJPROP_PRICE1,setTP); 
+                  if (oStopLoss>0) {
+                     double den = MathAbs(oStopLoss-oOpenPrice);
+                     if (den>0) {
+                        double RR = MathAbs(setTP-oOpenPrice)/den;
+                        ObjectSetText("lvoe_tp_" + oTicket,DoubleToStr(RR,2)+" R");
+                     }
+                  }                 
                   if(NormalizeDouble(oTakeProfit,dgts)!=setTP)
                   {
                      if(!OrderModify(oTicket,oOpenPrice,oStopLoss,setTP,oExpiration,CLR_NONE))
