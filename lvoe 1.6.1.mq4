@@ -67,6 +67,9 @@ extern int    ol_buy_style          = STYLE_DASH;
 
 void init()
 {
+
+   IS_ECN_BROKER = true;
+
    if(use_cp)
       cp_size = MathMin(listToTab(cp_levels,cp_lvl),listToTab(cp_lots,cp_lts));
    
