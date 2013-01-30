@@ -1,9 +1,9 @@
 //+-------------------------------------------------------------------+
 //|                                           RangeTrader.mq4     |
-//|                                  Copyright © 2012, Andrea Maldini |
+//|                                  Copyright ï¿½ 2012, Andrea Maldini |
 //|                                                                   |                                      
 //+-------------------------------------------------------------------+
-#property copyright "Copyright © 2013, Andrea Maldini"
+#property copyright "Copyright ï¿½ 2013, Andrea Maldini"
 // #property link      ""
 
 #include <common_functions.mqh>
@@ -53,7 +53,9 @@ double basePrice=0;
 int pipTouches[1000];
 int pipTimeStamp[1000];
 int currentTimeStamp=0;
+datetime tickTime[100000];
 
+int hoursInTickHistory = 4;
 
 datetime last_t;
 
@@ -187,6 +189,7 @@ int start()
    */
    
    currentTimeStamp++;
+   tickTime[currentTimeStamp] = TimeLocal();
    
    if (checkSpread()) return;
    
@@ -201,9 +204,19 @@ int start()
    
    checkPivot();
    
+   if (currentTimeStamp % 100==0) {
+	garbageCollect();
+   }
+
  return(0);
 }//int start
 //+------------------------------------------------------------------+
+
+private void garbageCollect() {
+	// cancella la history troppo vecchia
+	// ricentra se necessario
+	// manda indietro il currenttick...
+}
 
 bool shortTriggered = false;
 bool longTriggered = false;
