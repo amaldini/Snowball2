@@ -54,6 +54,7 @@ int pipTouches[1000];
 int pipTimeStamp[1000];
 int currentTimeStamp=0;
 datetime tickTime[100000];
+double tickValue[100000];
 
 int hoursInTickHistory = 4;
 
@@ -190,6 +191,7 @@ int start()
    
    currentTimeStamp++;
    tickTime[currentTimeStamp] = TimeLocal();
+   tickValue[currentTimeStamp] = (Bid+Ask)/2;
    
    if (checkSpread()) return;
    
@@ -212,7 +214,7 @@ int start()
 }//int start
 //+------------------------------------------------------------------+
 
-private void garbageCollect() {
+void garbageCollect() {
 	// cancella la history troppo vecchia
 	// ricentra se necessario
 	// manda indietro il currenttick...
@@ -234,15 +236,18 @@ void onTick(double price) {
       pipTouches[priceIndex]++;
    }
    pipTimeStamp[priceIndex]=currentTimeStamp;
-   lastPriceIndex = priceIndex;
    
-   if (pipTouches[priceIndex]<=1 && !pivotON) {
+   if (pipTouches[priceIndex]<=1 && !pivotON && direction==0) {
       setPivot(price);
       pivotON=true;
       if (priceIndex>lastPriceIndex) {
          breakOutDirection = 1;
+         longTriggered=true;
+         go(1);
       } else {
          breakOutDirection = -1;
+         shortTriggered=true;
+         go(-1);
       }
    } else {
       
@@ -257,6 +262,8 @@ void onTick(double price) {
          updatePivotLines();
       }
    }
+   
+   lastPriceIndex = priceIndex;
    
    Comment("PriceIndex:"+priceIndex+" pipTouches:"+pipTouches[priceIndex]);
 }
@@ -279,12 +286,12 @@ void checkPivot() {
      
       if ((MathAbs(price-currentPivot)/pip)>pipsFromPivot) {
 
-            if (price<currentPivot) {
+            if (price<currentPivot && (!shortTriggered)) {
                go(-1);
                shortTriggered = true;
                // setPivot(price+pipsFromPivot*pip);
             }
-            if (price>currentPivot) {
+            if (price>currentPivot && (!longTriggered)) {
                go(1);
                longTriggered = true;
                // setPivot( price-pipsFromPivot*pip);
