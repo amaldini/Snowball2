@@ -46,6 +46,8 @@ double stop_value; // dollars (account) per single level (calculated in info())
 double auto_tp_price; // the price where auto_tp should trigger, calculated during break even calc.
 double auto_tp_profit; // rough estimation of auto_tp profit, calculated during break even calc.
 
+extern int maxRetriesForLevel = 3;
+
 bool start_immediately;
 string resumeInfo;
 
@@ -605,7 +607,34 @@ bool needsOrder(double price, int where){
          }
       }
    }
+   
+   if (direction==BIDIR) {
+      int numRetriesDone = getRetriesForLevel(price);
+      if (numRetriesDone<maxRetriesForLevel) {
+         markLine(price,numRetriesDone+1);
+      } else {
+         return (false);
+      }
+   }
+   
    return(true);
+}
+
+string levelName(double price) {
+   string levelName = "MarkLevel"+DoubleToStr(price,4);
+   return (levelName);
+}
+
+void markLine(double price,int numOrders) {
+   horizLine(levelName(price),price,Yellow,"Retries:"+numOrders);
+}
+
+int getRetriesForLevel(double price) {
+   string retries = ObjectDescription(levelName(price));
+   if (retries!="") {
+      return (StrToInteger(StringSubstr(retries,8)));  
+   }
+   return (0);
 }
 
 /**
