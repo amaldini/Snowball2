@@ -146,6 +146,7 @@ int deinit(){
    storeVariables();
    if (UninitializeReason() == REASON_PARAMETERS){
       Comment("Parameters changed, pending orders deleted, will be replaced with the next tick");
+      beforeCloseOrders();
       closeOpenOrders(OP_SELLSTOP, magic);
       closeOpenOrders(OP_BUYSTOP, magic);
    }else{
@@ -266,6 +267,7 @@ void stop(){
    if (sound_stop_all != ""){
       PlaySound(sound_stop_all);
    }
+   cleanMarkedLevels();
    if (IsTesting()) go(lastDirection);
 }
 
@@ -294,6 +296,7 @@ void pause(){
    if (sound_stop_all != ""){
       PlaySound(sound_stop_all);
    }
+   cleanMarkedLevels();
 }
 
 /**
@@ -635,6 +638,31 @@ int getRetriesForLevel(double price) {
       return (StrToInteger(StringSubstr(retries,8)));  
    }
    return (0);
+}
+
+void cleanMarkedLevels() {
+   for (int i = ObjectsTotal(); i>0; i--) {
+      string name = ObjectName(i);
+      if (StringSubstr(name,0,9) == "MarkLevel") {
+         ObjectDelete(name);
+      }
+   }
+}
+
+void beforeCloseOrders() {
+   RefreshRates();
+   int total = OrdersTotal();
+   for (int cnt = 0; cnt < total; cnt++) {
+      OrderSelect(cnt, SELECT_BY_POS, MODE_TRADES);
+      int order_type = OrderType();
+      if (order_type == OP_BUYSTOP || order_type == OP_SELLSTOP || order_type == OP_BUYLIMIT || order_type == OP_SELLLIMIT) {
+         double price = OrderOpenPrice();
+         int retries = getRetriesForLevel(price);
+         if (retries>0) {
+            markLine(price,retries-1);
+         }
+      }
+   }
 }
 
 /**
