@@ -616,6 +616,7 @@ bool needsOrder(double price, int where){
       if (numRetriesDone<maxRetriesForLevel) {
          markLine(price,numRetriesDone+1);
       } else {
+         ObjectSet(levelName(price), OBJPROP_COLOR, OrangeRed);
          return (false);
       }
    }
