@@ -47,6 +47,7 @@ double auto_tp_price; // the price where auto_tp should trigger, calculated duri
 double auto_tp_profit; // rough estimation of auto_tp profit, calculated during break even calc.
 
 extern int maxRetriesForLevel = 3;
+extern int DIRECTION_CHANGE_PERIODS = 120;
 
 bool start_immediately;
 string resumeInfo;
@@ -167,6 +168,45 @@ void onTick(){
       plotNewClosedTrades(magic);
    }
    checkDirection();
+
+   checkAutoChangeDirection();
+}
+
+void checkAutoChangeDirection() {
+   // calculating the highest value on the 20 consequtive bars in the range
+   // from the 4th to the 23rd index inclusive on the current chart
+   double highest=High[iHighest(NULL,0,MODE_HIGH,DIRECTION_CHANGE_PERIODS,1)];
+   double lowest=Low[iLowest(NULL,0,MODE_LOW,DIRECTION_CHANGE_PERIODS,1)];
+   
+   if (Close[0]>highest+pip) {
+      if (running) {
+         if (direction!=LONG) pause();
+         if (!running) go(LONG);
+      }   
+   }
+   
+   if (Close[0]<lowest-pip) {
+      if (running) {
+         if (direction!=SHORT) pause();
+         if (!running) go(SHORT);
+      }
+   }
+   
+   if (running) {
+      double price=0;
+      if (direction==LONG) {
+         price = lowest;
+      }
+      if (direction==SHORT) {
+         price = highest;
+      }
+      if (price>0) {
+         string dirChangeDescription = "next direction change ("+DIRECTION_CHANGE_PERIODS+" bars breakout)";
+         horizLine("directionChange", price, RoyalBlue, dirChangeDescription);
+      } else {
+         ObjectDelete("directionChange");
+      }
+   }
 }
 
 void checkDirection() {
@@ -189,6 +229,7 @@ void checkDirection() {
       }  
    }
    */
+   
    string cmd = getCmd(Symbol6(),0); 
    if (cmd=="LONG") {
       if (running && (direction!=LONG)) pause();
@@ -204,6 +245,7 @@ void checkDirection() {
    if (cmd!="") {
       setCmd(Symbol6(),0,"");
    }
+   
 }
 
 void onOpen(){
