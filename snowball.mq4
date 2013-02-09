@@ -554,6 +554,10 @@ void trade(){
          if (direction == BIDIR || direction == SHORT){
             shortOrders(start);
          }
+         
+         if (direction == LONG || direction == SHORT) {
+            cleanMarkedLevels();
+         }
       }
    
       // are we already long?
@@ -653,7 +657,7 @@ bool needsOrder(double price, int where){
       }
    }
    
-   if (direction==BIDIR) {
+   // if (direction==BIDIR) {
       int numRetriesDone = getRetriesForLevel(price);
       if (numRetriesDone<maxRetriesForLevel) {
          markLine(price,numRetriesDone+1);
@@ -661,7 +665,7 @@ bool needsOrder(double price, int where){
          ObjectSet(levelName(price), OBJPROP_COLOR, OrangeRed);
          return (false);
       }
-   }
+   // }
    
    return(true);
 }
