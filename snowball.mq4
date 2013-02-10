@@ -173,6 +173,9 @@ void onTick(){
 }
 
 void checkAutoChangeDirection() {
+
+   if (DIRECTION_CHANGE_PERIODS<=1) return;
+
    // calculating the highest value on the 20 consequtive bars in the range
    // from the 4th to the 23rd index inclusive on the current chart
    double highest=High[iHighest(NULL,0,MODE_HIGH,DIRECTION_CHANGE_PERIODS,1)];
