@@ -1,15 +1,15 @@
 //+------------------------------------------------------------------+
 //|                                   luktom visual order editor.mq4 |
-//|                                   luktom :: £ukasz Tomaszkiewicz |
+//|                                   luktom :: ï¿½ukasz Tomaszkiewicz |
 //|                                               http://luktom.biz/ |
 //+------------------------------------------------------------------+
 //|                                                                  |
-//| EA dostêpne na licencji Creative Commons BY-SA                   |
-//| Wiêcej szczegó³ow: http://go.luktom.biz/ccbysa                   |
+//| EA dostï¿½pne na licencji Creative Commons BY-SA                   |
+//| Wiï¿½cej szczegï¿½ï¿½ow: http://go.luktom.biz/ccbysa                   |
 //|                                                                  |
 //+------------------------------------------------------------------+
 
-#property copyright "£ukasz Tomaszkiewicz :: luktom"
+#property copyright "ï¿½ukasz Tomaszkiewicz :: luktom"
 #property link      "http://luktom.biz/"
 
 #include <stderror.mqh>
@@ -121,12 +121,14 @@ void start()
          Comment("marketOrderStop:"+marketOrderStop);
          ObjectDelete("MO");
          if (marketOrderStop<Bid) { // buy
+            marketOrderStop = marketOrderStop - MathAbs(Bid-Ask); // spread
             double calculatedLotsB = calculateLotSize(Bid,marketOrderStop,fixedRiskInEuro);
             double calculatedTPB = calcTP(Ask,marketOrderStop,dgts); 
             buy(calculatedLotsB, marketOrderStop, calculatedTPB, 0, "");        
          } else if (marketOrderStop>Ask) { // sell
+            marketOrderStop = marketOrderStop + MathAbs(Bid-Ask); // spread
             double calculatedLotsS = calculateLotSize(Ask,marketOrderStop,fixedRiskInEuro);
-            double calculatedTPS = calcTP(Bid,marketOrderStop,dgts);
+            double calculatedTPS = calcTP(Bid,marketOrderStop,dgts); 
             sell(calculatedLotsS, marketOrderStop, calculatedTPS, 0, "");
          } 
       }
