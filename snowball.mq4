@@ -660,6 +660,10 @@ bool needsOrder(double price, int where){
       }
    }
    
+   // SPREAD CHECK
+   double spreadPips = (MathAbs(Ask-Bid)/pip); 
+   if (spreadPips >(stop_distance / 2)) return (false);
+   
    // if (direction==BIDIR) {
       int numRetriesDone = getRetriesForLevel(price);
       if (numRetriesDone<maxRetriesForLevel) {
