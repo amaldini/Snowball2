@@ -172,6 +172,7 @@ void onTick(){
    checkAutoChangeDirection();
 }
 
+int lastDirectionChangeLevel = 0;
 void checkAutoChangeDirection() {
 
    if (DIRECTION_CHANGE_PERIODS<=1) return;
@@ -181,15 +182,19 @@ void checkAutoChangeDirection() {
    double highest=High[iHighest(NULL,0,MODE_HIGH,DIRECTION_CHANGE_PERIODS,1)];
    double lowest=Low[iLowest(NULL,0,MODE_LOW,DIRECTION_CHANGE_PERIODS,1)];
    
-   if (Close[0]>highest+pip) {
-      if (running) {
+   bool levelOk = MathAbs(level)>MathAbs(lastDirectionChangeLevel);
+   
+   if (Close[0]>highest+pip*stop_distance) {
+      if (running && levelOk) {
+         lastDirectionChangeLevel = level;
          if (direction!=LONG) pause();
          if (!running) go(LONG);
       }   
    }
    
-   if (Close[0]<lowest-pip) {
-      if (running) {
+   if (Close[0]<lowest-pip*stop_distance) {
+      if (running && levelOk) {
+         lastDirectionChangeLevel = level;
          if (direction!=SHORT) pause();
          if (!running) go(SHORT);
       }
