@@ -186,16 +186,20 @@ void checkAutoChangeDirection() {
    
    if (Close[0]>highest+pip*stop_distance) {
       if (running && levelOk) {
-         lastDirectionChangeLevel = level;
-         if (direction!=LONG) pause();
+         if (direction!=LONG) {
+            lastDirectionChangeLevel = level;
+            pause();
+         }
          if (!running) go(LONG);
       }   
    }
    
    if (Close[0]<lowest-pip*stop_distance) {
       if (running && levelOk) {
-         lastDirectionChangeLevel = level;
-         if (direction!=SHORT) pause();
+         if (direction!=SHORT) {
+            lastDirectionChangeLevel = level;
+            pause();
+         }
          if (!running) go(SHORT);
       }
    }
