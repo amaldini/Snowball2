@@ -65,6 +65,8 @@ extern int    ol_sell_style         = STYLE_DASH;
 extern color  ol_buy_color          = Blue      ;
 extern int    ol_buy_style          = STYLE_DASH;
 
+extern int multiOrder  = 4; 
+
 void init()
 {
 
@@ -116,20 +118,28 @@ void start()
    int    dgts    = MarketInfo(Symbol(),MODE_DIGITS);
    
    if (useFixedRiskInEuro) {
+      double riskEuro = fixedRiskInEuro / (multiOrder+1);
       if (-1 != ObjectFind("MO")) {
          double marketOrderStop = NormalizeDouble(ObjectGet("MO",OBJPROP_PRICE1),dgts);
          Comment("marketOrderStop:"+marketOrderStop);
          ObjectDelete("MO");
+         double step = MathAbs(marketOrderStop - (Bid+Ask)/2);
          if (marketOrderStop<Bid) { // buy
             marketOrderStop = marketOrderStop - MathAbs(Bid-Ask); // spread
-            double calculatedLotsB = calculateLotSize(Bid,marketOrderStop,fixedRiskInEuro);
-            double calculatedTPB = calcTP(Ask,marketOrderStop,dgts); 
-            buy(calculatedLotsB, marketOrderStop, calculatedTPB, 0, "");        
+            for (int k=0;k<=multiOrder;k++) {
+               double calculatedLotsB = calculateLotSize(Bid,marketOrderStop,riskEuro);
+               double calculatedTPB = calcTP(Ask,marketOrderStop,dgts); 
+               buy(calculatedLotsB, marketOrderStop, calculatedTPB, 0, "");
+               marketOrderStop-=step;
+            }        
          } else if (marketOrderStop>Ask) { // sell
             marketOrderStop = marketOrderStop + MathAbs(Bid-Ask); // spread
-            double calculatedLotsS = calculateLotSize(Ask,marketOrderStop,fixedRiskInEuro);
-            double calculatedTPS = calcTP(Bid,marketOrderStop,dgts); 
-            sell(calculatedLotsS, marketOrderStop, calculatedTPS, 0, "");
+            for (int w=0;w<=multiOrder;w++) {
+               double calculatedLotsS = calculateLotSize(Ask,marketOrderStop,riskEuro);
+               double calculatedTPS = calcTP(Bid,marketOrderStop,dgts); 
+               sell(calculatedLotsS, marketOrderStop, calculatedTPS, 0, "");
+               marketOrderStop+=step;
+            }
          } 
       }
    }
