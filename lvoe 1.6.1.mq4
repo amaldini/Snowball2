@@ -26,7 +26,7 @@ extern color  sl_color              = Orange    ;
 extern int    sl_style              = STYLE_DASH;
 
 extern string _________FIXED_RISK_EURO          ;
-extern double fixedRiskInEuro       = 20        ;
+extern double fixedRiskInEuro       = 5         ;
 extern bool useFixedRiskInEuro    = true        ;
 extern double rewardToRisk        = 2           ;
 
