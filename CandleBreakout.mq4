@@ -1,16 +1,16 @@
 //+------------------------------------------------------------------+
-//|                                   luktom visual order editor.mq4 |
-//|                                   luktom :: �ukasz Tomaszkiewicz |
-//|                                               http://luktom.biz/ |
+//|                                               CandleBreakout.mq4 |
+//|                                               Andrea Maldini     |
+//|                                                                  |
 //+------------------------------------------------------------------+
 //|                                                                  |
-//| EA dost�pne na licencji Creative Commons BY-SA                   |
-//| Wi�cej szczeg��ow: http://go.luktom.biz/ccbysa                   |
+//|                                                                  |
+//|                                                                  |
 //|                                                                  |
 //+------------------------------------------------------------------+
 
-#property copyright "�ukasz Tomaszkiewicz :: luktom"
-#property link      "http://luktom.biz/"
+#property copyright "Andrea Maldini"
+// #property link      ""
 
 #include <stderror.mqh>
 #include <stdlib.mqh>
@@ -121,6 +121,8 @@ int ScanTrades()
       if (OrderType()==OP_BUY) direction = 1;
       profit+=OrderProfit();
    }
+   
+   Comment("Profit: "+profit);
    
    return(numords);
 }
