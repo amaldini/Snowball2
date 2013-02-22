@@ -12,6 +12,11 @@ double ACCOUNT_EURO() {
    }
 }
 
+void calculatePointsPerPip() {
+   pointsPerPip = pointsPerPip();
+   pip = Point*pointsPerPip;
+}
+
 double calculateLotSize(double oOpenPrice,double oStopLoss,double riskInEUR) {
 
    double toDestCurrency;
@@ -26,8 +31,7 @@ double calculateLotSize(double oOpenPrice,double oStopLoss,double riskInEUR) {
    double TradeSize;
 
    if (pointsPerPip==0) {
-      pointsPerPip = pointsPerPip();
-      pip = Point*pointsPerPip;
+      calculatePointsPerPip();
    }
 
    double StopPips = MathAbs(oOpenPrice-oStopLoss)/pip;
