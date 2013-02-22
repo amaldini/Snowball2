@@ -130,7 +130,6 @@ void goWithStopPrice(double marketOrderStop) {
       double riskEuro = fixedRiskInEuro / (multiOrder+1);
       double step = MathAbs(marketOrderStop - (Bid+Ask)/2);
       if (marketOrderStop<Bid) { // buy
-         marketOrderStop = marketOrderStop - MathAbs(Bid-Ask); // spread
          for (int k=0;k<=multiOrder;k++) {
             double calculatedLotsB = calculateLotSize(Bid,marketOrderStop,riskEuro);
             double calculatedTPB = calcTP(Ask,marketOrderStop,dgts); 
@@ -138,7 +137,6 @@ void goWithStopPrice(double marketOrderStop) {
             marketOrderStop-=step;
          }        
       } else if (marketOrderStop>Ask) { // sell
-         marketOrderStop = marketOrderStop + MathAbs(Bid-Ask); // spread
          for (int w=0;w<=multiOrder;w++) {
             double calculatedLotsS = calculateLotSize(Ask,marketOrderStop,riskEuro);
             double calculatedTPS = calcTP(Bid,marketOrderStop,dgts); 
