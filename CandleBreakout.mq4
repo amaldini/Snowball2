@@ -19,7 +19,7 @@
 extern bool   delete_on_deinit      = true      ;
 
 extern string _________FIXED_RISK_EURO          ;
-extern double fixedRiskInEuro       = 5         ;
+extern double fixedRiskInEuro       = 3         ;
 extern double rewardToRisk        = 20          ;
 
 extern string ________TAKE_PROFIT               ;
@@ -77,24 +77,29 @@ void start()
    double stopPips=0;
    
    if (ScanTrades()==0) { // we are flat
-      if (Close[0]>(High[1]+pip)) {
+   
+      bool previousBarIsDoji = ((High[1]-Low[1])/pip) < 2;
+   
+      if (previousBarIsDoji) {
+         if (Close[0]>(High[1]+pip)) {
       
-         double low = MathMin(Low[1],Low[0]);
+            double low = MathMin(Low[1],Low[0]);
       
-         stopPips = (Close[0]-low)*1.5 / pip;
+            stopPips = (Close[0]-low) / pip + pip;
       
-         if (stopPips < 5) stopPips = 5;   
+            // if (stopPips < 5) stopPips = 5;   
       
-         stopPrice = Bid - stopPips * pip;   
-      } else if (Close[0]<(Low[1]-pip)) {
+            stopPrice = Bid - stopPips * pip;   
+         } else if (Close[0]<(Low[1]-pip)) {
       
-         double high = MathMax(High[1],High[0]);
+            double high = MathMax(High[1],High[0]);
       
-         stopPips = (high-Close[0])*1.5 / pip;
+            stopPips = (high-Close[0]) / pip + pip;
          
-         if (stopPips <5) stopPips = 5;     
+            // if (stopPips <5) stopPips = 5;     
          
-         stopPrice = Ask + stopPips * pip;      
+            stopPrice = Ask + stopPips * pip;      
+         }
       }
       
       if (stopPips>0 && stopPrice>0) {
