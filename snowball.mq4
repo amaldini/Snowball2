@@ -173,18 +173,64 @@ void onTick(){
 }
 
 int lastDirectionChangeLevel = 0;
-void checkAutoChangeDirection() {
+double directionChangeHigh=100000;
+double directionChangeLow=0;
 
-   if (DIRECTION_CHANGE_PERIODS<=1) return;
+void resetDirectionChangeValues() {
+   directionChangeHigh = 100000;
+   directionChangeLow = 0;
+}
+
+void updateDirectionChangeValues() {
 
    // calculating the highest value on the 20 consequtive bars in the range
    // from the 4th to the 23rd index inclusive on the current chart
    double highest=High[iHighest(NULL,0,MODE_HIGH,DIRECTION_CHANGE_PERIODS,1)];
    double lowest=Low[iLowest(NULL,0,MODE_LOW,DIRECTION_CHANGE_PERIODS,1)];
+
+   double newHigh = highest+pip*stop_distance;
+   if ((directionChangeHigh<0.001) || (directionChangeHigh>newHigh)) { 
+      directionChangeHigh = newHigh; // trail high to the bottom
+      Comment("trail high to the bottom");
+   }
+  
+   double newLow = lowest-pip*stop_distance;
+   if ((directionChangeLow<0.001) || (directionChangeLow<newLow)) {
+      directionChangeLow = newLow; // trail low to the top
+      Comment("trail low to the top");
+   }
    
-   bool levelOk = MathAbs(level)>MathAbs(lastDirectionChangeLevel);
+}
+
+void showDirectionChangeLine() {
+   if (running) {
+      double price=0;
+      string dirChangeDescription;
+      if (direction==LONG) {
+         price = directionChangeLow;
+         dirChangeDescription = "next direction change to SHORT ("+DIRECTION_CHANGE_PERIODS+" bars breakout)";
+      }
+      if (direction==SHORT) {
+         price = directionChangeHigh;
+         dirChangeDescription = "next direction change to HIGH ("+DIRECTION_CHANGE_PERIODS+" bars breakout)";
+      }
+      if (price>0) {
+         horizLine("directionChange", price, RoyalBlue, dirChangeDescription);
+      } else {
+         ObjectDelete("directionChange");
+      }
+   }
+}
+
+void checkAutoChangeDirection() {
+
+   if (DIRECTION_CHANGE_PERIODS<=1) return;   
    
-   if (Close[0]>highest+pip*stop_distance) {
+   updateDirectionChangeValues();
+   
+   bool levelOk = (MathAbs(level)>0); // MathAbs(level)>MathAbs(lastDirectionChangeLevel);
+   
+   if (Close[0]>directionChangeHigh) {
       if (running && levelOk) {
          if (direction!=LONG) {
             lastDirectionChangeLevel = level;
@@ -194,7 +240,7 @@ void checkAutoChangeDirection() {
       }   
    }
    
-   if (Close[0]<lowest-pip*stop_distance) {
+   if (Close[0]<directionChangeLow) {
       if (running && levelOk) {
          if (direction!=SHORT) {
             lastDirectionChangeLevel = level;
@@ -204,21 +250,7 @@ void checkAutoChangeDirection() {
       }
    }
    
-   if (running) {
-      double price=0;
-      if (direction==LONG) {
-         price = lowest;
-      }
-      if (direction==SHORT) {
-         price = highest;
-      }
-      if (price>0) {
-         string dirChangeDescription = "next direction change ("+DIRECTION_CHANGE_PERIODS+" bars breakout)";
-         horizLine("directionChange", price, RoyalBlue, dirChangeDescription);
-      } else {
-         ObjectDelete("directionChange");
-      }
-   }
+   showDirectionChangeLine();
 }
 
 void checkDirection() {
@@ -710,6 +742,7 @@ void cleanMarkedLevels() {
          ObjectDelete(name);
       }
    }
+   resetDirectionChangeValues();
 }
 
 void beforeCloseOrders() {
