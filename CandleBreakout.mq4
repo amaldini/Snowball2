@@ -27,6 +27,8 @@ extern int    default_tp_level      = 120       ;
 extern color  tp_color              = DarkGray  ;
 extern int    tp_style              = STYLE_DASH;
 
+extern bool avoidRanges = true;
+
 extern int multiOrder  = 0; 
 
 int dgts=0;
@@ -120,7 +122,12 @@ void start()
       } 
      
       if (stopPips>0 && stopPrice>0) {
-         bool touchesOk = (getPriceTouches(Close[0])<3) || (getPriceTouches(stopPrice)<3);
+         bool touchesOk;
+         if (avoidRanges) {
+            touchesOk = (getPriceTouches(Close[0])<3) || (getPriceTouches(stopPrice)<3);
+         } else {
+            touchesOk = true;
+         }
          if (touchesOk) {
             goWithStopPrice(stopPrice);
          }
