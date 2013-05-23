@@ -22,7 +22,7 @@ extern double     LockGainPips2 = 10;
 extern double     autoSLPips = 20;
 extern double     autoTPPips = 200;
 
-extern double     pipsFromPivot = 10;
+extern double     pipsFromPivot = 1;
 extern double     MAX_SPREAD_PIPS = 2.5;
 
 extern double     lots = 0.5;
@@ -33,8 +33,8 @@ extern bool pivotON = true;
 extern bool trailPivot = false;
 
 extern bool channelBreakout = true;
-extern int channelBreakoutMinutes = 120;
-
+extern int channelBreakoutMinutes = 5;
+extern bool forcePivotInsideChannel = true;
 
 
 double            currentPivot = 0;
@@ -215,6 +215,14 @@ void checkPivot() {
          if (High[i]>highest) highest = High[i];
          if (Low[i]<lowest) lowest = Low[i];
       }
+      
+      if (forcePivotInsideChannel) {
+         setPivot((highest+lowest)/2);
+         pipsFromPivot = 3;
+         horizLine("channelUP", highest, Yellow);
+         horizLine("channelDown", lowest, Yellow);
+      }
+      
    }
 
    if (pipsFromPivot<1) {
@@ -231,23 +239,33 @@ void checkPivot() {
       return (0);
    }
 
+   double price=(Ask+Bid)/2;
+      
+   bool channkelBreakoutOk,channelBreakoutDirection=0;
+   if (channelBreakout) {
+      if (price>highest) channelBreakoutDirection = 1;
+      if (price<lowest) channelBreakoutDirection = -1;
+      channkelBreakoutOk = (channelBreakoutDirection!=0);
+   } else {
+      channkelBreakoutOk = true;
+   }
+
+   bool breakoutInOppositeDirection = (direction!=0 && channelBreakoutDirection!=0 && channelBreakoutDirection!=direction);
+   if (breakoutInOppositeDirection) { 
+      closeOpenOrders(OP_BUY,magic);
+      closeOpenOrders(OP_SELL,magic);
+      direction=0;
+   }
+
    if (direction==0) {
-      
-      // currentPivot = (Ask+Bid)/2;
-      double price=(Ask+Bid)/2;
-      
-      bool channkelBreakoutOk;
-      if (channelBreakout) {
-         channkelBreakoutOk = (price<lowest || price>highest);
-      } else {
-         channkelBreakoutOk = true;
-      }
-      
+     
       if (channkelBreakoutOk && ((MathAbs(price-currentPivot)/pip)>pipsFromPivot)) {
       
          bool movePivot = false;
-         if (lastDirection!=0 && (MathAbs(price-currentPivot)/pip>pipsFromPivot*2)) {
-            movePivot = true;
+         if (!forcePivotInsideChannel) {
+            if (lastDirection!=0 && (MathAbs(price-currentPivot)/pip>pipsFromPivot*2)) {
+               movePivot = true;
+            }
          }
       
          if (movePivot) {
