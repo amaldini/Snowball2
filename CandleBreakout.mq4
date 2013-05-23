@@ -62,6 +62,16 @@ double calcTP(double openPrice,double stopLossPrice,int dgts) {
    return (NormalizeDouble(openPrice+(openPrice-stopLossPrice)*rewardToRisk,dgts));
 }
 
+int getPriceTouches(double price) {
+   int touches = 0;
+   for (int i=1;i<60;i++) {
+      if (High[i]>=price && Low[i]<=price) {
+         touches++;
+      }
+   }
+   return (touches);
+}
+
 void start()
 {
    RefreshRates();
@@ -107,10 +117,13 @@ void start()
          
             stopPrice = Ask + stopPips * pip;      
          }
-      }
-      
+      } 
+     
       if (stopPips>0 && stopPrice>0) {
-         goWithStopPrice(stopPrice);
+         bool touchesOk = (getPriceTouches(Close[0])<3) || (getPriceTouches(stopPrice)<3);
+         if (touchesOk) {
+            goWithStopPrice(stopPrice);
+         }
       }
    }
    
