@@ -79,11 +79,17 @@ void start()
    if (ScanTrades()==0) { // we are flat
    
       bool previousBarIsDoji = ((High[1]-Low[1])/pip) < 2;
+
+      bool BearEngulfing =  (Close[0]  <=  (Low[1]-pip))  && (High[0]>= High[1]); 
+      bool BullEngulfing  = (Close[0]  >=  (High[1]+pip)) && (Low[0] <= Low[1] );
+      
+      bool previousIsInsideBar = (High[1]<=High[2]) && (Low[1]>=Low[2]);
    
-      if (previousBarIsDoji) {
+      if (previousBarIsDoji || BearEngulfing || BullEngulfing || previousIsInsideBar) {
          if (Close[0]>(High[1]+pip)) {
       
-            double low = MathMin(Low[1],Low[0]);
+            // double low = MathMin(Low[1],Low[0]);
+            double low = Low[1];
       
             stopPips = (Close[0]-low) / pip + pip;
       
@@ -92,7 +98,8 @@ void start()
             stopPrice = Bid - stopPips * pip;   
          } else if (Close[0]<(Low[1]-pip)) {
       
-            double high = MathMax(High[1],High[0]);
+            // double high = MathMax(High[1],High[0]);
+            double high = High[1];
       
             stopPips = (high-Close[0]) / pip + pip;
          
