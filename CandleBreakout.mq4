@@ -149,7 +149,7 @@ void start()
             // double low = MathMin(Low[1],Low[0]);
             double low = Low[1];
       
-            stopPips = (Close[0]-low) / pip + pip;
+            stopPips = (Close[0]-low) / pip + 1;
       
             // if (stopPips < 5) stopPips = 5;   
       
@@ -160,7 +160,7 @@ void start()
             // double high = MathMax(High[1],High[0]);
             double high = High[1];
       
-            stopPips = (high-Close[0]) / pip + pip;
+            stopPips = (high-Close[0]) / pip + 1;
          
             // if (stopPips <5) stopPips = 5;     
          
@@ -170,7 +170,7 @@ void start()
       } else {
          
          if (isBullishHammer()) {
-            stopPips = (Close[0]-Low[1]) / pip + pip;
+            stopPips = (Close[0]-Low[1]) / pip + 1;
             if (stopPips<0) {
                stopPips = 0;
             } else {
@@ -178,7 +178,7 @@ void start()
                cmts = "Bullish hammer";
             }  
          } else if (isBearishHammer()) {
-            stopPips = (High[1]-Close[0]) / pip + pip;
+            stopPips = (High[1]-Close[0]) / pip + 1;
             if (stopPips<0) {
                stopPips = 0;
             } else {
