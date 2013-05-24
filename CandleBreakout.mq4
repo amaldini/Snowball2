@@ -74,6 +74,40 @@ int getPriceTouches(double price) {
    return (touches);
 }
 
+bool isBullishHammer() {
+   double HighCloseDelta = High[1]-Close[1]; // always >=0
+   double HighOpenDelta = High[1]-Open[1];   // always >=0
+   double HighLowDelta = High[1]-Low[1];     // always >=0
+   
+   bool cond1 = true;
+   if (HighCloseDelta>0) {
+      cond1 = ((HighLowDelta / HighCloseDelta) >=3);
+   } 
+   bool cond2 = true;
+   if (HighOpenDelta>0) {
+      cond2 = ((HighLowDelta / HighOpenDelta) >=3);
+   }
+   
+   return (cond1 && cond2);
+}
+
+bool isBearishHammer() {
+   double LowCloseDelta = Close[1]-Low[1];   // always >=0
+   double LowOpenDelta = Open[1]-Low[1];     // always >=0
+   double HighLowDelta = High[1]-Low[1];     // always >=0
+   
+   bool cond1 = true;
+   if (LowCloseDelta>0) {
+      cond1 = ((HighLowDelta / LowCloseDelta) >=3);
+   } 
+   bool cond2 = true;
+   if (LowOpenDelta>0) {
+      cond2 = ((HighLowDelta / LowOpenDelta) >=3);
+   }
+   
+   return (cond1 && cond2);
+}
+
 void start()
 {
    RefreshRates();
@@ -88,6 +122,8 @@ void start()
    double stopPrice=0;
    double stopPips=0;
    
+   string cmts = "";
+   
    if (ScanTrades()==0) { // we are flat
    
       bool previousBarIsDoji = ((High[1]-Low[1])/pip) < 2;
@@ -96,9 +132,19 @@ void start()
       bool BullEngulfing  = (Close[0]  >=  (High[1]+pip)) && (Low[0] <= Low[1] );
       
       bool previousIsInsideBar = (High[1]<=High[2]) && (Low[1]>=Low[2]);
+      
+      if (previousBarIsDoji) {
+         cmts = "Doji breakout";
+      } else if (previousIsInsideBar) {
+         cmts = "Inside bar breakout";
+      } else if (BearEngulfing) {
+         cmts = "Bearish engulfing";
+      } else if (BullEngulfing) {
+         cmts = "Bullish engulfing";
+      }
    
       if (previousBarIsDoji || BearEngulfing || BullEngulfing || previousIsInsideBar) {
-         if (Close[0]>(High[1]+pip)) {
+         if (Close[0]>(High[1]+pip)) { // BULLISH
       
             // double low = MathMin(Low[1],Low[0]);
             double low = Low[1];
@@ -108,7 +154,7 @@ void start()
             // if (stopPips < 5) stopPips = 5;   
       
             stopPrice = Bid - stopPips * pip;   
-         } else if (Close[0]<(Low[1]-pip)) {
+         } else if (Close[0]<(Low[1]-pip)) {  // BEARISH
       
             // double high = MathMax(High[1],High[0]);
             double high = High[1];
@@ -118,6 +164,25 @@ void start()
             // if (stopPips <5) stopPips = 5;     
          
             stopPrice = Ask + stopPips * pip;      
+         }
+      } else {
+         
+         if (isBullishHammer()) {
+            stopPips = (Close[0]-Low[1]) / pip + pip;
+            if (stopPips<0) {
+               stopPips = 0;
+            } else {
+               stopPrice = Bid - stopPips * pip;
+               cmts = "Bullish hammer";
+            }  
+         } else if (isBearishHammer()) {
+            stopPips = (High[1]-Close[0]) / pip + pip;
+            if (stopPips<0) {
+               stopPips = 0;
+            } else {
+               stopPrice = Ask + stopPips * pip;
+               cmts = "Bearish hammer";
+            }
          }
       } 
      
@@ -129,7 +194,7 @@ void start()
             touchesOk = true;
          }
          if (touchesOk) {
-            goWithStopPrice(stopPrice);
+            goWithStopPrice(stopPrice, cmts);
          }
       }
    }
@@ -160,21 +225,21 @@ int ScanTrades()
 }
 
 
-void goWithStopPrice(double marketOrderStop) {
+void goWithStopPrice(double marketOrderStop,string cmts) {
       double riskEuro = fixedRiskInEuro / (multiOrder+1);
       double step = MathAbs(marketOrderStop - (Bid+Ask)/2);
       if (marketOrderStop<Bid) { // buy
          for (int k=0;k<=multiOrder;k++) {
             double calculatedLotsB = calculateLotSize(Bid,marketOrderStop,riskEuro);
             double calculatedTPB = calcTP(Ask,marketOrderStop,dgts); 
-            buy(calculatedLotsB, marketOrderStop, calculatedTPB, 0, "");
+            buy(calculatedLotsB, marketOrderStop, calculatedTPB, 0, cmts);
             marketOrderStop-=step;
          }        
       } else if (marketOrderStop>Ask) { // sell
          for (int w=0;w<=multiOrder;w++) {
             double calculatedLotsS = calculateLotSize(Ask,marketOrderStop,riskEuro);
             double calculatedTPS = calcTP(Bid,marketOrderStop,dgts); 
-            sell(calculatedLotsS, marketOrderStop, calculatedTPS, 0, "");
+            sell(calculatedLotsS, marketOrderStop, calculatedTPS, 0, cmts);
             marketOrderStop+=step;
          }
       }    
