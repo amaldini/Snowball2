@@ -108,6 +108,9 @@ bool isBearishHammer() {
    return (cond1 && cond2);
 }
 
+int lastPriceTouches = 0;
+int lastStopTouches = 0;
+
 void start()
 {
    RefreshRates();
@@ -192,9 +195,12 @@ void start()
       
          cmts = StringConcatenate(cmts," ("+DoubleToStr(stopPips,2)+" pips stop)"); 
       
+         lastPriceTouches = getPriceTouches(Close[0]);
+         lastStopTouches = getPriceTouches(stopPrice);
+      
          bool touchesOk;
          if (avoidRanges) {
-            touchesOk = (getPriceTouches(Close[0])<3) || (getPriceTouches(stopPrice)<3);
+            touchesOk = !IsInCluster();
          } else {
             touchesOk = true;
          }
@@ -204,7 +210,21 @@ void start()
       }
    }
    
+   Comment("Profit: "+DoubleToStr(profit,2)+"\n"+
+           "Last price touches: "+lastPriceTouches+"\n"+
+           "Last stop touches: "+lastStopTouches+"\n"+
+           "IsInCluster:" + IsInCluster()); 
+   
+   
    WindowRedraw(); 
+}
+
+bool IsInCluster() {
+   bool res = !(
+         (lastPriceTouches<3) || 
+         (lastStopTouches<3)
+      );
+   return (res);
 }
 
 int ScanTrades()
@@ -223,8 +243,6 @@ int ScanTrades()
       if (OrderType()==OP_BUY) direction = 1;
       profit+=OrderProfit();
    }
-   
-   Comment("Profit: "+profit);
    
    return(numords);
 }
