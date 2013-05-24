@@ -154,6 +154,7 @@ void start()
             // if (stopPips < 5) stopPips = 5;   
       
             stopPrice = Bid - stopPips * pip;   
+            
          } else if (Close[0]<(Low[1]-pip)) {  // BEARISH
       
             // double high = MathMax(High[1],High[0]);
@@ -163,7 +164,8 @@ void start()
          
             // if (stopPips <5) stopPips = 5;     
          
-            stopPrice = Ask + stopPips * pip;      
+            stopPrice = Ask + stopPips * pip;    
+             
          }
       } else {
          
@@ -187,6 +189,9 @@ void start()
       } 
      
       if (stopPips>0 && stopPrice>0) {
+      
+         cmts = StringConcatenate(cmts," ("+DoubleToStr(stopPips,2)+" pips stop)"); 
+      
          bool touchesOk;
          if (avoidRanges) {
             touchesOk = (getPriceTouches(Close[0])<3) || (getPriceTouches(stopPrice)<3);
