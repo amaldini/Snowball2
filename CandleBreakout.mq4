@@ -64,6 +64,34 @@ double calcTP(double openPrice,double stopLossPrice,int dgts) {
    return (NormalizeDouble(openPrice+(openPrice-stopLossPrice)*rewardToRisk,dgts));
 }
 
+double getTippingPoint_SELL(double price) {
+   int potentialTippingPoint = 0;
+   double tippingPoint = 0;
+   for (int i=2;i<Bars;i++) {
+      if (High[i]>High[i-1]) potentialTippingPoint = i;
+      if (High[i]>High[i+1] && potentialTippingPoint>0) {
+         tippingPoint = High[potentialTippingPoint];
+         break;
+      } 
+   }
+   if (tippingPoint<price) tippingPoint = price;
+   return (tippingPoint);
+} 
+
+double getTippingPoint_BUY(double price) {
+   int potentialTippingPoint = 0;
+   double tippingPoint = 0;
+   for (int i=2;i<Bars;i++) {
+      if (Low[i]<Low[i-1]) potentialTippingPoint = i;
+      if (Low[i]<Low[i+1] && potentialTippingPoint>0) {
+         tippingPoint = Low[potentialTippingPoint];
+         break;
+      } 
+   }
+   if (tippingPoint>price) tippingPoint = price;
+   return (tippingPoint);
+} 
+
 int getPriceTouches(double price) {
    int touches = 0;
    for (int i=1;i<60;i++) {
