@@ -270,9 +270,41 @@ int ScanTrades()
       if (OrderType()==OP_SELL) direction = -1;
       if (OrderType()==OP_BUY) direction = 1;
       profit+=OrderProfit();
+      
+      EnforceTippingPointOnThisTrade();
+      
    }
    
    return(numords);
+}
+
+// ---- Trailing Stops
+void EnforceTippingPointOnThisTrade()
+{        
+   int mode=OrderType();    
+   if ( mode==OP_BUY )
+   {  
+      double BuyStop = getTippingPoint_BUY(Bid);
+
+      if (OrderStopLoss()<BuyStop || OrderStopLoss()==0) {
+         OrderModify(OrderTicket(),OrderOpenPrice(),
+                     NormalizeDouble(BuyStop, Digits),
+                     OrderTakeProfit(),0,LightGreen);
+      }
+
+   }
+   if ( mode==OP_SELL )
+   {
+      double SellStop = getTippingPoint_SELL(Ask);
+      
+      if (OrderStopLoss()>SellStop || OrderStopLoss()==0) {
+         OrderModify(OrderTicket(),OrderOpenPrice(),
+                  NormalizeDouble(SellStop, Digits),
+                  OrderTakeProfit(),0,Yellow);	 
+      }   
+
+   }
+     
 }
 
 
