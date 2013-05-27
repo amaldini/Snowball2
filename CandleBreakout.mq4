@@ -244,7 +244,9 @@ void start()
       }
    }
    
-   Comment("Profit: "+DoubleToStr(profit,2)+"\n"+
+   Comment("Symbol:"+Symbol()+"\n"+
+           "MarketInfo('EURUSD',MODE_ASK)"+MarketInfo("EURUSD",MODE_ASK)+"\n"+
+           "Profit: "+DoubleToStr(profit,2)+"\n"+
            "Last price touches: "+lastPriceTouches+"\n"+
            "Last stop touches: "+lastStopTouches+"\n"+
            "IsInCluster:" + IsInCluster()+"\n"+
