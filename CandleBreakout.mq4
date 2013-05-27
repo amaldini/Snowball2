@@ -138,6 +138,7 @@ bool isBearishHammer() {
 
 int lastPriceTouches = 0;
 int lastStopTouches = 0;
+string lastPASignal = "";
 
 void start()
 {
@@ -223,6 +224,8 @@ void start()
       
          cmts = StringConcatenate(cmts," ("+DoubleToStr(stopPips,2)+" pips stop)"); 
       
+         lastPASignal = cmts;
+      
          lastPriceTouches = getPriceTouches(Close[0]);
          lastStopTouches = getPriceTouches(stopPrice);
       
@@ -234,6 +237,8 @@ void start()
          }
          if (touchesOk) {
             goWithStopPrice(stopPrice, cmts);
+         } else {
+            lastPASignal = StringConcatenate(lastPASignal," (skipped)");
          }
       }
    }
@@ -241,7 +246,8 @@ void start()
    Comment("Profit: "+DoubleToStr(profit,2)+"\n"+
            "Last price touches: "+lastPriceTouches+"\n"+
            "Last stop touches: "+lastStopTouches+"\n"+
-           "IsInCluster:" + IsInCluster()); 
+           "IsInCluster:" + IsInCluster()+"\n"+
+           "Last PA signal:" + lastPASignal);
    
    
    WindowRedraw(); 
