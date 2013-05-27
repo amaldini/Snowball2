@@ -236,6 +236,7 @@ void start()
             touchesOk = true;
          }
          if (touchesOk) {
+            Comment("Going with stop price:"+DoubleToStr(stopPrice,Digits));
             goWithStopPrice(stopPrice, cmts);
          } else {
             lastPASignal = StringConcatenate(lastPASignal," (skipped)");
@@ -250,7 +251,8 @@ void start()
            "Last PA signal:" + lastPASignal+"\n"+
            "High[1]:"+DoubleToStr(High[1],Digits)+"\n"+
            "Low[1]:"+DoubleToStr(Low[1],Digits)+"\n"+
-           "Close[0]:"+DoubleToStr(Close[0],Digits));
+           "Close[0]:"+DoubleToStr(Close[0],Digits)+"\n"+
+           "pip:"+DoubleToStr(pip,Digits));
    
    
    WindowRedraw(); 
