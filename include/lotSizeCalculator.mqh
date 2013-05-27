@@ -23,11 +23,18 @@ double calculateLotSize(double oOpenPrice,double oStopLoss,double riskInEUR) {
    double PointValue;
    double pipValueInDollars;
 
-   double eu_ask = MarketInfo("EURUSD",MODE_ASK); 
-   double eu_bid = MarketInfo("EURUSD",MODE_BID);
+   string postFix = "";
+   int lun = StringLen(Symbol());
+   if ((StringSubstr(Symbol(),lun-4,4)) == ".arm") {
+      postFix = ".arm";
+   }
+   Print("PostFix:'"+postFix+"'");
+
+   double eu_ask = MarketInfo("EURUSD"+postFix,MODE_ASK); 
+   double eu_bid = MarketInfo("EURUSD"+postFix,MODE_BID);
    double EURUSD = (eu_ask + eu_bid) / 2;
 
-   double lotSize = MarketInfo(Symbol6(),MODE_LOTSIZE);
+   double lotSize = MarketInfo(Symbol(),MODE_LOTSIZE);
    double TradeSize;
 
    if (pointsPerPip==0) {
@@ -47,14 +54,14 @@ double calculateLotSize(double oOpenPrice,double oStopLoss,double riskInEUR) {
    double currentQuote = ((Bid+Ask)/2);
 
    // COPPIE xxxUSD
-   if (StringSubstr(Symbol6(),3,3)=="USD") {   
+   if (StringSubstr(Symbol(),3,3)=="USD") {   
       TradeSize = pipValueInDollars / (lotSize * pip);   
       // maldaLog("lotSize*pip*TradeSize="+lotSize+"*"+pip+"*"+TradeSize);         
       // COPPIE USDxxx
-   } else if (StringSubstr(Symbol6(),0,3)=="USD") {
+   } else if (StringSubstr(Symbol(),0,3)=="USD") {
       TradeSize = pipValueInDollars * currentQuote /  (lotSize * pip) ; 
    } else { // COPPIE xxxyyy
-      string baseCurr = StringSubstr(Symbol6(),0,3)+"USD";
+      string baseCurr = StringSubstr(Symbol(),0,3)+"USD"+postFix;
       double baseQuote= (MarketInfo(baseCurr,MODE_ASK)+MarketInfo(baseCurr,MODE_BID))/2; 
       // maldaLog("baseQuote:"+baseQuote);
       TradeSize = pipValueInDollars * currentQuote / (lotSize * pip * baseQuote );  

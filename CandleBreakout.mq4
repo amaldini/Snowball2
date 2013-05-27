@@ -19,7 +19,7 @@
 extern bool   delete_on_deinit      = true      ;
 
 extern string _________FIXED_RISK_EURO          ;
-extern double fixedRiskInEuro       = 3         ;
+extern double fixedRiskInEuro       = 1         ;
 extern double rewardToRisk        = 20          ;
 
 extern string ________TAKE_PROFIT               ;
@@ -245,7 +245,6 @@ void start()
    }
    
    Comment("Symbol:"+Symbol()+"\n"+
-           "MarketInfo('EURUSD',MODE_ASK)"+MarketInfo("EURUSD",MODE_ASK)+"\n"+
            "Profit: "+DoubleToStr(profit,2)+"\n"+
            "Last price touches: "+lastPriceTouches+"\n"+
            "Last stop touches: "+lastStopTouches+"\n"+
