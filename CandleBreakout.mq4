@@ -71,9 +71,9 @@ int getBarShift(datetime time) {
 	return (bs);
 }
 
-double getTippingPoint_SELL(double price,int barShift) {
+double getTippingPoint_SELL(double stopLossPrice,int barShift) {
    int potentialTippingPoint = 0;
-   double tippingPoint = 0;
+   double tippingPoint = stopLossPrice;
    for (int i=2;i<barShift;i++) {
       if (High[i]>High[i-1]) potentialTippingPoint = i;
       if (High[i]>High[i+1] && potentialTippingPoint>0) {
@@ -81,13 +81,13 @@ double getTippingPoint_SELL(double price,int barShift) {
          break;
       } 
    }
-   if (tippingPoint<price) tippingPoint = price;
+   if (tippingPoint>stopLossPrice) tippingPoint = stopLossPrice;
    return (tippingPoint);
 } 
 
-double getTippingPoint_BUY(double price,int barShift) {
+double getTippingPoint_BUY(double stopLossPrice,int barShift) {
    int potentialTippingPoint = 0;
-   double tippingPoint = 0;
+   double tippingPoint = stopLossPrice;
    for (int i=2;i<barShift;i++) {
       if (Low[i]<Low[i-1]) potentialTippingPoint = i;
       if (Low[i]<Low[i+1] && potentialTippingPoint>0) {
@@ -95,7 +95,7 @@ double getTippingPoint_BUY(double price,int barShift) {
          break;
       } 
    }
-   if (tippingPoint>price) tippingPoint = price;
+   if (tippingPoint<stopLossPrice) tippingPoint = stopLossPrice;
    return (tippingPoint);
 } 
 
@@ -306,7 +306,11 @@ void EnforceTippingPointOnThisTrade(datetime opentime)
    int mode=OrderType();    
    if ( mode==OP_BUY )
    {  
-      double BuyStop = getTippingPoint_BUY(Bid,barshift);
+   
+      double curStop_BUY = OrderStopLoss();
+      if (curStop_BUY<pip) curStop_BUY = Bid-10*pip; // default SL 10 pip 
+   
+      double BuyStop = getTippingPoint_BUY(curStop_BUY,barshift);
 
       if (OrderStopLoss()<BuyStop || OrderStopLoss()==0) {
          OrderModify(OrderTicket(),OrderOpenPrice(),
@@ -317,7 +321,11 @@ void EnforceTippingPointOnThisTrade(datetime opentime)
    }
    if ( mode==OP_SELL )
    {
-      double SellStop = getTippingPoint_SELL(Ask,barshift);
+   
+      double curStop_SELL = OrderStopLoss();
+      if (curStop_SELL<pip) curStop_SELL = Ask+10*pip; // default SL 10 pip 
+   
+      double SellStop = getTippingPoint_SELL(curStop_SELL,barshift);
       
       if (OrderStopLoss()>SellStop || OrderStopLoss()==0) {
          OrderModify(OrderTicket(),OrderOpenPrice(),
