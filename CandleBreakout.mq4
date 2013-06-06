@@ -66,13 +66,15 @@ double calcTP(double openPrice,double stopLossPrice,int dgts) {
 
 int getBarShift(datetime time) {
 	// int iBarShift(	string symbol, int timeframe, datetime time, bool exact=false)
-	return iBarShift(NULL,0,time,false);
+	int bs = iBarShift(NULL,0,time,false);
+	Print("BarShift:"+bs);
+	return (bs);
 }
 
 double getTippingPoint_SELL(double price,int barShift) {
    int potentialTippingPoint = 0;
    double tippingPoint = 0;
-   for (int i=2;i<barshift;i++) {
+   for (int i=2;i<barShift;i++) {
       if (High[i]>High[i-1]) potentialTippingPoint = i;
       if (High[i]>High[i+1] && potentialTippingPoint>0) {
          tippingPoint = High[potentialTippingPoint];
@@ -83,10 +85,10 @@ double getTippingPoint_SELL(double price,int barShift) {
    return (tippingPoint);
 } 
 
-double getTippingPoint_BUY(double price,int barshift) {
+double getTippingPoint_BUY(double price,int barShift) {
    int potentialTippingPoint = 0;
    double tippingPoint = 0;
-   for (int i=2;i<barshift;i++) {
+   for (int i=2;i<barShift;i++) {
       if (Low[i]<Low[i-1]) potentialTippingPoint = i;
       if (Low[i]<Low[i+1] && potentialTippingPoint>0) {
          tippingPoint = Low[potentialTippingPoint];
