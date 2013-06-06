@@ -155,8 +155,10 @@ void start()
    double stopPips=0;
    
    string cmts = "";
+   int numTrades = ScanTrades();
+   bool onlyTippingPoint = true;
    
-   if (ScanTrades()==0) { // we are flat
+   if ((!onlyTippingPoint) && numTrades==0) { // we are flat
    
       bool previousBarIsDoji = ((High[1]-Low[1])/pip) < 2;
 
