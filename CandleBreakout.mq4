@@ -64,10 +64,15 @@ double calcTP(double openPrice,double stopLossPrice,int dgts) {
    return (NormalizeDouble(openPrice+(openPrice-stopLossPrice)*rewardToRisk,dgts));
 }
 
-double getTippingPoint_SELL(double price) {
+int getBarShift(datetime time) {
+	// int iBarShift(	string symbol, int timeframe, datetime time, bool exact=false)
+	return iBarShift(NULL,0,time,false);
+}
+
+double getTippingPoint_SELL(double price,int barShift) {
    int potentialTippingPoint = 0;
    double tippingPoint = 0;
-   for (int i=2;i<Bars;i++) {
+   for (int i=2;i<barshift;i++) {
       if (High[i]>High[i-1]) potentialTippingPoint = i;
       if (High[i]>High[i+1] && potentialTippingPoint>0) {
          tippingPoint = High[potentialTippingPoint];
@@ -78,10 +83,10 @@ double getTippingPoint_SELL(double price) {
    return (tippingPoint);
 } 
 
-double getTippingPoint_BUY(double price) {
+double getTippingPoint_BUY(double price,int barshift) {
    int potentialTippingPoint = 0;
    double tippingPoint = 0;
-   for (int i=2;i<Bars;i++) {
+   for (int i=2;i<barshift;i++) {
       if (Low[i]<Low[i-1]) potentialTippingPoint = i;
       if (Low[i]<Low[i+1] && potentialTippingPoint>0) {
          tippingPoint = Low[potentialTippingPoint];
@@ -285,7 +290,7 @@ int ScanTrades()
       if (OrderType()==OP_BUY) direction = 1;
       profit+=OrderProfit();
       
-      EnforceTippingPointOnThisTrade();
+      EnforceTippingPointOnThisTrade(OrderOpenTime());
       
    }
    
@@ -293,12 +298,13 @@ int ScanTrades()
 }
 
 // ---- Trailing Stops
-void EnforceTippingPointOnThisTrade()
-{        
+void EnforceTippingPointOnThisTrade(datetime opentime)
+{  
+   int barshift = getBarShift(opentime);
    int mode=OrderType();    
    if ( mode==OP_BUY )
    {  
-      double BuyStop = getTippingPoint_BUY(Bid);
+      double BuyStop = getTippingPoint_BUY(Bid,barshift);
 
       if (OrderStopLoss()<BuyStop || OrderStopLoss()==0) {
          OrderModify(OrderTicket(),OrderOpenPrice(),
@@ -309,7 +315,7 @@ void EnforceTippingPointOnThisTrade()
    }
    if ( mode==OP_SELL )
    {
-      double SellStop = getTippingPoint_SELL(Ask);
+      double SellStop = getTippingPoint_SELL(Ask,barshift);
       
       if (OrderStopLoss()>SellStop || OrderStopLoss()==0) {
          OrderModify(OrderTicket(),OrderOpenPrice(),
